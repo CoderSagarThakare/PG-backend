@@ -20,7 +20,8 @@ router.post(
 
 router.post(
   "/login",
-  [captcha.verify, validate(authValidation.login)],
+  // [captcha.verify, validate(authValidation.login)],
+  [validate(authValidation.login)],
   authController.login
 );
 

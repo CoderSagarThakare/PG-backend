@@ -10,6 +10,11 @@ const userSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
+    role : {
+      type: String,
+      required: true,
+      enum: ['owner', 'tenant', 'guest', 'admin'],
+    },
     email: {
       type: String,
       required: true,
