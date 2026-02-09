@@ -52,14 +52,27 @@ const pgSchema = mongoose.Schema(
         }
       },
     },
+    totalBeds: {
+      type: Number,
+      required: true,
+      validate(value) {
+        if (value < 1) {
+          throw new Error("Total beds must be at least 1");
+        }
+      },
+    },
     description: {
       type: String,
       trim: true,
-      default: "",
+      default: "A comfortable and secure PG stay with all essential amenities, ideal for students and working professionals. Enjoy a clean, peaceful, and convenient living experience.",
     },
     isActive: {
       type: Boolean,
       default: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   {

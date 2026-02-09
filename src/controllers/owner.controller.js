@@ -35,25 +35,25 @@ const getPGs = catchAsync(async (req, res) => {
     sortBy: req.query.sortBy,
   };
 
-  const result = await ownerService.getPGsByOwner(req.user.id, options);
+  const isAdmin = req.user.role === "admin" || req.user.isAdmin === true;
+  const result = await ownerService.getPGsByOwner(req.user.id, options, isAdmin);
 
   res.status(httpStatus.OK).json(result);
 });
 
 const getPG = catchAsync(async (req, res) => {
-  const pg = await ownerService.getPGById(req.params.pgId, req.user.id);
+  const isAdmin = req.user.role === "admin" || req.user.isAdmin === true;
+  const pg = await ownerService.getPGById(req.params.pgId, req.user.id, isAdmin);
 
   res.status(httpStatus.OK).json({ pg });
 });
 
 const updatePG = catchAsync(async (req, res) => {
-  const pg = await ownerService.updatePG(
-    req.params.pgId,
-    req.user.id,
-    req.body,
-  );
+  await ownerService.updatePG(req.params.pgId, req.user.id, req.body);
 
-  res.status(httpStatus.OK).json({ pg });
+  res
+    .status(httpStatus.OK)
+    .json({ success: true, message: "PG updated successfully" });
 });
 
 const deletePG = catchAsync(async (req, res) => {

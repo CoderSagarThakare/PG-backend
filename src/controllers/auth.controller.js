@@ -23,10 +23,12 @@ const login = catchAsync(async (req, res) => {
 
   const user = await authService.loginUserWithEmailAndPassword(email, password);
 
-  // await tokenService.generateAuthTokens(user);
+  const token = await tokenService.generateAuthTokens(user);
+
   res.send({
     success: true,
     message: "Login successful",
+    token: token.token,
   });
 });
 
