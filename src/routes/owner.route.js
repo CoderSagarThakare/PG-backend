@@ -8,6 +8,7 @@ const router = require("express").Router();
 // All owner routes require authentication
 router.use(auth());
 
+// register new PG
 router.post(
   "/pg",
   validate(ownerValidation.createPG),

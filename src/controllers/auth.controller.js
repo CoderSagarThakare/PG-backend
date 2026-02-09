@@ -11,9 +11,11 @@ const httpStatus = require("http-status");
 const register = catchAsync(async (req, res) => {
   let user = await authService.registerUser({ ...req.body });
 
-  const { token, expires } = await tokenService.generateAuthTokens(user);
+  // await tokenService.generateAuthTokens(user);
 
-  res.status(httpStatus.CREATED).json({ user, token, expires });
+  res
+    .status(httpStatus.CREATED)
+    .json({ success: true, message: "User registered successfully" });
 });
 
 const login = catchAsync(async (req, res) => {
@@ -21,11 +23,10 @@ const login = catchAsync(async (req, res) => {
 
   const user = await authService.loginUserWithEmailAndPassword(email, password);
 
-  const { token, expires } = await tokenService.generateAuthTokens(user);
+  // await tokenService.generateAuthTokens(user);
   res.send({
-    user,
-    token,
-    expires,
+    success: true,
+    message: "Login successful",
   });
 });
 
@@ -43,7 +44,7 @@ const socialLogin = catchAsync(async (req, res) => {
     default:
       throw new ApiError(
         httpStatus.UNPROCESSABLE_ENTITY,
-        `Provider ${req.body.provider} is not supported`
+        `Provider ${req.body.provider} is not supported`,
       );
   }
   const { token, expires } = await tokenService.generateAuthTokens(user);
@@ -56,7 +57,7 @@ const socialLogin = catchAsync(async (req, res) => {
 
 const forgotPassword = catchAsync(async (req, res) => {
   const resetPasswordToken = await tokenService.generateResetPassword(
-    req.body.email
+    req.body.email,
   );
   await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
   res.status(200).json({ message: "Email sent successfully" });
@@ -69,7 +70,7 @@ const resetPassword = catchAsync(async (req, res) => {
 
 const sendVerificationEmail = catchAsync(async (req, res) => {
   const verifyEmailToken = await tokenService.generateVerifyEmailToken(
-    req.user
+    req.user,
   );
   await emailService.sendVerificationEmail(req.user.email, verifyEmailToken);
   res.status(httpStatus.OK).json({ message: "verify email sent successfully" });

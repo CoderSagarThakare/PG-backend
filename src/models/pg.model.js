@@ -1,38 +1,47 @@
 const mongoose = require("mongoose");
-const validator = require("validator");
 const { private } = require("./plugins");
 
 const pgSchema = mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
     ownerId: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "User",
       required: true,
     },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     address: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    city: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    state: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    zipCode: {
-      type: String,
-      required: true,
-      trim: true,
+      pincode: {
+        type: Number,
+        required: true,
+      },
+      locationDescription: {
+        type: String,
+        trim: true,
+      },
+      landmark: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      city: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      state: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      country: {
+        type: String,
+        required: true,
+        trim: true,
+      },
     },
     totalRooms: {
       type: Number,
@@ -55,7 +64,7 @@ const pgSchema = mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 /**
@@ -64,6 +73,5 @@ const pgSchema = mongoose.Schema(
 const PG = mongoose.model("PG", pgSchema);
 
 pgSchema.plugin(private);
-
 
 module.exports = PG;

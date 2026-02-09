@@ -18,12 +18,14 @@ const createPG = catchAsync(async (req, res) => {
   if (existingPG) {
     throw new ApiError(
       httpStatus.CONFLICT,
-      "You already have a PG with this name"
+      "You already have a PG with this name",
     );
   }
-  const pg = await ownerService.createPG(pgData);
+  await ownerService.createPG(pgData);
 
-  res.status(httpStatus.CREATED).json({ pg });
+  res
+    .status(httpStatus.CREATED)
+    .json({ success: true, message: "PG created successfully" });
 });
 
 const getPGs = catchAsync(async (req, res) => {
@@ -48,7 +50,7 @@ const updatePG = catchAsync(async (req, res) => {
   const pg = await ownerService.updatePG(
     req.params.pgId,
     req.user.id,
-    req.body
+    req.body,
   );
 
   res.status(httpStatus.OK).json({ pg });

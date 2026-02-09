@@ -3,10 +3,14 @@ const Joi = require("joi");
 const createPG = {
   body: Joi.object().keys({
     name: Joi.string().required(),
-    address: Joi.string().required(),
-    city: Joi.string().required(),
-    state: Joi.string().required(),
-    zipCode: Joi.string().required(),
+    address: Joi.object().keys({
+      pincode: Joi.number().required(),
+      locationDescription: Joi.string().optional(),
+      landmark: Joi.string().required(),
+      city: Joi.string().required(),
+      state: Joi.string().required(),
+      country: Joi.string().required(),
+    }).required(),
     totalRooms: Joi.number().integer().required(),
     totalBeds: Joi.number().integer().required(),
     description: Joi.string(),
@@ -19,10 +23,14 @@ const updatePG = {
   }),
   body: Joi.object().keys({
     name: Joi.string(),
-    address: Joi.string(),
-    city: Joi.string(),
-    state: Joi.string(),
-    zipCode: Joi.string(),
+    address: Joi.object().keys({
+      pincode: Joi.number(),
+      locationDescription: Joi.string().optional(),
+      landmark: Joi.string(),
+      city: Joi.string(),
+      state: Joi.string(),
+      country: Joi.string(),
+    }),
     totalRooms: Joi.number().integer(),
     description: Joi.string(),
   }),
