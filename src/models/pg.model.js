@@ -52,19 +52,68 @@ const pgSchema = mongoose.Schema(
         }
       },
     },
-    totalBeds: {
-      type: Number,
-      required: true,
-      validate(value) {
-        if (value < 1) {
-          throw new Error("Total beds must be at least 1");
-        }
-      },
-    },
     description: {
       type: String,
       trim: true,
       default: "A comfortable and secure PG stay with all essential amenities, ideal for students and working professionals. Enjoy a clean, peaceful, and convenient living experience.",
+    },
+    rating: {
+      type: Number,
+      min: 0,
+      max: 5,
+      default: 0,
+    },
+    manager: {
+      name: {
+        type: String,
+        trim: true,
+      },
+      mobNo1: {
+        type: String,
+        trim: true,
+      },
+      mobNo2: {
+        type: String,
+        trim: true,
+      },
+    },
+    beds: {
+      totalBeds: {
+        type: Number,
+      },
+      occupiedBeds: {
+        type: Number,
+        default: 0,
+      },
+      emptyBeds: {
+        type: Number,
+        default: 0,
+      },
+    },
+    landline: {
+      type: String,
+      trim: true,
+    },
+    pgStartedDate: {
+      type: Date,
+    },
+    images: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+    locationLink: {
+      type: String,
+      trim: true,
+    },
+    checkInTime: {
+      type: String,
+      trim: true,
+    },
+    checkOutTime: {
+      type: String,
+      trim: true,
     },
     isActive: {
       type: Boolean,

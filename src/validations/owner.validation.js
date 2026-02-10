@@ -14,8 +14,23 @@ const createPG = {
       })
       .required(),
     totalRooms: Joi.number().integer().required(),
-    totalBeds: Joi.number().integer().required(),
     description: Joi.string(),
+    manager: Joi.object().keys({
+      name: Joi.string().required(),
+      mobNo1: Joi.string().required(),
+      mobNo2: Joi.string(),
+    }),
+    beds: Joi.object().keys({
+      totalBeds: Joi.number().integer(),
+      occupiedBeds: Joi.number().integer().min(0),
+      emptyBeds: Joi.number().integer().min(0),
+    }),
+    landline: Joi.string(),
+    pgStartedDate: Joi.date(),
+    images: Joi.array().items(Joi.string()),
+    locationLink: Joi.string().uri(),
+    checkInTime: Joi.string(),
+    checkOutTime: Joi.string(),
   }),
 };
 
@@ -36,6 +51,23 @@ const updatePG = {
       }),
       totalRooms: Joi.number().integer(),
       description: Joi.string(),
+      rating: Joi.number().min(0).max(5),
+      manager: Joi.object().keys({
+        name: Joi.string(),
+        mobNo1: Joi.string(),
+        mobNo2: Joi.string(),
+      }),
+      beds: Joi.object().keys({
+        totalBeds: Joi.number().integer(),
+        occupiedBeds: Joi.number().integer().min(0),
+        emptyBeds: Joi.number().integer().min(0),
+      }),
+      landline: Joi.string(),
+      pgStartedDate: Joi.date(),
+      images: Joi.array().items(Joi.string()),
+      locationLink: Joi.string().uri(),
+      checkInTime: Joi.string(),
+      checkOutTime: Joi.string(),
       isActive: Joi.boolean(),
       isDeleted: Joi.boolean(),
     })
