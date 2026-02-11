@@ -1,7 +1,7 @@
-const { pgController } = require("../controllers");
+const { pgController, facilitiesController } = require("../controllers");
 const auth = require("../middlewares/auth");
 const validate = require("../middlewares/validate");
-const { ownerValidation } = require("../validations");
+const { pgValidation } = require("../validations");
 
 const router = require("express").Router();
 
@@ -9,30 +9,24 @@ const router = require("express").Router();
 router.use(auth());
 
 // register new PG
-router.post(
-  "/pg",
-  validate(ownerValidation.createPG),
-  pgController.createPG
-);
+router.post("/pg", validate(pgValidation.createPG), pgController.createPG);
 
-router.get("/pgs", validate(ownerValidation.listPGs), pgController.getPGs);
+router.get("/pgs", validate(pgValidation.listPGs), pgController.getPGs);
 
-router.get(
-  "/pg/:pgId",
-  validate(ownerValidation.getPG),
-  pgController.getPG
-);
+router.get("/pg/:pgId", validate(pgValidation.getPG), pgController.getPG);
 
 router.patch(
   "/pg/:pgId",
-  validate(ownerValidation.updatePG),
-  pgController.updatePG
+  validate(pgValidation.updatePG),
+  pgController.updatePG,
 );
 
 router.delete(
   "/pg/:pgId",
-  validate(ownerValidation.deletePG),
-  pgController.deletePG
+  validate(pgValidation.deletePG),
+  pgController.deletePG,
 );
+
+router.get("/facilities", facilitiesController.getAllFacilities);
 
 module.exports = router;

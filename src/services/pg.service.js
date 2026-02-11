@@ -2,6 +2,22 @@ const { PG } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 
+const checkExistingPG = async (ownerId, name) => {
+  const existingPG = await PG.findOne({
+    ownerId: ownerId,
+    name: name,
+  });
+
+  if (existingPG) {
+    throw new ApiError(
+      httpStatus.CONFLICT,
+      "You already have a PG with this name",
+    );
+  }
+
+  return;
+};
+
 /**
  * Create PG
  * @param {Object} pgBody - PG information Object
@@ -12,7 +28,7 @@ const createPG = async (pgBody) => {
     const pg = await PG.create({ ...pgBody, isDeleted: false });
     return pg;
   } catch (error) {
-    throw error;
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to create PG");
   }
 };
 
@@ -39,7 +55,10 @@ const getPGsByOwner = async (ownerId, options = {}, isAdmin = false) => {
 
     return { pgs, total, limit, page };
   } catch (error) {
-    throw error;
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to retrieve PGs",
+    );
   }
 };
 
@@ -62,7 +81,10 @@ const getPGById = async (pgId, ownerId, isAdmin = false) => {
     }
     return pg;
   } catch (error) {
-    throw error;
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to retrieve PG",
+    );
   }
 };
 
@@ -81,9 +103,9 @@ const updatePG = async (pgId, ownerId, updateBody) => {
     }
     Object.assign(pg, updateBody);
     await pg.save();
-    return ;
+    return;
   } catch (error) {
-    throw error;
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to update PG");
   }
 };
 
@@ -101,7 +123,7 @@ const deletePG = async (pgId, ownerId) => {
     }
     await PG.updateOne({ _id: pgId }, { isDeleted: true });
   } catch (error) {
-    throw error;
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to delete PG");
   }
 };
 
@@ -121,7 +143,10 @@ const getAllPGs = async (options = {}) => {
 
     return { pgs, total, limit, page };
   } catch (error) {
-    throw error;
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to retrieve PGs",
+    );
   }
 };
 
@@ -138,11 +163,15 @@ const restorePG = async (pgId) => {
     }
     await PG.updateOne({ _id: pgId }, { isDeleted: false });
   } catch (error) {
-    throw error;
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to restore PG",
+    );
   }
 };
 
 module.exports = {
+  checkExistingPG,
   createPG,
   getPGsByOwner,
   getPGById,

@@ -55,7 +55,8 @@ const pgSchema = mongoose.Schema(
     description: {
       type: String,
       trim: true,
-      default: "A comfortable and secure PG stay with all essential amenities, ideal for students and working professionals. Enjoy a clean, peaceful, and convenient living experience.",
+      default:
+        "A comfortable and secure PG stay with all essential amenities, ideal for students and working professionals. Enjoy a clean, peaceful, and convenient living experience.",
     },
     rating: {
       type: Number,
@@ -119,6 +120,12 @@ const pgSchema = mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    facilities: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Facilities",
+      },
+    ],
     isDeleted: {
       type: Boolean,
       default: false,
@@ -132,7 +139,7 @@ const pgSchema = mongoose.Schema(
 /**
  * @typedef PG
  */
-const PG = mongoose.model("PG", pgSchema);
+const PG = mongoose.model("Pg", pgSchema);
 
 pgSchema.plugin(private);
 

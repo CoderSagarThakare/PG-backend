@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const objectIdPattern = /^[0-9a-fA-F]{24}$/;
 
 const createPG = {
   body: Joi.object().keys({
@@ -70,6 +71,20 @@ const updatePG = {
       checkOutTime: Joi.string(),
       isActive: Joi.boolean(),
       isDeleted: Joi.boolean(),
+      facilities: Joi.array()
+        .items(
+          Joi.string()
+            .pattern(objectIdPattern)
+            .messages({ "string.pattern.base": "Invalid facility ID format" }),
+        )
+        .unique()
+        .min(1)
+        .optional()
+        .messages({
+          "array.base": "Facilities must be an array",
+          "array.min":
+            "Please select at least one facility if providing facilities",
+        }),
     })
     .min(1),
 };
