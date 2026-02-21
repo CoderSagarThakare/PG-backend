@@ -23,7 +23,7 @@ const sendResetPasswordEmail = async (to, token) => {
 
 const sendEmail = async (to, subject, text) => {
   const msg = {
-    from: `Admin@Marathi-Coders <${config.gmail.auth.user}>`,
+    from: `Admin@PG_Stay <${config.gmail.auth.user}>`,
     to,
     subject,
     html: text,
