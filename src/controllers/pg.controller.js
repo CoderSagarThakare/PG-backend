@@ -2,7 +2,6 @@ const catchAsync = require("../utils/catchAsync");
 const { PgService } = require("../services");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
-const { PG } = require("../models");
 
 const createPG = catchAsync(async (req, res) => {
   const pgData = {
