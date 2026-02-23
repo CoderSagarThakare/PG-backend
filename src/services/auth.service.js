@@ -1,5 +1,6 @@
 const httpStatus = require("http-status");
 const userService = require("./user.service");
+const ownerService = require("./owner.service");
 const tokenService = require("./token.service");
 const ApiError = require("../utils/ApiError");
 const { OAuth2Client } = require("google-auth-library");
@@ -15,9 +16,18 @@ const { tokenTypes } = require("../config/token");
 const loginUserWithEmailAndPassword = async (email, password) => {
   const user = await userService.getUserByEmail(email);
   if (!user || user.deleted || !(await user.isPasswordMatch(password))) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
+    // throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
+    return await loginOwnerWithEmailAndPassword(email, password);
   }
   return await user;
+};
+
+const loginOwnerWithEmailAndPassword = async (email, password) => {
+  const owner = await ownerService.getOwnerByEmail(email);
+  if (!owner || owner.deleted || !(await owner.isPasswordMatch(password))) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
+  }
+  return await owner;
 };
 
 const loginWithGoogle = async (idToken) => {
@@ -57,10 +67,19 @@ const registerUser = async (userBody) => {
   }
 };
 
+const registerOwner = async (ownerBody) => {
+  try {
+    const owner = await ownerService.createOwner({ ...ownerBody });
+    return owner;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const resetPassword = async (resetPasswordToken, newPassword) => {
   const payload = await tokenService.verifyToken(
     resetPasswordToken,
-    tokenTypes.RESET_PASSWORD
+    tokenTypes.RESET_PASSWORD,
   );
 
   if (payload.type !== tokenTypes.RESET_PASSWORD) {
@@ -82,7 +101,7 @@ const verifyEmail = async (verifyEmailToken) => {
   try {
     const payload = await tokenService.verifyToken(
       verifyEmailToken,
-      tokenTypes.VERIFY_EMAIL
+      tokenTypes.VERIFY_EMAIL,
     );
 
     const user = await userService.getUserById(payload.sub);
@@ -100,8 +119,10 @@ const verifyEmail = async (verifyEmailToken) => {
 };
 module.exports = {
   loginUserWithEmailAndPassword,
+  loginOwnerWithEmailAndPassword,
   loginWithGoogle,
   registerUser,
+  registerOwner,
   resetPassword,
   verifyEmail,
 };

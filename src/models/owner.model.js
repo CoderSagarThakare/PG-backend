@@ -3,17 +3,17 @@ const validator = require("validator");
 const bcrypt = require("bcrypt");
 const { private } = require("./plugins");
 
-const userSchema = mongoose.Schema(
+const ownerSchema = mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
       trim: true,
     },
-    role: {
+    role : {
       type: String,
       required: true,
-      enum: ["owner", "user", "admin"],
+      enum: ["owner"],
     },
     email: {
       type: String,
@@ -36,7 +36,7 @@ const userSchema = mongoose.Schema(
       validate(value) {
         if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
           throw new Error(
-            "Password must contain at least one letter and one number",
+            "Password must contain at least one letter and one number"
           );
         }
       },
@@ -62,10 +62,10 @@ const userSchema = mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-userSchema.plugin(private);
+ownerSchema.plugin(private);
 
 /**
  *
@@ -73,7 +73,7 @@ userSchema.plugin(private);
  * @param {ObjectId} excludeUserId  - exclude given user ObjectId
  * @returns {<true/false>}
  */
-userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
+ownerSchema.statics.isEmailTaken = async function (email, excludeUserId) {
   // this : represent Model { User }
   const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
 
@@ -85,28 +85,28 @@ userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
  * @param {string} password
  * @returns {Promise<boolean>}
  */
-userSchema.methods.isPasswordMatch = async function (password) {
-  const user = this;
+ownerSchema.methods.isPasswordMatch = async function (password) {
+  const owner = this;
 
-  return bcrypt.compare(password, user.password);
+  return bcrypt.compare(password, owner.password);
 };
 
-userSchema.pre("save", async function (next) {
-  const user = this;
-  if (user.isModified("password")) {
-    user.password = await bcrypt.hash(user.password, 8);
+ownerSchema.pre("save", async function (next) {
+  const owner = this;
+  if (owner.isModified("password")) {
+    owner.password = await bcrypt.hash(owner.password, 8);
   }
   next();
 });
 
 /**
- * @typedef User
+ * @typedef Owner
  */
-const User = mongoose.model("User", userSchema);
+const Owner = mongoose.model("Owner", ownerSchema);
 
-module.exports = User;
+module.exports = Owner;
 
 /**
- * When fetching a user from the database, this plugin ensures that the password field is excluded from the output.
+ * When fetching an owner from the database, this plugin ensures that the password field is excluded from the output.
  * It helps maintain data privacy and security by not exposing sensitive information.
  */

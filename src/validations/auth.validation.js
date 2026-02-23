@@ -8,9 +8,9 @@ const register = {
     name: Joi.string().required(),
     role: Joi.string()
       .required()
-      .valid('owner', 'tenant', 'guest', 'admin')
+      .valid('owner', 'user', 'admin')
       .messages({
-        'any.only': 'Role must be one of [owner, tenant, guest, admin]'
+        'any.only': 'Role must be one of [owner, user, admin]'
       })
   }),
 };

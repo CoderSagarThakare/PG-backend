@@ -4,24 +4,46 @@ const {
   authService,
   emailService,
   otpService,
+  ownerService,
   userService,
 } = require("../services");
 const httpStatus = require("http-status");
+const ApiError = require("../utils/ApiError");
 
 const register = catchAsync(async (req, res) => {
-  let user = await authService.registerUser({ ...req.body });
+  if (req.body.role.toLowerCase() === "owner") {
+    await authService.registerOwner({ ...req.body });
+
+    res
+      .status(httpStatus.CREATED)
+      .json({ success: true, message: "Owner registered successfully" });
+  } else {
+    const owner = await ownerService.getOwnerByEmail(req.body.email);
+    if (owner) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Owner already exists with this email",
+      );
+    }
+
+    await authService.registerUser({ ...req.body });
+
+    res
+      .status(httpStatus.CREATED)
+      .json({ success: true, message: "User registered successfully" });
+  }
 
   // await tokenService.generateAuthTokens(user);
 
-  res
-    .status(httpStatus.CREATED)
-    .json({ success: true, message: "User registered successfully" });
+  // res
+  //   .status(httpStatus.CREATED)
+  //   .json({ success: true, message: "User registered successfully" });
 });
 
 const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await authService.loginUserWithEmailAndPassword(email, password);
+  let user = await authService.loginUserWithEmailAndPassword(email, password);
 
   const token = await tokenService.generateAuthTokens(user);
 
@@ -86,10 +108,17 @@ const verifyEmail = catchAsync(async (req, res) => {
 const sendVerificationOTP = catchAsync(async (req, res) => {
   const otp = await otpService.sendVerificationOTP(req.user.email);
 
-  await userService.updateUserById(req.user.id, {
-    otp: otp,
-    otpGeneratedTime: new Date(),
-  });
+  if (req.user.role.toLowerCase() === "owner") {
+    await ownerService.updateOwnerById(req.user.id, {
+      otp: otp,
+      otpGeneratedTime: new Date(),
+    });
+  } else {
+    await userService.updateUserById(req.user.id, {
+      otp: otp,
+      otpGeneratedTime: new Date(),
+    });
+  }
 
   res
     .status(httpStatus.OK)
