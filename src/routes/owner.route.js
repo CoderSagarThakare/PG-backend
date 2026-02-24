@@ -1,34 +1,39 @@
+const { ROLE_TYPES } = require("../const/constant");
 const { pgController, facilitiesController,postController } = require("../controllers");
 const auth = require("../middlewares/auth");
 const validate = require("../middlewares/validate");
 const { pgValidation, postValidation } = require("../validations");
+const pgRoute = require("./pg.route");
 
 const router = require("express").Router();
 
 // All owner routes require authentication
-router.use(auth());
+router.use(auth(ROLE_TYPES.owner));
 
 // --------------------------- PG RELETED ROUTES
+router.use("/pg", pgRoute);
+
 // register new PG
-router.post("/pg", validate(pgValidation.createPG), pgController.createPG);
+// router.post("/pg", validate(pgValidation.createPG), pgController.createPG);
 
-router.get("/pgs", validate(pgValidation.listPGs), pgController.getPGs);
+// router.get("/pgs", validate(pgValidation.listPGs), pgController.getPGs);
 
-router.get("/pg/:pgId", validate(pgValidation.getPG), pgController.getPG);
+// router.get("/pg/:pgId", validate(pgValidation.getPG), pgController.getPG);
 
-router.patch(
-  "/pg/:pgId",
-  validate(pgValidation.updatePG),
-  pgController.updatePG,
-);
+// router.patch(
+//   "/pg/:pgId",
+//   validate(pgValidation.updatePG),
+//   pgController.updatePG,
+// );
 
-router.delete(
-  "/pg/:pgId",
-  validate(pgValidation.deletePG),
-  pgController.deletePG,
-);
+// router.delete(
+//   "/pg/:pgId",
+//   validate(pgValidation.deletePG),
+//   pgController.deletePG,
+// );
 
-router.get("/facilities", facilitiesController.getAllFacilities);
+// router.get("/facilities", facilitiesController.getAllFacilities);
+
 
 // --------------------------- POST RELETED ROUTES
 

@@ -48,7 +48,9 @@ const updatePG = catchAsync(async (req, res) => {
 const deletePG = catchAsync(async (req, res) => {
   await PgService.deletePG(req.params.pgId, req.user.id);
 
-  res.status(httpStatus.OK).json({ message: "PG deleted successfully" });
+  res
+    .status(httpStatus.OK)
+    .json({ success: true, message: "PG deleted successfully" });
 });
 
 module.exports = {

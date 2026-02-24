@@ -1,4 +1,5 @@
 const logger = require("../config/logger");
+const { ROLE_TYPES } = require("../const/constant");
 const { authController } = require("../controllers");
 const auth = require("../middlewares/auth");
 const captcha = require("../middlewares/captcha");
@@ -15,56 +16,59 @@ router.post(
   "/register",
   // [captcha.verify, validate(authValidation.register)],
   [validate(authValidation.register)],
-  authController.register
+  authController.register,
 );
 
 router.post(
   "/login",
   // [captcha.verify, validate(authValidation.login)],
   [validate(authValidation.login)],
-  authController.login
+  authController.login,
 );
 
 router.post(
   "/login/:provider",
   [captcha.verify, validate(authValidation.socialLogin)],
-  authController.socialLogin
+  authController.socialLogin,
 );
 
 router.post(
   "/forgot-password",
   [captcha.verify, validate(authValidation.forgotPassword)],
-  authController.forgotPassword
+  authController.forgotPassword,
 );
 
 router.post(
   "/reset-password",
   validate(authValidation.resetPassword),
-  authController.resetPassword
+  authController.resetPassword,
 );
 
 router.post(
   "/send-verification-email",
-  [auth()],
-  authController.sendVerificationEmail
+  [auth(ROLE_TYPES.user, ROLE_TYPES.owner, ROLE_TYPES.admin)],
+  authController.sendVerificationEmail,
 );
 
 router.post(
   "/verify-email",
   validate(authValidation.verifyEmail),
-  authController.verifyEmail
+  authController.verifyEmail,
 );
 
 router.get(
   "/send-verification-otp",
-  auth(),
-  authController.sendVerificationOTP
+  auth(ROLE_TYPES.user, ROLE_TYPES.owner, ROLE_TYPES.admin),
+  authController.sendVerificationOTP,
 );
 
 router.post(
   "/verify-otp",
-  [validate(authValidation.verifyOTP), auth()],
-  authController.verifyOTP
+  [
+    validate(authValidation.verifyOTP),
+    auth(ROLE_TYPES.user, ROLE_TYPES.owner, ROLE_TYPES.admin),
+  ],
+  authController.verifyOTP,
 );
 
 module.exports = router;

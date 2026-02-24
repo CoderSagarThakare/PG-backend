@@ -6,6 +6,10 @@ const {
   updateUserById,
   removeUserFields,
 } = require("./user.service");
+const {
+  getOwnerById,
+  updateOwnerById,
+} = require("./owner.service");
 
 const sendVerificationOTP = async (to) => {
   const subject = "PG_Stay: Verify Your Identity";
@@ -21,7 +25,7 @@ const sendVerificationOTP = async (to) => {
       
       <div style="background-color: #f9f9f9; padding: 30px; border-radius: 8px; text-align: center;">
         <h2 style="color: #333; margin-top: 0;">Verify Your Email</h2>
-        <p style="color: #555; font-size: 16px;">Please use the following One-Time Password (OTP) to complete your verification. This code is valid for <b>10 minutes</b>.</p>
+        <p style="color: #555; font-size: 16px;">Please use the following One-Time Password (OTP) to complete your verification. This code is valid for <b>2 minutes</b>.</p>
         
         <div style="margin: 30px 0;">
           <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #127de0; background: #fff; padding: 10px 20px; border: 2px dashed #127de0; border-radius: 5px;">
@@ -62,25 +66,41 @@ const generateOTP = (length = 6) => {
 
 // validate otp coming from frontned
 const validateOTP = async (userId, otp) => {
-  const user = await getUserById(userId);
+  // Try to get user first, then owner
+  let account = await getUserById(userId);
+  let isOwner = false;
 
-  if (!user) {
+  if (!account) {
+    account = await getOwnerById(userId);
+    isOwner = true;
+  }
+
+  if (!account) {
     throw new ApiError(httpStatus.BAD_REQUEST, "User not found");
   }
 
-  const duration = checkDuration(user.otpGeneratedTime);
+  const duration = checkDuration(account.otpGeneratedTime);
 
-  if (otp !== user.otp)
+  if (otp !== account.otp)
     throw new ApiError(httpStatus.BAD_REQUEST, "Please Enter Valid OTP");
 
   if (duration > 120)
     throw new ApiError(httpStatus.BAD_REQUEST, "OTP Expired Generate New OTP ");
 
-  await updateUserById(userId, {
-    isEmailVerified: true,
-    otp: undefined,
-    otpGeneratedTime: undefined,
-  });
+  // Update either user or owner based on account type
+  if (isOwner) {
+    await updateOwnerById(userId, {
+      isEmailVerified: true,
+      otp: undefined,
+      otpGeneratedTime: undefined,
+    });
+  } else {
+    await updateUserById(userId, {
+      isEmailVerified: true,
+      otp: undefined,
+      otpGeneratedTime: undefined,
+    });
+  }
 
   return true;
 };

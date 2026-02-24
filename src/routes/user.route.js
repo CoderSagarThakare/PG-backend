@@ -1,3 +1,4 @@
+const { ROLE_TYPES } = require("../const/constant");
 const { userController } = require("../controllers");
 const auth = require("../middlewares/auth");
 const validate = require("../middlewares/validate");
@@ -6,7 +7,7 @@ const { userValidation } = require("../validations");
 const router = require("express").Router();
 
 // Token authentication for all routes defined in this file
-router.use(auth());
+router.use(auth(ROLE_TYPES.user));
 
 // get update user
 router

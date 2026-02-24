@@ -23,6 +23,7 @@ const auth =
   };
 
 const verifyCallBack = (req, resolve, reject, requiredRights) => {
+
   // err, user, info this data coming from jwtVerify() => done(null,user)
   return async (err, user, info) => {
     if (err || info || !user) {
@@ -35,6 +36,14 @@ const verifyCallBack = (req, resolve, reject, requiredRights) => {
     if (user.deleted) {
       return reject(new ApiError(httpStatus.UNAUTHORIZED, "User deleted"));
     }
+
+    // Check if requiredRights is provided and validate user role
+    if (requiredRights.length > 0 && !requiredRights.includes(user.role.toLowerCase())) {
+      return reject(
+        new ApiError(httpStatus.FORBIDDEN, "Access denied: Insufficient permissions")
+      );
+    }
+
     req.user = user;
 
     resolve();
