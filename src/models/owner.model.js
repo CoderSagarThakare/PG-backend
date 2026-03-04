@@ -10,10 +10,10 @@ const ownerSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
-    role : {
+    role: {
       type: String,
       required: true,
-      enum: ["owner"],
+      enum: ["owner", "manager", "employee"],
     },
     email: {
       type: String,
@@ -36,7 +36,7 @@ const ownerSchema = mongoose.Schema(
       validate(value) {
         if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
           throw new Error(
-            "Password must contain at least one letter and one number"
+            "Password must contain at least one letter and one number",
           );
         }
       },
@@ -62,7 +62,7 @@ const ownerSchema = mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 ownerSchema.plugin(private);

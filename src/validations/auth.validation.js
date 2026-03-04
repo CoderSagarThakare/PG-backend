@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const { password } = require("./custom.validation");
+const { ROLE_TYPES } = require("../const/constant");
 
 const register = {
   body: Joi.object().keys({
@@ -8,10 +9,17 @@ const register = {
     name: Joi.string().required(),
     role: Joi.string()
       .required()
-      .valid('owner', 'user', 'admin')
+      .valid(
+        ROLE_TYPES.user,
+        ROLE_TYPES.owner,
+        ROLE_TYPES.admin,
+        ROLE_TYPES.manager,
+        ROLE_TYPES.employee,
+      )
       .messages({
-        'any.only': 'Role must be one of [owner, user, admin]'
-      })
+        "any.only":
+          "Role must be one of [owner, user, admin, manager, employee]",
+      }),
   }),
 };
 
@@ -50,10 +58,10 @@ const verifyEmail = {
 };
 
 const verifyOTP = {
-  body : Joi.object().keys({
-    otp : Joi.number().required() 
-  })
-}
+  body: Joi.object().keys({
+    otp: Joi.number().required(),
+  }),
+};
 module.exports = {
   register,
   login,
@@ -61,5 +69,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   verifyEmail,
-  verifyOTP
+  verifyOTP,
 };
