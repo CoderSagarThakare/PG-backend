@@ -1,25 +1,26 @@
-const { pgController, facilitiesController } = require("../controllers");
+const { ownerController } = require("../controllers");
 const validate = require("../middlewares/validate");
 const { pgValidation } = require("../validations");
+const ownerRoute = require("./owner.route");
+const managerRoute = require("./manager.route");
+const employeeRoute = require("./employee.route");
+const auth = require("../middlewares/auth");
+const { ROLE_TYPES } = require("../const/constant");
 
 const router = require("express").Router();
+// Role-based subrouters mounted under /pg
+router.use("/owner", auth(ROLE_TYPES.owner), ownerRoute);
+router.use("/manager", auth(ROLE_TYPES.manager), managerRoute);
+router.use("/employee", auth(ROLE_TYPES.employee), employeeRoute);
 
-// Create a new PG
-router.post("/", validate(pgValidation.createPG), pgController.createPG);
+// create new PG
+router.post(
+  "/",
+  auth(ROLE_TYPES.owner),
+  validate(pgValidation.createPG),
+  ownerController.createPG,
+);
 
-// Get all PGs
-router.get("/", validate(pgValidation.listPGs), pgController.getPGs);
-
-// Get all facilities
-router.get("/facilities", facilitiesController.getAllFacilities);
-
-// Get a specific PG
-router.get("/:pgId", validate(pgValidation.getPG), pgController.getPG);
-
-// Update a PG
-router.patch("/:pgId", validate(pgValidation.updatePG), pgController.updatePG);
-
-// Delete a PG
-router.delete("/:pgId", validate(pgValidation.deletePG), pgController.deletePG);
+router.get("/", validate(pgValidation.listPGs), ownerController.getPGs);
 
 module.exports = router;

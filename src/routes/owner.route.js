@@ -1,71 +1,45 @@
-const { ROLE_TYPES } = require("../const/constant");
-const { pgController, facilitiesController,postController } = require("../controllers");
-const auth = require("../middlewares/auth");
+const express = require("express");
+const router = express.Router();
 const validate = require("../middlewares/validate");
 const { pgValidation, postValidation } = require("../validations");
-const pgRoute = require("./pg.route");
-
-const router = require("express").Router();
+const { ownerController, pgController, facilitiesController, postController } = require("../controllers");
+const { ROLE_TYPES } = require("../const/constant");
+const auth = require("../middlewares/auth");
 
 // All owner routes require authentication
-router.use(auth(ROLE_TYPES.owner));
+// router.use(auth(ROLE_TYPES.owner));
 
-// --------------------------- PG RELETED ROUTES
-router.use("/pg", pgRoute);
-
-// register new PG
-// router.post("/pg", validate(pgValidation.createPG), pgController.createPG);
-
-// router.get("/pgs", validate(pgValidation.listPGs), pgController.getPGs);
-
-// router.get("/pg/:pgId", validate(pgValidation.getPG), pgController.getPG);
-
-// router.patch(
-//   "/pg/:pgId",
-//   validate(pgValidation.updatePG),
-//   pgController.updatePG,
-// );
-
-// router.delete(
-//   "/pg/:pgId",
-//   validate(pgValidation.deletePG),
-//   pgController.deletePG,
-// );
-
-// router.get("/facilities", facilitiesController.getAllFacilities);
-
-
-// --------------------------- POST RELETED ROUTES
-
-// Create a new vacancy post
+// PG-related routes for owners (mounted under /pg/owner)
+router.get("/:pgId", validate(pgValidation.getPG), ownerController.getPG);
+router.patch("/:pgId", validate(pgValidation.updatePG), ownerController.updatePG);
+router.delete("/:pgId", validate(pgValidation.deletePG), ownerController.deletePG);
+router.get("/facilities", facilitiesController.getAllFacilities);
+ 
+// Post-related routes for owners
 router.post(
   "/post",
   validate(postValidation.createPost),
   postController.createPost,
 );
 
-// Get all posts created by the logged-in owner
 router.get(
   "/posts",
   validate(postValidation.listPosts),
   postController.getPosts,
 );
 
-// Get a specific post detail
 router.get(
   "/post/:postId",
   validate(postValidation.getPost),
   postController.getPost,
 );
 
-// Update post (e.g., mark as filled/inactive)
 router.patch(
   "/post/:postId",
   validate(postValidation.updatePost),
   postController.updatePost,
 );
 
-// Delete a post
 router.delete(
   "/post/:postId",
   validate(postValidation.deletePost),

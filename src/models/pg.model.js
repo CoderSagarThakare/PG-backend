@@ -8,6 +8,11 @@ const pgSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
+    managerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Staff",
+      required: true,
+    },
     name: {
       type: String,
       required: true,
@@ -63,20 +68,6 @@ const pgSchema = mongoose.Schema(
       min: 0,
       max: 5,
       default: 0,
-    },
-    manager: {
-      name: {
-        type: String,
-        trim: true,
-      },
-      mobNo1: {
-        type: String,
-        trim: true,
-      },
-      mobNo2: {
-        type: String,
-        trim: true,
-      },
     },
     beds: {
       totalBeds: {

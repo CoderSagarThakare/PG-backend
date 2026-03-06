@@ -13,7 +13,7 @@ const userSchema = mongoose.Schema(
     role: {
       type: String,
       required: true,
-      enum: ["owner", "user", "admin"],
+      enum: ["user", "admin"],
     },
     email: {
       type: String,

@@ -1,5 +1,9 @@
 module.exports.authController = require("./auth.controller");
 module.exports.userController = require("./user.controller");
+module.exports.staffController = require("./staff.controller");
 module.exports.pgController = require("./pg.controller");
 module.exports.facilitiesController = require("./facilities.controller");
 module.exports.postController = require("./post.controller");
+module.exports.ownerController = require("./owner.controller");
+module.exports.managerController = require("./manager.controller");
+module.exports.employeeController = require("./employee.controller");

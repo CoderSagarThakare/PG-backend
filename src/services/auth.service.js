@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const userService = require("./user.service");
-const ownerService = require("./owner.service");
+const staffService = require("./staff.service");
 const tokenService = require("./token.service");
 const ApiError = require("../utils/ApiError");
 const { OAuth2Client } = require("google-auth-library");
@@ -16,18 +16,18 @@ const { tokenTypes } = require("../config/token");
 const loginUserWithEmailAndPassword = async (email, password) => {
   const user = await userService.getUserByEmail(email);
   if (!user || user.deleted || !(await user.isPasswordMatch(password))) {
-    // throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
-    return await loginOwnerWithEmailAndPassword(email, password);
+    // Try to login as staff member instead
+    return await loginStaffWithEmailAndPassword(email, password);
   }
   return await user;
 };
 
-const loginOwnerWithEmailAndPassword = async (email, password) => {
-  const owner = await ownerService.getOwnerByEmail(email);
-  if (!owner || owner.deleted || !(await owner.isPasswordMatch(password))) {
+const loginStaffWithEmailAndPassword = async (email, password) => {
+  const staff = await staffService.getStaffByEmail(email);
+  if (!staff || staff.deleted || !(await staff.isPasswordMatch(password))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
   }
-  return await owner;
+  return await staff;
 };
 
 const loginWithGoogle = async (idToken) => {
@@ -67,10 +67,10 @@ const registerUser = async (userBody) => {
   }
 };
 
-const registerOwner = async (ownerBody) => {
+const registerStaff = async (staffBody) => {
   try {
-    const owner = await ownerService.createOwner({ ...ownerBody });
-    return owner;
+    const staff = await staffService.createStaff({ ...staffBody });
+    return staff;
   } catch (error) {
     throw error;
   }
@@ -119,10 +119,10 @@ const verifyEmail = async (verifyEmailToken) => {
 };
 module.exports = {
   loginUserWithEmailAndPassword,
-  loginOwnerWithEmailAndPassword,
+  loginStaffWithEmailAndPassword,
   loginWithGoogle,
   registerUser,
-  registerOwner,
+  registerStaff,
   resetPassword,
   verifyEmail,
 };

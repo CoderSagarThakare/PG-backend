@@ -4,40 +4,42 @@ const {
   authService,
   emailService,
   otpService,
-  ownerService,
+  staffService,
   userService,
 } = require("../services");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
+const { ROLE_TYPES } = require("../const/constant");
 
 const register = catchAsync(async (req, res) => {
-  if (req.body.role.toLowerCase() === "owner") {
-    await authService.registerOwner({ ...req.body });
+  const staffRoles = [
+    ROLE_TYPES.owner,
+    ROLE_TYPES.manager,
+    ROLE_TYPES.employee,
+  ];
+
+  const role = req.body.role.toLowerCase();
+
+  if (staffRoles.includes(role)) {
+    // Register as staff member with specified role
+    await authService.registerStaff({ ...req.body });
 
     res
       .status(httpStatus.CREATED)
-      .json({ success: true, message: "Owner registered successfully" });
-  } else {
-    const owner = await ownerService.getOwnerByEmail(req.body.email);
-    if (owner) {
-      throw new ApiError(
-        httpStatus.BAD_REQUEST,
-        "Owner already exists with this email",
-      );
-    }
-
+      .json({
+        success: true,
+        message: `Staff member with role ${role} registered successfully`,
+      });
+  } else if (role === ROLE_TYPES.user) {
+    // Register as regular user
     await authService.registerUser({ ...req.body });
 
     res
       .status(httpStatus.CREATED)
       .json({ success: true, message: "User registered successfully" });
+  } else {
+    throw new ApiError(httpStatus.BAD_REQUEST, `Invalid role: ${role}`);
   }
-
-  // await tokenService.generateAuthTokens(user);
-
-  // res
-  //   .status(httpStatus.CREATED)
-  //   .json({ success: true, message: "User registered successfully" });
 });
 
 const login = catchAsync(async (req, res) => {
@@ -108,8 +110,15 @@ const verifyEmail = catchAsync(async (req, res) => {
 const sendVerificationOTP = catchAsync(async (req, res) => {
   const otp = await otpService.sendVerificationOTP(req.user.email);
 
-  if (req.user.role.toLowerCase() === "owner") {
-    await ownerService.updateOwnerById(req.user.id, {
+  const staffRoles = [
+    ROLE_TYPES.owner,
+    ROLE_TYPES.manager,
+    ROLE_TYPES.employee,
+  ];
+
+  // Update OTP for staff members or users based on their role
+  if (staffRoles.includes(req.user.role.toLowerCase())) {
+    await staffService.updateStaffById(req.user.id, {
       otp: otp,
       otpGeneratedTime: new Date(),
     });

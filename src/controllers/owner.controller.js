@@ -1,3 +1,4 @@
+const { pgController } = require(".");
 const httpStatus = require("http-status");
 const catchAsync = require("../utils/catchAsync");
 const { ownerService } = require("../services");
@@ -9,9 +10,15 @@ const getOwner = catchAsync(async (req, res) => {
 const updateOwner = catchAsync(async (req, res) => {
   await ownerService.updateOwnerById(req.owner._id, req.body);
 
-  res
-    .status(200)
-    .send({ success: true, message: "owner modified successfully" });
+  res.status(200).send({ success: true, message: "owner modified successfully" });
 });
 
-module.exports = { getOwner, updateOwner };
+module.exports = {
+  createPG: pgController.createPG,
+  getPGs: pgController.getPGs,
+  getPG: pgController.getPG,
+  updatePG: pgController.updatePG,
+  deletePG: pgController.deletePG,
+  getOwner,
+  updateOwner,
+};

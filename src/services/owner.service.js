@@ -1,4 +1,4 @@
-const { Owner } = require("../models");
+const { Staff } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 

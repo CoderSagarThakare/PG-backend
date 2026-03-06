@@ -2,8 +2,9 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const { private } = require("./plugins");
+const { ROLE_TYPES } = require("../const/constant");
 
-const ownerSchema = mongoose.Schema(
+const staffSchema = mongoose.Schema(
   {
     name: {
       type: String,
@@ -13,7 +14,7 @@ const ownerSchema = mongoose.Schema(
     role: {
       type: String,
       required: true,
-      enum: ["owner", "manager", "employee"],
+      enum: [ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.employee],
     },
     email: {
       type: String,
@@ -65,7 +66,7 @@ const ownerSchema = mongoose.Schema(
   },
 );
 
-ownerSchema.plugin(private);
+staffSchema.plugin(private);
 
 /**
  *
@@ -73,7 +74,7 @@ ownerSchema.plugin(private);
  * @param {ObjectId} excludeUserId  - exclude given user ObjectId
  * @returns {<true/false>}
  */
-ownerSchema.statics.isEmailTaken = async function (email, excludeUserId) {
+staffSchema.statics.isEmailTaken = async function (email, excludeUserId) {
   // this : represent Model { User }
   const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
 
@@ -85,28 +86,23 @@ ownerSchema.statics.isEmailTaken = async function (email, excludeUserId) {
  * @param {string} password
  * @returns {Promise<boolean>}
  */
-ownerSchema.methods.isPasswordMatch = async function (password) {
-  const owner = this;
+staffSchema.methods.isPasswordMatch = async function (password) {
+  const staff = this;
 
-  return bcrypt.compare(password, owner.password);
+  return bcrypt.compare(password, staff.password);
 };
 
-ownerSchema.pre("save", async function (next) {
-  const owner = this;
-  if (owner.isModified("password")) {
-    owner.password = await bcrypt.hash(owner.password, 8);
+staffSchema.pre("save", async function (next) {
+  const staff = this;
+  if (staff.isModified("password")) {
+    staff.password = await bcrypt.hash(staff.password, 8);
   }
   next();
 });
 
 /**
- * @typedef Owner
+ * @typedef Staff
  */
-const Owner = mongoose.model("Owner", ownerSchema);
+const Staff = mongoose.model("Staff", staffSchema);
 
-module.exports = Owner;
-
-/**
- * When fetching an owner from the database, this plugin ensures that the password field is excluded from the output.
- * It helps maintain data privacy and security by not exposing sensitive information.
- */
+module.exports = Staff;
