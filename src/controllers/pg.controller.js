@@ -24,14 +24,14 @@ const getPGs = catchAsync(async (req, res) => {
     sortBy: req.query.sortBy,
   };
 
-  const isAdmin = req.user.role === "admin" || req.user.isAdmin === true;
+  const isAdmin = req.user.role === "admin";
   const result = await PgService.getPGsByOwner(req.user.id, options, isAdmin);
 
   res.status(httpStatus.OK).json(result);
 });
 
 const getPG = catchAsync(async (req, res) => {
-  const isAdmin = req.user.role === "admin" || req.user.isAdmin === true;
+  const isAdmin = req.user.role === "admin";
   const pg = await PgService.getPGById(req.params.pgId, req.user.id, isAdmin);
 
   res.status(httpStatus.OK).json({ pg });

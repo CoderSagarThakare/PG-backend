@@ -37,9 +37,6 @@ const verifyCallBack = (req, resolve, reject, requiredRights) => {
       return reject(new ApiError(httpStatus.UNAUTHORIZED, "User deleted"));
     }
 
-    console.log("Authenticated user:", user);
-    console.log( !requiredRights.includes(user.role.toLowerCase()), "Required rights:", requiredRights, "User role:", user.role.toLowerCase());
-
     // Check if requiredRights is provided and validate user role
     if (requiredRights.length > 0 && !requiredRights.includes(user.role.toLowerCase())) {
       return reject(

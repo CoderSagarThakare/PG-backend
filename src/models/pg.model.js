@@ -11,7 +11,6 @@ const pgSchema = mongoose.Schema(
     managerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Staff",
-      required: true,
     },
     name: {
       type: String,
@@ -69,18 +68,16 @@ const pgSchema = mongoose.Schema(
       max: 5,
       default: 0,
     },
-    beds: {
-      totalBeds: {
-        type: Number,
-      },
-      occupiedBeds: {
-        type: Number,
-        default: 0,
-      },
-      emptyBeds: {
-        type: Number,
-        default: 0,
-      },
+    totalBeds: {
+      type: Number,
+    },
+    occupiedBeds: {
+      type: Number,
+      default: 0,
+    },
+    emptyBeds: {
+      type: Number,
+      default: 0,
     },
     landline: {
       type: String,

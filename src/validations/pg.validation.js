@@ -21,11 +21,9 @@ const createPG = {
       mobNo1: Joi.string().required(),
       mobNo2: Joi.string(),
     }),
-    beds: Joi.object().keys({
-      totalBeds: Joi.number().integer(),
-      occupiedBeds: Joi.number().integer().min(0),
-      emptyBeds: Joi.number().integer().min(0),
-    }),
+    totalBeds: Joi.number().integer(),
+    occupiedBeds: Joi.number().integer().min(0),
+    emptyBeds: Joi.number().integer().min(0),
     landline: Joi.string(),
     pgStartedDate: Joi.date(),
     images: Joi.array().items(Joi.string()),
@@ -50,14 +48,12 @@ const updatePG = {
         state: Joi.string(),
         country: Joi.string(),
       }),
+      managerId: Joi.string().pattern(objectIdPattern).messages({
+        "string.pattern.base": "Invalid manager ID format",
+      }),
       totalRooms: Joi.number().integer(),
       description: Joi.string(),
       rating: Joi.number().min(0).max(5),
-      manager: Joi.object().keys({
-        name: Joi.string(),
-        mobNo1: Joi.string(),
-        mobNo2: Joi.string(),
-      }),
       beds: Joi.object().keys({
         totalBeds: Joi.number().integer(),
         occupiedBeds: Joi.number().integer().min(0),

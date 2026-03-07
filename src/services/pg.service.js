@@ -97,14 +97,28 @@ const getPGById = async (pgId, ownerId, isAdmin = false) => {
  */
 const updatePG = async (pgId, ownerId, updateBody) => {
   try {
-    const pg = await PG.findOne({ _id: pgId, ownerId, isDeleted: false });
+    
+    if (updateBody.address) {
+      Object.keys(updateBody.address).forEach((key) => {
+        updateBody[`address.${key}`] = updateBody.address[key];
+      });
+      delete updateBody.address; // Delete the original object to prevent overwrite
+    }
+    const pg = await PG.findOneAndUpdate(
+      { _id: pgId, ownerId, isDeleted: false },
+      { $set: updateBody }, // $set ensures partial updates
+      { new: true, runValidators: true },
+    );
+    
     if (!pg) {
       throw new ApiError(httpStatus.NOT_FOUND, "PG not found");
     }
-    Object.assign(pg, updateBody);
-    await pg.save();
+    
+
     return;
   } catch (error) {
+    console.log("error : ", error.message);
+    if (error instanceof ApiError) throw error;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to update PG");
   }
 };

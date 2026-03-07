@@ -2,19 +2,22 @@ const express = require("express");
 const router = express.Router();
 const validate = require("../middlewares/validate");
 const { pgValidation, postValidation } = require("../validations");
-const { ownerController, pgController, facilitiesController, postController } = require("../controllers");
+const {
+  ownerController,
+  pgController,
+  facilitiesController,
+  postController,
+} = require("../controllers");
 const { ROLE_TYPES } = require("../const/constant");
 const auth = require("../middlewares/auth");
+const pgRoute = require("./pg.route");
 
 // All owner routes require authentication
-// router.use(auth(ROLE_TYPES.owner));
+router.use(auth(ROLE_TYPES.owner));
 
 // PG-related routes for owners (mounted under /pg/owner)
-router.get("/:pgId", validate(pgValidation.getPG), ownerController.getPG);
-router.patch("/:pgId", validate(pgValidation.updatePG), ownerController.updatePG);
-router.delete("/:pgId", validate(pgValidation.deletePG), ownerController.deletePG);
-router.get("/facilities", facilitiesController.getAllFacilities);
- 
+router.use("/pg", pgRoute);
+
 // Post-related routes for owners
 router.post(
   "/post",
