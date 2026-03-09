@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const { private } = require("./plugins");
+const { SCHEMA_NAME } = require("../const/constant");
 
 const userSchema = mongoose.Schema(
   {
@@ -137,7 +138,7 @@ userSchema.pre("save", async function (next) {
 /**
  * @typedef User
  */
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model(SCHEMA_NAME.user, userSchema);
 
 module.exports = User;
 

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const { private } = require("./plugins");
-const { ROLE_TYPES } = require("../const/constant");
+const { ROLE_TYPES, SCHEMA_NAME } = require("../const/constant");
 
 const staffSchema = mongoose.Schema(
   {
@@ -138,6 +138,6 @@ staffSchema.pre("save", async function (next) {
 /**
  * @typedef Staff
  */
-const Staff = mongoose.model("Staff", staffSchema);
+const Staff = mongoose.model(SCHEMA_NAME.staff, staffSchema);
 
 module.exports = Staff;

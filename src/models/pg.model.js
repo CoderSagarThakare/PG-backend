@@ -1,16 +1,17 @@
 const mongoose = require("mongoose");
 const { private } = require("./plugins");
+const { SCHEMA_NAME } = require("../const/constant");
 
 const pgSchema = mongoose.Schema(
   {
     ownerId: {
       type: mongoose.SchemaTypes.ObjectId,
-      ref: "User",
+      ref: SCHEMA_NAME.staff,
       required: true,
     },
     managerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Staff",
+      ref: SCHEMA_NAME.staff,
       required: true,
     },
     name: {
@@ -112,7 +113,7 @@ const pgSchema = mongoose.Schema(
     facilities: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Facilities",
+        ref: SCHEMA_NAME.facilities,
       },
     ],
     isDeleted: {
@@ -128,7 +129,7 @@ const pgSchema = mongoose.Schema(
 /**
  * @typedef PG
  */
-const PG = mongoose.model("Pg", pgSchema);
+const PG = mongoose.model(SCHEMA_NAME.pg, pgSchema);
 
 pgSchema.plugin(private);
 

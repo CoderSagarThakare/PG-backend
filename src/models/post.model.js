@@ -1,16 +1,17 @@
 const mongoose = require("mongoose");
 const { private } = require("./plugins");
+const { SCHEMA_NAME } = require("../const/constant");
 
 const postSchema = mongoose.Schema(
   {
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: SCHEMA_NAME.staff,
       required: true,
     },
     pgId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Pg", // Match this with your PG model name
+      ref: SCHEMA_NAME.pg, // Match this with your PG model name
       required: true,
     },
     title: {
@@ -69,6 +70,6 @@ postSchema.plugin(private);
 /**
  * @typedef Post
  */
-const Post = mongoose.model("Post", postSchema);
+const Post = mongoose.model(SCHEMA_NAME.post, postSchema);
 
 module.exports = Post;
