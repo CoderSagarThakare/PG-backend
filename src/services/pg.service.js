@@ -75,7 +75,10 @@ const getPGById = async (pgId, ownerId, isAdmin = false) => {
     if (!isAdmin) {
       query.isDeleted = false;
     }
-    const pg = await PG.findOne(query);
+    const pg = await PG.findOne(query)
+      .populate("ownerId", "name email role email")
+      .populate("managerId", "name email role email")
+      .populate("facilities");
     if (!pg) {
       throw new ApiError(httpStatus.NOT_FOUND, "PG not found");
     }
@@ -104,11 +107,11 @@ const updatePG = async (pgId, ownerId, updateBody) => {
       });
       delete updateBody.address;
     }
-    
+
     const pg = await PG.findOneAndUpdate(
       { _id: pgId, ownerId, isDeleted: false },
       { $set: updateBody },
-      { runValidators: true },  // validate data before updating data in DB
+      { runValidators: true }, // validate data before updating data in DB
     );
 
     if (!pg) {
