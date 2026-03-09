@@ -1,4 +1,4 @@
-const { Staff } = require("../models");
+const { Staff, User } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 
@@ -8,6 +8,15 @@ const httpStatus = require("http-status");
  * @returns {Promise<Staff>}
  */
 const createStaff = async (staffBody) => {
+  const user = await User.findOne({ email: staffBody.email });
+
+  if (user) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "User already exists with this email",
+    );
+  }
+
   if (await Staff.isEmailTaken(staffBody.email)) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
@@ -69,7 +78,7 @@ const updateStaffById = async (staffId, updateBody) => {
       throw new ApiError(httpStatus.NOT_FOUND, "Staff not found");
     }
 
-    return ;
+    return;
   } catch (error) {
     if (error instanceof ApiError) throw error;
     throw new ApiError(

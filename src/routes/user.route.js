@@ -13,6 +13,7 @@ router.use(auth(ROLE_TYPES.user));
 router
   .route("/profile")
   .get(userController.getUser)
-  .patch(validate(userValidation.updateUser), userController.updateUser);
+  .patch(validate(userValidation.updateUser), userController.updateUser)
+  .delete(userController.deleteUser);
 
 module.exports = router;

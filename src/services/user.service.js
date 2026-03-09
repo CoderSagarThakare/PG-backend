@@ -1,4 +1,4 @@
-const { User } = require("../models");
+const { User, Staff } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 
@@ -9,6 +9,15 @@ const httpStatus = require("http-status");
  */
 
 const createUser = async (userBody) => {
+  const staff = await Staff.findOne({ email: userBody.email });
+
+  if (staff) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "PG Staff already exists with this email",
+    );
+  }
+
   // User.isEmailTaken => return true/false
   if (await User.isEmailTaken(userBody.email)) {
     throw new ApiError(
@@ -27,7 +36,7 @@ const createUser = async (userBody) => {
  */
 const getUserByEmail = async (email) => {
   return User.findOne({
-    email,
+    email
   });
 };
 
@@ -94,9 +103,28 @@ const updateUserById = async (userId, updateBody) => {
   }
 };
 
+const deleteUserById = async (userId) => {
+  try {
+    const user = await User.findByIdAndUpdate(userId, { isDeleted: true }, { new: true });
+    
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    return;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to delete User",
+    );
+  }
+};
+
 module.exports = {
   createUser,
   getUserByEmail,
   getUserById,
   updateUserById,
+  deleteUserById,
 };

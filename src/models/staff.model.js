@@ -46,30 +46,31 @@ const staffSchema = mongoose.Schema(
     address: {
       pincode: {
         type: Number,
-        required: true,
+        default: "",
       },
       locationDescription: {
         type: String,
+        default: "",
         trim: true,
       },
       landmark: {
         type: String,
-        required: true,
+        default: "",
         trim: true,
       },
       city: {
+        default: "",
         type: String,
-        required: true,
         trim: true,
       },
       state: {
         type: String,
-        required: true,
+        default: "",
         trim: true,
       },
       country: {
         type: String,
-        required: true,
+        default: "India",
         trim: true,
       },
     },
@@ -90,6 +91,10 @@ const staffSchema = mongoose.Schema(
       default: -1,
     },
     otpGeneratedTime: { type: String, default: undefined },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
