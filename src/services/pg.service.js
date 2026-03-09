@@ -108,7 +108,7 @@ const updatePG = async (pgId, ownerId, updateBody) => {
     const pg = await PG.findOneAndUpdate(
       { _id: pgId, ownerId, isDeleted: false },
       { $set: updateBody },
-      { runValidators: true },
+      { runValidators: true },  // validate data before updating data in DB
     );
 
     if (!pg) {
