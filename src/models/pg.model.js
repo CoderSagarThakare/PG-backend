@@ -11,6 +11,7 @@ const pgSchema = mongoose.Schema(
     managerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Staff",
+      required: true,
     },
     name: {
       type: String,

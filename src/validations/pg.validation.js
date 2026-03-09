@@ -16,10 +16,8 @@ const createPG = {
       .required(),
     totalRooms: Joi.number().integer().required(),
     description: Joi.string(),
-    manager: Joi.object().keys({
-      name: Joi.string().required(),
-      mobNo1: Joi.string().required(),
-      mobNo2: Joi.string(),
+    managerId: Joi.string().pattern(objectIdPattern).required().messages({
+      "string.pattern.base": "Invalid manager ID format",
     }),
     totalBeds: Joi.number().integer(),
     occupiedBeds: Joi.number().integer().min(0),
