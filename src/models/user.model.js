@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const { private } = require("./plugins");
-const { SCHEMA_NAME } = require("../const/constant");
+const { SCHEMA_NAME, ROLE_TYPES } = require("../const/constant");
 
 const userSchema = mongoose.Schema(
   {
@@ -14,7 +14,7 @@ const userSchema = mongoose.Schema(
     role: {
       type: String,
       required: true,
-      enum: ["user", "admin"],
+      enum: [ROLE_TYPES.user, ROLE_TYPES.admin],
     },
     email: {
       type: String,
