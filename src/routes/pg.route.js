@@ -1,5 +1,4 @@
 const {
-  ownerController,
   pgController,
   facilitiesController,
 } = require("../controllers");

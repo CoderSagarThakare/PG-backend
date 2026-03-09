@@ -1,11 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const validate = require("../middlewares/validate");
-const { pgValidation, postValidation } = require("../validations");
+const { postValidation } = require("../validations");
 const {
-  ownerController,
-  pgController,
-  facilitiesController,
   postController,
 } = require("../controllers");
 const { ROLE_TYPES } = require("../const/constant");

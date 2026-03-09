@@ -11,7 +11,8 @@ const employeeRoute = require("./employee.route");
 const defaultRoutes = [
   { path: "/auth", route: authRoute }, // base path for auth routes
   { path: "/user", route: userRoute }, // base path for user routes
-  { path: "/owner", route: ownerRoute } // base path for owner routes
+  { path: "/owner", route: ownerRoute }, // base path for owner routes
+  { path: "/staff", route: staffRoute }, // base path for staff routes
 ];
 
 defaultRoutes.map((route) => {
