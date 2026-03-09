@@ -11,7 +11,7 @@ const createStaff = async (staffBody) => {
   if (await Staff.isEmailTaken(staffBody.email)) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      "Staff already exists with this email"
+      "Staff already exists with this email",
     );
   }
 
@@ -40,21 +40,43 @@ const getStaffById = (id) => {
  * @returns {Promise<Staff>}
  */
 const updateStaffById = async (staffId, updateBody) => {
-  const staff = await getStaffById(staffId);
-  if (!staff) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Staff not found");
-  }
-  if (updateBody.email && (await Staff.isEmailTaken(updateBody.email, staffId))) {
+  try {
+    if (
+      updateBody.email &&
+      (await Staff.isEmailTaken(updateBody.email, staffId))
+    ) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Staff already exists with this email",
+      );
+    }
+
+    // User will pass only updated data in address
+    if (updateBody.address) {
+      Object.keys(updateBody.address).forEach((key) => {
+        updateBody[`address.${key}`] = updateBody.address[key];
+      });
+      delete updateBody.address;
+    }
+
+    const staff = await Staff.findByIdAndUpdate(
+      staffId,
+      { $set: updateBody },
+      { runValidators: true },
+    );
+
+    if (!staff) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Staff not found");
+    }
+
+    return ;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
     throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Staff already exists with this email"
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to update staff",
     );
   }
-
-  Object.assign(staff, updateBody);
-  await staff.save();
-
-  return staff;
 };
 
 /**
@@ -68,9 +90,7 @@ const getStaffByRole = async (role, options = {}) => {
   const page = options.page || 1;
   const skip = (page - 1) * limit;
 
-  const staff = await Staff.find({ role })
-    .limit(limit)
-    .skip(skip);
+  const staff = await Staff.find({ role }).limit(limit).skip(skip);
   const total = await Staff.countDocuments({ role });
 
   return { staff, total, limit, page };
@@ -86,9 +106,7 @@ const getAllStaff = async (options = {}) => {
   const page = options.page || 1;
   const skip = (page - 1) * limit;
 
-  const staff = await Staff.find()
-    .limit(limit)
-    .skip(skip);
+  const staff = await Staff.find().limit(limit).skip(skip);
   const total = await Staff.countDocuments();
 
   return { staff, total, limit, page };

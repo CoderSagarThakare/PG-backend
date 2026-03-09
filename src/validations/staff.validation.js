@@ -1,6 +1,6 @@
 const Joi = require("joi");
 
-const updateUser = {
+const updateStaff = {
   body: Joi.object()
     .keys({
       name: Joi.string(),
@@ -13,7 +13,6 @@ const updateUser = {
           "string.pattern.base":
             "Password must contain at least one letter and one number",
         }),
-      picture: Joi.string().uri().optional(),
       address: Joi.object()
         .keys({
           pincode: Joi.number(),
@@ -24,10 +23,13 @@ const updateUser = {
           country: Joi.string(),
         })
         .min(1),
+      picture: Joi.string().uri().optional(),
       isEmailVerified: Joi.boolean(),
       isPasswordUpdated: Joi.boolean(),
     })
     .min(1),
 };
 
-module.exports = { updateUser };
+module.exports = {
+  updateStaff,
+};

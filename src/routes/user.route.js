@@ -11,7 +11,7 @@ router.use(auth(ROLE_TYPES.user));
 
 // get update user
 router
-  .route("/self")
+  .route("/profile")
   .get(userController.getUser)
   .patch(validate(userValidation.updateUser), userController.updateUser);
 

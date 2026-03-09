@@ -13,7 +13,7 @@ const createUser = async (userBody) => {
   if (await User.isEmailTaken(userBody.email)) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      "User already exists with this email"
+      "User already exists with this email",
     );
   }
 
@@ -35,23 +35,63 @@ const getUserById = (id) => {
   return User.findById(id);
 };
 // remove fields is boolean value created for delete otp,otpGeneratedTime field from document
+// const updateUserById = async (userId, updateBody) => {
+//   const user = await getUserById(userId);
+//   if (!user) {
+//     throw new ApiError(httpStatus.BAD_REQUEST, "User not found");
+//   }
+
+//   if (updateBody.email && (await User.isEmailTaken(updateBody.email, userId))) {
+//     throw new ApiError(
+//       httpStatus.BAD_REQUEST,
+//       "User already exists with this email"
+//     );
+//   }
+
+//   Object.assign(user, updateBody);
+
+//   await user.save();
+
+//   return user;
+// };
+
 const updateUserById = async (userId, updateBody) => {
-  const user = await getUserById(userId);
-  if (!user) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "User not found");
-  }
-  if (updateBody.email && (await User.isEmailTaken(updateBody.email, userId))) {
+  try {
+    if (
+      updateBody.email &&
+      (await User.isEmailTaken(updateBody.email, userId))
+    ) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "User already exists with this email",
+      );
+    }
+
+    // User will pass only updated data in address
+    if (updateBody.address) {
+      Object.keys(updateBody.address).forEach((key) => {
+        updateBody[`address.${key}`] = updateBody.address[key];
+      });
+      delete updateBody.address;
+    }
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateBody },
+      { runValidators: true },
+    );
+
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    return;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
     throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "User already exists with this email"
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to update User",
     );
   }
-
-  Object.assign(user, updateBody);
-
-  await user.save();
-
-  return user;
 };
 
 module.exports = {

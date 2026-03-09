@@ -42,6 +42,36 @@ const userSchema = mongoose.Schema(
       },
       private: true, // used by the private plugin
     },
+    address: {
+      pincode: {
+        type: Number,
+        required: true,
+      },
+      locationDescription: {
+        type: String,
+        trim: true,
+      },
+      landmark: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      city: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      state: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      country: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+    },
     picture: {
       type: String,
       default: "https://i.imgur.com/CR1iy7U.png",
