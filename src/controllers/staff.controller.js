@@ -48,4 +48,9 @@ const getStaffByRole = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(result);
 });
 
-module.exports = { getStaff, updateStaff, getAllStaff, getStaffByRole };
+const deleteStaff = catchAsync(async (req, res) => {
+  await staffService.deleteStaffById(req.user._id);
+  res.status(httpStatus.OK).send({ success: true, message: "staff deleted successfully" });
+});
+
+module.exports = { getStaff, updateStaff, getAllStaff, getStaffByRole, deleteStaff };

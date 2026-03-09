@@ -121,6 +121,24 @@ const getAllStaff = async (options = {}) => {
   return { staff, total, limit, page };
 };
 
+const deleteStaffById = async (staffId) => {
+  try {
+    const staff = await Staff.findByIdAndUpdate(staffId, { isDeleted: true });
+    
+    if (!staff) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Staff not found");
+    }
+
+    return;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to delete staff",
+    );
+  }
+};
+
 module.exports = {
   createStaff,
   getStaffByEmail,
@@ -128,4 +146,5 @@ module.exports = {
   updateStaffById,
   getStaffByRole,
   getAllStaff,
+  deleteStaffById,
 };
