@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const { private } = require("./plugins");
-const { ROLE_TYPES, SCHEMA_NAME } = require("../const/constant");
+const { ROLE_TYPES, SCHEMA_NAME, GENDER_TYPES } = require("../const/constant");
 
 const staffSchema = mongoose.Schema(
   {
@@ -73,6 +73,10 @@ const staffSchema = mongoose.Schema(
         default: "India",
         trim: true,
       },
+    },
+    gender: {
+      type: String,
+      enum: [GENDER_TYPES.male, GENDER_TYPES.female, GENDER_TYPES.transgender],
     },
     picture: {
       type: String,

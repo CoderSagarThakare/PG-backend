@@ -8,14 +8,23 @@ const ROLE_TYPES = {
 
 // schema names for mongoose models
 const SCHEMA_NAME = {
-  staff : "Staff",
-  pg : "Pg",
-  facilities : "Facilities",
-  post : "Post",
-  user : "User"
-}
+  staff: "Staff",
+  pg: "Pg",
+  facilities: "Facilities",
+  post: "Post",
+  user: "User",
+};
+
+const GENDER_TYPES = {
+  male: "male",
+  female: "female",
+  unisex: "unisex",
+  transgender : "transgender",
+  notToSay : "notToSay"
+};
 
 module.exports = {
   ROLE_TYPES,
-  SCHEMA_NAME
+  SCHEMA_NAME,
+  GENDER_TYPES,
 };

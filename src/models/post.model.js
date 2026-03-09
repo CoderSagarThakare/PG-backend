@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { private } = require("./plugins");
-const { SCHEMA_NAME } = require("../const/constant");
+const { SCHEMA_NAME, GENDER_TYPES } = require("../const/constant");
 
 const postSchema = mongoose.Schema(
   {
@@ -11,7 +11,7 @@ const postSchema = mongoose.Schema(
     },
     pgId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: SCHEMA_NAME.pg, // Match this with your PG model name
+      ref: SCHEMA_NAME.pg,
       required: true,
     },
     title: {
@@ -33,7 +33,7 @@ const postSchema = mongoose.Schema(
     gender: {
       type: String,
       required: true,
-      enum: ["boys", "girls", "unisex"],
+      enum: [GENDER_TYPES.male, GENDER_TYPES.female, GENDER_TYPES.unisex],
     },
     pricePerBed: {
       type: Number,
@@ -61,7 +61,7 @@ const postSchema = mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Plugin to hide private fields (like __v) if you're using it
