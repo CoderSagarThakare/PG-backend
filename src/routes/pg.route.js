@@ -20,6 +20,8 @@ const router = require("express").Router();
 // register new PG
 router.post("/", validate(pgValidation.createPG), pgController.createPG);
 
+router.get("/facilities", facilitiesController.getAllFacilities);
+
 // Get PG Details
 router.get("/:pgId", validate(pgValidation.getPG), pgController.getPG);
 
@@ -30,6 +32,6 @@ router.get("/", validate(pgValidation.listPGs), pgController.getPGs);
 router.patch("/:pgId", validate(pgValidation.updatePG), pgController.updatePG);
 
 router.delete("/:pgId", validate(pgValidation.deletePG), pgController.deletePG);
-router.get("/facilities", facilitiesController.getAllFacilities);
+
 
 module.exports = router;

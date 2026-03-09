@@ -5,7 +5,6 @@ const httpStatus = require("http-status");
 const getAllFacilities = async () => {
   try {
     const facilities = await Facilities.find();
-
     return facilities;
   } catch (error) {
     throw new ApiError(

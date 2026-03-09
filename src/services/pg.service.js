@@ -97,23 +97,23 @@ const getPGById = async (pgId, ownerId, isAdmin = false) => {
  */
 const updatePG = async (pgId, ownerId, updateBody) => {
   try {
-    
+    // User will pass only updated data in address
     if (updateBody.address) {
       Object.keys(updateBody.address).forEach((key) => {
         updateBody[`address.${key}`] = updateBody.address[key];
       });
-      delete updateBody.address; // Delete the original object to prevent overwrite
+      delete updateBody.address;
     }
+    
     const pg = await PG.findOneAndUpdate(
       { _id: pgId, ownerId, isDeleted: false },
-      { $set: updateBody }, // $set ensures partial updates
-      { new: true, runValidators: true },
+      { $set: updateBody },
+      { runValidators: true },
     );
-    
+
     if (!pg) {
-      throw new ApiError(httpStatus.NOT_FOUND, "PG not found");
+      throw new ApiError(httpStatus.NOT_FOUND, "PG not found or access denied");
     }
-    
 
     return;
   } catch (error) {

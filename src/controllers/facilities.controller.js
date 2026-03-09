@@ -5,7 +5,7 @@ const ApiError = require("../utils/ApiError");
 const { PG } = require("../models");
 
 const getAllFacilities = catchAsync(async (req, res) => {
-  const isAdmin = req.user.role === "admin" || req.user.isAdmin === true;
+  const isAdmin = req.user.role === "admin";
 
   const facilities = await facilitiesService.getAllFacilities();
 
