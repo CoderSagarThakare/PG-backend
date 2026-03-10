@@ -35,13 +35,16 @@ const createUser = async (userBody) => {
  * @returns {Promise<User>}
  */
 const getUserByEmail = async (email) => {
+  // always ignore soft-deleted users
   return User.findOne({
-    email
+    email,
+    isDeleted: false,
   });
 };
 
 const getUserById = (id) => {
-  return User.findById(id);
+  // filter out deleted documents
+  return User.findOne({ _id: id, isDeleted: false });
 };
 // remove fields is boolean value created for delete otp,otpGeneratedTime field from document
 // const updateUserById = async (userId, updateBody) => {
@@ -66,6 +69,12 @@ const getUserById = (id) => {
 
 const updateUserById = async (userId, updateBody) => {
   try {
+    // ensure we are modifying an active user only
+    const user = await User.findOne({ _id: userId, isDeleted: false });
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    }
+
     if (
       updateBody.email &&
       (await User.isEmailTaken(updateBody.email, userId))
@@ -83,13 +92,13 @@ const updateUserById = async (userId, updateBody) => {
       });
       delete updateBody.address;
     }
-    const user = await User.findByIdAndUpdate(
+    const users = await User.findByIdAndUpdate(
       userId,
       { $set: updateBody },
       { runValidators: true },
     );
 
-    if (!user) {
+    if (!users) {
       throw new ApiError(httpStatus.NOT_FOUND, "User not found");
     }
 

@@ -35,11 +35,12 @@ const createStaff = async (staffBody) => {
 const getStaffByEmail = async (email) => {
   return Staff.findOne({
     email,
+    isDeleted: false,
   });
 };
 
 const getStaffById = (id) => {
-  return Staff.findById(id);
+  return Staff.findOne({ _id: id, isDeleted: false });
 };
 
 /**
@@ -50,6 +51,12 @@ const getStaffById = (id) => {
  */
 const updateStaffById = async (staffId, updateBody) => {
   try {
+    // only update active staff
+    const staff = await Staff.findOne({ _id: staffId, isDeleted: false });
+    if (!staff) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Staff not found");
+    }
+
     if (
       updateBody.email &&
       (await Staff.isEmailTaken(updateBody.email, staffId))
@@ -68,13 +75,13 @@ const updateStaffById = async (staffId, updateBody) => {
       delete updateBody.address;
     }
 
-    const staff = await Staff.findByIdAndUpdate(
+    const staffs = await Staff.findByIdAndUpdate(
       staffId,
       { $set: updateBody },
       { runValidators: true },
     );
 
-    if (!staff) {
+    if (!staffs) {
       throw new ApiError(httpStatus.NOT_FOUND, "Staff not found");
     }
 
@@ -99,8 +106,9 @@ const getStaffByRole = async (role, options = {}) => {
   const page = options.page || 1;
   const skip = (page - 1) * limit;
 
-  const staff = await Staff.find({ role }).limit(limit).skip(skip);
-  const total = await Staff.countDocuments({ role });
+  const filter = { role, isDeleted: false };
+  const staff = await Staff.find(filter).limit(limit).skip(skip);
+  const total = await Staff.countDocuments(filter);
 
   return { staff, total, limit, page };
 };
@@ -115,8 +123,9 @@ const getAllStaff = async (options = {}) => {
   const page = options.page || 1;
   const skip = (page - 1) * limit;
 
-  const staff = await Staff.find().limit(limit).skip(skip);
-  const total = await Staff.countDocuments();
+  const filter = { isDeleted: false };
+  const staff = await Staff.find(filter).limit(limit).skip(skip);
+  const total = await Staff.countDocuments(filter);
 
   return { staff, total, limit, page };
 };

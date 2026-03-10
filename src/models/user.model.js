@@ -111,7 +111,8 @@ userSchema.plugin(private);
  */
 userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
   // this : represent Model { User }
-  const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
+  const filter = { email, _id: { $ne: excludeUserId }, isDeleted: false };
+  const user = await this.findOne(filter);
 
   return !!user;
 };

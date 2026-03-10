@@ -114,8 +114,9 @@ staffSchema.plugin(private);
  * @returns {<true/false>}
  */
 staffSchema.statics.isEmailTaken = async function (email, excludeUserId) {
-  // this : represent Model { User }
-  const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
+  // this : represent Model { Staff }
+  const filter = { email, _id: { $ne: excludeUserId }, isDeleted: false };
+  const user = await this.findOne(filter);
 
   return !!user;
 };

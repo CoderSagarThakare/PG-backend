@@ -75,15 +75,27 @@ const getPGById = async (pgId, ownerId, isAdmin = false) => {
     if (!isAdmin) {
       query.isDeleted = false;
     }
+
     const pg = await PG.findOne(query)
       .populate("ownerId", "name email role email")
       .populate("managerId", "name email role email")
       .populate("facilities");
+
     if (!pg) {
-      throw new ApiError(httpStatus.NOT_FOUND, "PG not found");
+      const message = isAdmin
+        ? "No PG found with the provided ID."
+        : "PG not found, or it has been deactivated/deleted.";
+
+      throw new ApiError(httpStatus.NOT_FOUND, message);
     }
+
     return pg;
   } catch (error) {
+    console.log("error : ", error);
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
       "Failed to retrieve PG",
