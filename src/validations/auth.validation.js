@@ -1,12 +1,18 @@
 const Joi = require("joi");
 const { password } = require("./custom.validation");
 const { ROLE_TYPES } = require("../const/constant");
+const mobileRegex = /^[6-9]\d{9}$/;
 
 const register = {
   body: Joi.object().keys({
+    name: Joi.string().required(),
     email: Joi.string().required().email(),
     password: Joi.string().required().custom(password),
-    name: Joi.string().required(),
+    mobNo1: Joi.string().required().pattern(mobileRegex).messages({
+      "string.pattern.base":
+        "Primary mobile number must be a valid 10-digit Indian number.",
+      "any.required": "Primary mobile number is mandatory.",
+    }),
     role: Joi.string()
       .required()
       .valid(

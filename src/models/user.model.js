@@ -43,6 +43,18 @@ const userSchema = mongoose.Schema(
       },
       private: true, // used by the private plugin
     },
+    mobNo1: {
+      type: String,
+      required: true,
+      trim: true,
+      match: [/^[6-9]\d{9}$/, "Please provide a valid 10-digit mobile number"],
+    },
+    mobNo2: {
+      type: String,
+      trim: true,
+      match: [/^[6-9]\d{9}$/, "Please provide a valid 10-digit mobile number"],
+      default: null,
+    },
     address: {
       pincode: {
         type: Number,

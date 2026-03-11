@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const mobileRegex = /^[6-9]\d{9}$/;
 
 const updateStaff = {
   body: Joi.object()
@@ -13,6 +14,15 @@ const updateStaff = {
           "string.pattern.base":
             "Password must contain at least one letter and one number",
         }),
+      mobNo1: Joi.string().pattern(mobileRegex).messages({
+        "string.pattern.base":
+          "Primary mobile number must be a valid 10-digit Indian number.",
+        "any.required": "Primary mobile number is mandatory.",
+      }),
+      mobNo2: Joi.string().pattern(mobileRegex).messages({
+        "string.pattern.base":
+          "Secondary mobile number must be a valid 10-digit Indian number.",
+      }),
       address: Joi.object()
         .keys({
           pincode: Joi.number(),

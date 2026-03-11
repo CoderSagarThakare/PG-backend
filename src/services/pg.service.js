@@ -69,6 +69,7 @@ const getPGsByOwner = async (ownerId, options = {}, isAdmin = false) => {
  * @param {boolean} isAdmin - Whether user is admin (if true, returns deleted records too)
  * @returns {Promise<PG>}
  */
+
 const getPGById = async (pgId, ownerId, isAdmin = false) => {
   try {
     const query = { _id: pgId, ownerId };
@@ -77,8 +78,8 @@ const getPGById = async (pgId, ownerId, isAdmin = false) => {
     }
 
     const pg = await PG.findOne(query)
-      .populate("ownerId", "name email role email")
-      .populate("managerId", "name email role email")
+      .populate("ownerId", "name email role email mobNo1 mobNo2")
+      .populate("managerId", "name email role email mobNo1 mobNo2")
       .populate("facilities");
 
     if (!pg) {
