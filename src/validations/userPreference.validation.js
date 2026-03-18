@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { GENDER_TYPES } = require("../const/constant");
+const { PG_TYPES } = require("../const/constant");
 
 const preferenceIdValidation = Joi.string()
   .regex(/^[0-9a-fA-F]{24}$/)
@@ -25,8 +25,8 @@ const createPreference = {
         }),
       })
       .required(),
-    gender: Joi.string()
-      .valid(GENDER_TYPES.male, GENDER_TYPES.female, GENDER_TYPES.unisex)
+    pgType: Joi.string()
+      .valid(PG_TYPES.male, PG_TYPES.female, PG_TYPES.unisex, PG_TYPES.coLiving)
       .required(),
     facilities: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)),
   }),
@@ -58,10 +58,11 @@ const updatePreference = {
             "number.min": "Max budget cannot be less than min.",
           }),
       }),
-      gender: Joi.string().valid(
-        GENDER_TYPES.male,
-        GENDER_TYPES.female,
-        GENDER_TYPES.unisex,
+      pgType: Joi.string().valid(
+        PG_TYPES.male,
+        PG_TYPES.female,
+        PG_TYPES.unisex,
+        PG_TYPES.coLiving,
       ),
       facilities: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)),
       isActive: Joi.boolean(),

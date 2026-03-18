@@ -49,6 +49,27 @@ const pgSchema = mongoose.Schema(
         trim: true,
       },
     },
+    // geolocation point for the PG (longitude, latitude)
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number],
+        default: [0, 0],
+      },
+    },
+    pgType: {
+      type: String,
+      enum: [
+        PG_TYPES.male,
+        PG_TYPES.female,
+        PG_TYPES.unisex,
+        PG_TYPES.coLiving,
+      ],
+    },
     totalRooms: {
       type: Number,
       required: true,
@@ -69,6 +90,7 @@ const pgSchema = mongoose.Schema(
       min: 0,
       max: 5,
       default: 0,
+      set: (v) => Math.round(v * 10) / 10,
     },
     totalBeds: {
       type: Number,
@@ -130,6 +152,9 @@ const pgSchema = mongoose.Schema(
  * @typedef PG
  */
 const PG = mongoose.model(SCHEMA_NAME.pg, pgSchema);
+
+// Enables high-performance geospatial queries like "find PGs near me" (within X km radius)
+pgSchema.index({ location: "2dsphere" });
 
 pgSchema.plugin(private);
 

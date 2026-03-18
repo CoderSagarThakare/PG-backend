@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { SCHEMA_NAME, GENDER_TYPES } = require("../const/constant");
+const { SCHEMA_NAME, PG_TYPES } = require("../const/constant");
 
 const userPreferenceSchema = mongoose.Schema(
   {
@@ -38,9 +38,9 @@ const userPreferenceSchema = mongoose.Schema(
         type: Number,
       },
     },
-    gender: {
+    pgType: {
       type: String,
-      enum: [GENDER_TYPES.male, GENDER_TYPES.female, GENDER_TYPES.unisex],
+      enum: [PG_TYPES.male, PG_TYPES.female, PG_TYPES.unisex, PG_TYPES.coLiving],
     },
     facilities: [
       {

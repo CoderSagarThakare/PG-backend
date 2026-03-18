@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { PG_TYPES } = require("../const/constant");
 const objectIdPattern = /^[0-9a-fA-F]{24}$/;
 
 const createPG = {
@@ -19,6 +20,9 @@ const createPG = {
     managerId: Joi.string().pattern(objectIdPattern).required().messages({
       "string.pattern.base": "Invalid manager ID format",
     }),
+    pgType: Joi.string()
+      .valid(PG_TYPES.male, PG_TYPES.female, PG_TYPES.unisex, PG_TYPES.coLiving)
+      .required(),
     totalBeds: Joi.number().integer(),
     occupiedBeds: Joi.number().integer().min(0),
     emptyBeds: Joi.number().integer().min(0),
@@ -49,14 +53,13 @@ const updatePG = {
       managerId: Joi.string().pattern(objectIdPattern).messages({
         "string.pattern.base": "Invalid manager ID format",
       }),
+       pgType: Joi.string()
+      .valid(PG_TYPES.male, PG_TYPES.female, PG_TYPES.unisex, PG_TYPES.coLiving),
       totalRooms: Joi.number().integer(),
       description: Joi.string(),
-      rating: Joi.number().min(0).max(5),
-      beds: Joi.object().keys({
-        totalBeds: Joi.number().integer(),
-        occupiedBeds: Joi.number().integer().min(0),
-        emptyBeds: Joi.number().integer().min(0),
-      }),
+      totalBeds: Joi.number().integer(),
+      occupiedBeds: Joi.number().integer().min(0),
+      emptyBeds: Joi.number().integer().min(0),
       landline: Joi.string(),
       pgStartedDate: Joi.date(),
       images: Joi.array().items(Joi.string()),

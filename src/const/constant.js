@@ -17,15 +17,23 @@ const SCHEMA_NAME = {
 };
 
 const GENDER_TYPES = {
-  male: "male",
-  female: "female",
-  unisex: "unisex",
-  transgender : "transgender",
-  notToSay : "notToSay"
+  male: "Male",
+  female: "Female",
+  unisex: "Unisex",
+  transgender: "Transgender",
+  preferNotToSay: "PreferNotToSay",
+};
+
+const PG_TYPES = {
+  male: "Male",
+  female: "Female",
+  unisex: "Unisex",
+  coLiving: "Co-Living",
 };
 
 module.exports = {
   ROLE_TYPES,
   SCHEMA_NAME,
   GENDER_TYPES,
+  PG_TYPES,
 };
