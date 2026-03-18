@@ -13,6 +13,7 @@ const SCHEMA_NAME = {
   facilities: "Facilities",
   post: "Post",
   user: "User",
+  userPreference: "UserPreference",
 };
 
 const GENDER_TYPES = {

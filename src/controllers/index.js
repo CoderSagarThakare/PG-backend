@@ -7,3 +7,4 @@ module.exports.postController = require("./post.controller");
 module.exports.ownerController = require("./owner.controller");
 module.exports.managerController = require("./manager.controller");
 module.exports.employeeController = require("./employee.controller");
+module.exports.userPreferenceController = require("./userPreference.controller");
