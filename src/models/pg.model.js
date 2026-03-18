@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { private } = require("./plugins");
-const { SCHEMA_NAME } = require("../const/constant");
+const { SCHEMA_NAME, PG_TYPES } = require("../const/constant");
 
 const pgSchema = mongoose.Schema(
   {
