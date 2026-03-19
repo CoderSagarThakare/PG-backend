@@ -17,18 +17,26 @@ const SCHEMA_NAME = {
 };
 
 const GENDER_TYPES = {
-  male: "Male",
-  female: "Female",
-  unisex: "Unisex",
-  transgender: "Transgender",
-  preferNotToSay: "PreferNotToSay",
+  male: "male",
+  female: "female",
+  unisex: "unisex",
+  transgender: "transgender",
+  preferNotToSay: "preferNotToSay",
 };
 
 const PG_TYPES = {
-  male: "Male",
-  female: "Female",
-  unisex: "Unisex",
-  coLiving: "Co-Living",
+  male: "male",
+  female: "female",
+  unisex: "unisex",
+  coLiving: "coLiving",
+};
+
+const OCCUPANCY_TYPES = {
+  single: "single",
+  double: "double",
+  triple: "triple",
+  four: "four",
+  other: "other",
 };
 
 module.exports = {
@@ -36,4 +44,5 @@ module.exports = {
   SCHEMA_NAME,
   GENDER_TYPES,
   PG_TYPES,
+  OCCUPANCY_TYPES
 };
