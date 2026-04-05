@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { PG_TYPES, OCCUPANCY_TYPES } = require("../const/constant");
 const objectIdPattern = /^[0-9a-fA-F]{24}$/;
 
 const createPost = {
@@ -8,12 +9,23 @@ const createPost = {
       .required()
       .messages({ "string.pattern.base": "Invalid PG ID format" }),
 
-    title: Joi.string().required().trim().max(100), // e.g. "Double Sharing Bed Available"
+    title: Joi.string().required().trim().max(100),
     description: Joi.string().required().trim(),
 
     vacancyCount: Joi.number().integer().min(1).required(),
-    gender: Joi.string().valid("boys", "girls", "unisex").required(),
+    pgType: Joi.string()
+      .valid(PG_TYPES.male, PG_TYPES.female, PG_TYPES.unisex, PG_TYPES.coLiving)
+      .required(),
     pricePerBed: Joi.number().required(),
+    occupancyType: Joi.string()
+      .valid(
+        OCCUPANCY_TYPES.single,
+        OCCUPANCY_TYPES.double,
+        OCCUPANCY_TYPES.triple,
+        OCCUPANCY_TYPES.four,
+        OCCUPANCY_TYPES.other,
+      )
+      .required(),
 
     availableFrom: Joi.date().default(Date.now),
     images: Joi.array().items(Joi.string()).optional(),
@@ -42,11 +54,12 @@ const updatePost = {
           otherwise: Joi.number().min(0),
         }),
 
-      gender: Joi.string().valid("boys", "girls", "unisex"),
+      gender: Joi.string().valid("male", "female", "unisex"),
       pricePerBed: Joi.number(),
       availableFrom: Joi.date(),
       images: Joi.array().items(Joi.string()),
       isActive: Joi.boolean(),
+      
     })
     .min(1),
 };
@@ -66,7 +79,7 @@ const deletePost = {
 const listPosts = {
   query: Joi.object().keys({
     pgId: Joi.string().pattern(objectIdPattern).optional(), // Filter by specific PG
-    gender: Joi.string().valid("boys", "girls", "unisex").optional(),
+    gender: Joi.string().valid("male", "female", "unisex").optional(),
     minPrice: Joi.number().optional(),
     maxPrice: Joi.number().optional(),
     sortBy: Joi.string(),

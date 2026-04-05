@@ -1,4 +1,5 @@
-const { Post } = require("../models");
+const { Post, PG } = require("../models");
+const userPreferenceService = require("./userPreference.service");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 
@@ -10,12 +11,15 @@ const httpStatus = require("http-status");
 const createPost = async (postBody) => {
   try {
     // Ensuring default flags are set correctly on creation
-    return await Post.create({
+    const post = await Post.create({
       ...postBody,
       isDeleted: false,
       isActive: true,
     });
+
+    console.log({ post });
   } catch (error) {
+    console.log({ error });
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
       "Failed to create post",
@@ -45,7 +49,10 @@ const queryPosts = async (filter, options = {}) => {
       .populate("pgId", "name address locationLink")
       .sort(options.sortBy || "-createdAt")
       .limit(limit)
-      .skip(skip);
+      .skip(skip)
+      .populate("ownerId", "name mobNo1 mobNo2 role email picture")
+      .populate("pgId", "name rating checkInTime checkOutTime")
+      .populate("facilities");
 
     const total = await Post.countDocuments(finalFilter);
 
@@ -64,8 +71,11 @@ const queryPosts = async (filter, options = {}) => {
  * @returns {Promise<Post>}
  */
 const getPostById = async (postId) => {
-  // Check for isDeleted: false to ensure we don't retrieve a deleted post via ID
-  const post = await Post.findOne({ _id: postId, isDeleted: false })
+  const post = await Post.findOne({ _id: postId })
+    .populate("ownerId", "name mobNo1 mobNo2 role email picture")
+    .populate("pgId", "name rating checkInTime checkOutTime")
+    .populate("facilities")
+    .populate("createdBy", "name")
 
   if (!post) {
     throw new ApiError(
@@ -85,7 +95,7 @@ const getPostById = async (postId) => {
  */
 const updatePostById = async (postId, ownerId, updateBody) => {
   // Ensure we are only updating a post that is NOT deleted
-  const post = await Post.findOne({ _id: postId, ownerId, isDeleted: false });
+  const post = await Post.findOne({ _id: postId, ownerId });
 
   if (!post) {
     throw new ApiError(
@@ -107,7 +117,7 @@ const updatePostById = async (postId, ownerId, updateBody) => {
  */
 const deletePostById = async (postId, ownerId) => {
   try {
-    const post = await Post.findOne({ _id: postId, ownerId, isDeleted: false });
+    const post = await Post.findOne({ _id: postId, ownerId });
 
     if (!post) {
       throw new ApiError(
@@ -127,10 +137,113 @@ const deletePostById = async (postId, ownerId) => {
   }
 };
 
+/**
+ * Fetch vacancy posts tailored to a user's preferences with scoring and pagination.
+ * @param {string} userId
+ * @param {Object} options - { limit, page }
+ * @returns {Promise<QueryResult>}
+ */
+const getPostsByPreference = async (userId, options = {}) => {
+  const pref = await userPreferenceService.getPreferenceByUserId(userId);
+  const limit = parseInt(options.limit, 10) || 10;
+  const page = parseInt(options.page, 10) || 1;
+  const skip = (page - 1) * limit;
+
+  if (!pref) {
+    return { posts: [], total: 0, limit, page };
+  }
+
+  // build PG filter first (for geo / pincode)
+  const pgFilter = { isActive: true, isDeleted: false };
+  if (pref.location) {
+    if (pref.location.pincode) {
+      pgFilter["address.pincode"] = pref.location.pincode;
+    }
+    if (
+      pref.location.coordinates &&
+      Array.isArray(pref.location.coordinates) &&
+      pref.location.coordinates.length === 2
+    ) {
+      pgFilter.location = {
+        $near: {
+          $geometry: { type: "Point", coordinates: pref.location.coordinates },
+          $maxDistance: pref.location.radius || 5000,
+        },
+      };
+    }
+    if (pref.location.city) {
+      pgFilter["address.city"] = pref.location.city;
+    }
+  }
+
+  // find matching PG ids
+  const pgDocs = await PG.find(pgFilter).select("_id facilities");
+  const pgIds = pgDocs.map((p) => p._id);
+
+  // build post filter
+  const postFilter = {
+    isDeleted: false,
+    isActive: true,
+    pgId: { $in: pgIds },
+  };
+  if (pref.pgType) {
+    postFilter.gender = pref.pgType;
+  }
+
+  // initial fetch without scoring (just to get total count)
+  const total = await Post.countDocuments(postFilter);
+
+  // fetch actual posts, populate for scoring
+  let posts = await Post.find(postFilter)
+    .populate("pgId", "name address facilities location")
+    .limit(limit)
+    .skip(skip);
+
+  // compute scores
+  const now = Date.now();
+  posts = posts
+    .map((post) => {
+      let score = 0;
+      // pincode match
+      if (
+        pref.location &&
+        pref.location.pincode &&
+        post.pgId.address &&
+        post.pgId.address.pincode === pref.location.pincode
+      ) {
+        score += 50;
+      }
+      // budget match (assume pricePerBed <= budget)
+      if (pref.budget !== undefined && post.pricePerBed <= pref.budget) {
+        score += 30;
+      }
+      // facilities match
+      if (pref.facilities && pref.facilities.length && post.pgId.facilities) {
+        const matched = post.pgId.facilities.filter((f) =>
+          pref.facilities.includes(String(f)),
+        );
+        score += matched.length * 10;
+      }
+      // recency: created within last 7 days
+      const created = new Date(post.createdAt).getTime();
+      const ageDays = (now - created) / (1000 * 60 * 60 * 24);
+      if (ageDays <= 7) {
+        score += 20;
+      }
+
+      return { post, score };
+    })
+    .sort((a, b) => b.score - a.score || b.post.createdAt - a.post.createdAt)
+    .map((p) => p.post);
+
+  return { posts, total, limit, page };
+};
+
 module.exports = {
   createPost,
   queryPosts,
   getPostById,
   updatePostById,
   deletePostById,
+  getPostsByPreference,
 };

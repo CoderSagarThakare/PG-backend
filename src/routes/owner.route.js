@@ -8,42 +8,44 @@ const {
 const { ROLE_TYPES } = require("../const/constant");
 const auth = require("../middlewares/auth");
 const pgRoute = require("./pg.route");
+const postRoutes = require("./post.route")
 
 // All owner routes require authentication
 router.use(auth(ROLE_TYPES.owner));
 
 // PG-related routes for owners (mounted under /pg/owner)
 router.use("/pg", pgRoute);
+router.use("/post", postRoutes)
 
 // Post-related routes for owners
-router.post(
-  "/post",
-  validate(postValidation.createPost),
-  postController.createPost,
-);
+// router.post(
+//   "/post",
+//   validate(postValidation.createPost),
+//   postController.createPost,
+// );
 
-router.get(
-  "/posts",
-  validate(postValidation.listPosts),
-  postController.getPosts,
-);
+// router.get(
+//   "/posts",
+//   validate(postValidation.listPosts),
+//   postController.getPosts,
+// );
 
-router.get(
-  "/post/:postId",
-  validate(postValidation.getPost),
-  postController.getPost,
-);
+// router.get(
+//   "/post/:postId",
+//   validate(postValidation.getPost),
+//   postController.getPost,
+// );
 
-router.patch(
-  "/post/:postId",
-  validate(postValidation.updatePost),
-  postController.updatePost,
-);
+// router.patch(
+//   "/post/:postId",
+//   validate(postValidation.updatePost),
+//   postController.updatePost,
+// );
 
-router.delete(
-  "/post/:postId",
-  validate(postValidation.deletePost),
-  postController.deletePost,
-);
+// router.delete(
+//   "/post/:postId",
+//   validate(postValidation.deletePost),
+//   postController.deletePost,
+// );
 
 module.exports = router;
