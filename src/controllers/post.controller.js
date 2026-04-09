@@ -5,6 +5,7 @@ const ApiError = require("../utils/ApiError");
 
 const createPost = catchAsync(async (req, res) => {
   // 1. Check if the PG belongs to the logged-in owner
+
   const pg = await PgService.getPGById(req.body.pgId, req.user.id);
 
   if (!pg) {
@@ -21,7 +22,6 @@ const createPost = catchAsync(async (req, res) => {
   // 3. Denormalization: Copying PG location/address to PostData
   const postData = {
     ...req.body,
-    ownerId: req.user.id,
     location: pg.location,
     address: {
       pincode: pg.address.pincode,
@@ -48,23 +48,21 @@ const getPosts = catchAsync(async (req, res) => {
   };
 
   // Filter posts by the current owner (Owner only sees their own ads)
-  const filter = { ownerId: req.user.id };
+  // const filter = { ownerId: req.user.id };
 
   // Optional: Filter by specific PG if pgId is in query
   if (req.query.pgId) filter.pgId = req.query.pgId;
 
   const result = await postService.queryPosts(filter, options);
-  res
-    .status(httpStatus.OK)
-    .json({
-      status: true,
-      message: "All post fetched successfully",
-      ...result,
-    });
+  res.status(httpStatus.OK).json({
+    status: true,
+    message: "All post fetched successfully",
+    ...result,
+  });
 });
 
 const getPost = catchAsync(async (req, res) => {
-  const post = await postService.getPostById(req.params.postId);
+  const post = await postService.getPostById(req.params.postId, req.user._id);
 
   res
     .status(httpStatus.OK)
@@ -72,9 +70,7 @@ const getPost = catchAsync(async (req, res) => {
 });
 
 const updatePost = catchAsync(async (req, res) => {
-  console.log("in update post");
-  // Pass userId to service to ensure only owner can update
-  await postService.updatePostById(req.params.postId, req.user.id, req.body);
+  await postService.updatePostById(req.params.postId, req.body, req.user._id);
 
   res.status(httpStatus.OK).json({
     success: true,
@@ -95,7 +91,7 @@ const getPostsByPreference = catchAsync(async (req, res) => {
 
 const deletePost = catchAsync(async (req, res) => {
   // Pass userId to service to ensure only owner can delete
-  await postService.deletePostById(req.params.postId, req.user.id);
+  await postService.deletePostById(req.params.postId, req.user._id);
 
   res.status(httpStatus.OK).json({
     success: true,

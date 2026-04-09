@@ -17,8 +17,7 @@ router.post(
   postController.createPost,
 );
 router.get('/:postId', validate(postValidation.getPost), postController.getPost);
-router.get('/', postController.getPosts);
-// ---------------------
+router.get('/', postController.getPosts);   // update for manager and owner diffrently : not working
 
 router.patch(
   '/:postId',

@@ -16,8 +16,6 @@ const createPost = async (postBody) => {
       isDeleted: false,
       isActive: true,
     });
-
-    console.log({ post });
   } catch (error) {
     console.log({ error });
     throw new ApiError(
@@ -70,17 +68,28 @@ const queryPosts = async (filter, options = {}) => {
  * @param {string} postId
  * @returns {Promise<Post>}
  */
-const getPostById = async (postId) => {
+const getPostById = async (postId, staffId) => {
   const post = await Post.findOne({ _id: postId })
-    .populate("ownerId", "name mobNo1 mobNo2 role email picture")
-    .populate("pgId", "name rating checkInTime checkOutTime")
+    .populate("pgId", "name rating checkInTime checkOutTime ownerId managerId")
     .populate("facilities")
-    .populate("createdBy", "name")
+    .populate("createdBy", "name");
 
   if (!post) {
     throw new ApiError(
       httpStatus.NOT_FOUND,
       "Post not found or has been deleted",
+    );
+  }
+
+  const isOwner = post.pgId.ownerId.toString() === staffId.toString();
+  const isManager =
+    post.pgId.managerId &&
+    post.pgId.managerId.toString() === staffId.toString();
+
+  if (!isOwner && !isManager) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "Access Denied: You are not authorized to view this post.",
     );
   }
   return post;
@@ -93,14 +102,28 @@ const getPostById = async (postId) => {
  * @param {Object} updateBody
  * @returns {Promise<Post>}
  */
-const updatePostById = async (postId, ownerId, updateBody) => {
-  // Ensure we are only updating a post that is NOT deleted
-  const post = await Post.findOne({ _id: postId, ownerId });
+const updatePostById = async (postId, updateBody, staffId) => {
+  const post = await Post.findOne({ _id: postId }).populate(
+    "pgId",
+    "managerId ownerId",
+  );
 
   if (!post) {
     throw new ApiError(
       httpStatus.NOT_FOUND,
       "Post not found, unauthorized, or deleted",
+    );
+  }
+
+  const isOwner = post.pgId.ownerId.toString() === staffId.toString();
+  const isManager =
+    post.pgId.managerId &&
+    post.pgId.managerId.toString() === staffId.toString();
+
+  if (!isOwner && !isManager) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "Access Denied: You are not authorized to view this post.",
     );
   }
 
@@ -115,14 +138,27 @@ const updatePostById = async (postId, ownerId, updateBody) => {
  * @param {string} ownerId - For verification
  * @returns {Promise<void>}
  */
-const deletePostById = async (postId, ownerId) => {
+const deletePostById = async (postId, staffId) => {
   try {
-    const post = await Post.findOne({ _id: postId, ownerId });
+    const post = await Post.findOne({ _id: postId })
+    .populate("pgId", "ownerId managerId")
 
     if (!post) {
       throw new ApiError(
         httpStatus.NOT_FOUND,
         "Post not found or already deleted",
+      );
+    }
+
+    const isOwner = post.pgId.ownerId.toString() === staffId.toString();
+    const isManager =
+      post.pgId.managerId &&
+      post.pgId.managerId.toString() === staffId.toString();
+
+    if (!isOwner && !isManager) {
+      throw new ApiError(
+        httpStatus.FORBIDDEN,
+        "Access Denied: You are not authorized to view this post.",
       );
     }
 

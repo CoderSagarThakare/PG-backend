@@ -4,11 +4,6 @@ const { SCHEMA_NAME, PG_TYPES, OCCUPANCY_TYPES } = require("../const/constant");
 
 const postSchema = mongoose.Schema(
   {
-    ownerId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: SCHEMA_NAME.staff,
-      required: true,
-    },
     pgId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: SCHEMA_NAME.pg,

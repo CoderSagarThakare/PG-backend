@@ -70,17 +70,22 @@ const getPGsByOwner = async (ownerId, options = {}, isAdmin = false) => {
  * @returns {Promise<PG>}
  */
 
-const getPGById = async (pgId, ownerId, isAdmin = false) => {
+const getPGById = async (pgId, staffId, isAdmin = false) => {
   try {
-    const query = { _id: pgId, ownerId };
+
+    const query = { _id: pgId };
+
+    // only pg manager or owner can create a post
     if (!isAdmin) {
       query.isDeleted = false;
+      query.$or = [{ ownerId: staffId }, { managerId: staffId }];
     }
 
     const pg = await PG.findOne(query)
       .populate("ownerId", "name email role email mobNo1 mobNo2")
       .populate("managerId", "name email role email mobNo1 mobNo2")
-      .populate("facilities");
+      .populate("facilities", "name")
+      .lean();
 
     if (!pg) {
       const message = isAdmin
