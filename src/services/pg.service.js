@@ -50,7 +50,8 @@ const getPGsByOwner = async (ownerId, options = {}, isAdmin = false) => {
       query.isDeleted = false;
     }
 
-    const pgs = await PG.find(query).limit(limit).skip(skip);
+    const pgs = await PG.find(query).limit(limit).skip(skip)
+    .populate("facilities", "name");
     const total = await PG.countDocuments(query);
 
     return { pgs, total, limit, page };
