@@ -1,13 +1,14 @@
 const httpStatus = require("http-status");
 const catchAsync = require("../utils/catchAsync");
 const { staffService } = require("../services");
+const sendResponse = require("../utils/sendResponse");
 
 /**
  * Get current staff member details
  */
 const getStaff = catchAsync(async (req, res) => {
   req.user.otp = undefined;
-  res.status(httpStatus.OK).send(req.user);
+  sendResponse(res, { data: req.user, statusCode: httpStatus.OK });
 });
 
 /**
@@ -16,9 +17,7 @@ const getStaff = catchAsync(async (req, res) => {
 const updateStaff = catchAsync(async (req, res) => {
   await staffService.updateStaffById(req.user._id, req.body);
 
-  res
-    .status(200)
-    .send({ success: true, message: "staff modified successfully" });
+  sendResponse(res, { success: true, message: "staff modified successfully" });
 });
 
 /**
@@ -31,7 +30,7 @@ const getAllStaff = catchAsync(async (req, res) => {
   };
 
   const result = await staffService.getAllStaff(options);
-  res.status(httpStatus.OK).send(result);
+  sendResponse(res, { data: result, statusCode: httpStatus.OK });
 });
 
 /**
@@ -45,12 +44,12 @@ const getStaffByRole = catchAsync(async (req, res) => {
   };
 
   const result = await staffService.getStaffByRole(role, options);
-  res.status(httpStatus.OK).send(result);
+  sendResponse(res, { data: result, statusCode: httpStatus.OK });
 });
 
 const deleteStaff = catchAsync(async (req, res) => {
   await staffService.deleteStaffById(req.user._id);
-  res.status(httpStatus.OK).send({ success: true, message: "staff deleted successfully" });
+  sendResponse(res, { success: true, message: "staff deleted successfully", statusCode: httpStatus.OK });
 });
 
 module.exports = { getStaff, updateStaff, getAllStaff, getStaffByRole, deleteStaff };

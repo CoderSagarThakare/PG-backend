@@ -1,6 +1,7 @@
 const httpStatus = require("http-status");
 const catchAsync = require("../utils/catchAsync");
 const { userPreferenceService } = require("../services");
+const sendResponse = require("../utils/sendResponse");
 
 const getPreference = catchAsync(async (req, res) => {
   const pref = await userPreferenceService.getPreferenceByUserId(
@@ -8,14 +9,12 @@ const getPreference = catchAsync(async (req, res) => {
     req.params.preferenceId,
   );
 
-  res.status(httpStatus.OK).send(pref);
+  sendResponse(res, { data: pref, statusCode: httpStatus.OK });
 });
 
 const createPreference = catchAsync(async (req, res) => {
   await userPreferenceService.createPreference(req.user._id, req.body);
-  res
-    .status(httpStatus.CREATED)
-    .send({ status: true, message: "Preference created successfully" });
+  sendResponse(res, { success: true, message: "Preference created successfully", statusCode: httpStatus.CREATED });
 });
 
 const updatePreference = catchAsync(async (req, res) => {
@@ -24,9 +23,7 @@ const updatePreference = catchAsync(async (req, res) => {
     req.params.preferenceId,
     req.body,
   );
-  res
-    .status(httpStatus.OK)
-    .send({ status: true, message: "Preference updated successfully" });
+  sendResponse(res, { success: true, message: "Preference updated successfully", statusCode: httpStatus.OK });
 });
 
 const deletePreference = catchAsync(async (req, res) => {
@@ -35,9 +32,7 @@ const deletePreference = catchAsync(async (req, res) => {
     req.params.preferenceId,
     { isDeleted: true },
   );
-  res
-    .status(httpStatus.OK)
-    .send({ status: true, message: "Preference deleted successfully" });
+  sendResponse(res, { success: true, message: "Preference deleted successfully", statusCode: httpStatus.OK });
 });
 
 module.exports = {

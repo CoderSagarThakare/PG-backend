@@ -2,6 +2,7 @@ const catchAsync = require("../utils/catchAsync");
 const { postService, PgService } = require("../services");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
+const sendResponse = require("../utils/sendResponse");
 
 const createPost = catchAsync(async (req, res) => {
   // 1. Check if the PG belongs to the logged-in owner
@@ -33,10 +34,11 @@ const createPost = catchAsync(async (req, res) => {
 
   const post = await postService.createPost(postData);
 
-  res.status(httpStatus.CREATED).json({
+  sendResponse(res, {
     success: true,
     data: post,
     message: "Vacancy post created successfully",
+    statusCode: httpStatus.CREATED,
   });
 });
 
@@ -54,27 +56,32 @@ const getPosts = catchAsync(async (req, res) => {
   if (req.query.pgId) filter.pgId = req.query.pgId;
 
   const result = await postService.queryPosts(filter, options);
-  res.status(httpStatus.OK).json({
-    status: true,
+  sendResponse(res, {
+    success: true,
     message: "All post fetched successfully",
-    ...result,
+    data: result,
+    statusCode: httpStatus.OK,
   });
 });
 
 const getPost = catchAsync(async (req, res) => {
   const post = await postService.getPostById(req.params.postId, req.user._id);
 
-  res
-    .status(httpStatus.OK)
-    .json({ success: true, message: "Post fetched successfully", post });
+  sendResponse(res, {
+    success: true,
+    message: "Post fetched successfully",
+    data: { post },
+    statusCode: httpStatus.OK,
+  });
 });
 
 const updatePost = catchAsync(async (req, res) => {
   await postService.updatePostById(req.params.postId, req.body, req.user._id);
 
-  res.status(httpStatus.OK).json({
+  sendResponse(res, {
     success: true,
     message: "Post updated successfully",
+    statusCode: httpStatus.OK,
   });
 });
 
@@ -86,16 +93,17 @@ const getPostsByPreference = catchAsync(async (req, res) => {
   };
 
   const result = await postService.getPostsByPreference(req.user._id, options);
-  res.status(httpStatus.OK).json(result);
+  sendResponse(res, { data: result, statusCode: httpStatus.OK });
 });
 
 const deletePost = catchAsync(async (req, res) => {
   // Pass userId to service to ensure only owner can delete
   await postService.deletePostById(req.params.postId, req.user._id);
 
-  res.status(httpStatus.OK).json({
+  sendResponse(res, {
     success: true,
     message: "Post deleted successfully",
+    statusCode: httpStatus.OK,
   });
 });
 

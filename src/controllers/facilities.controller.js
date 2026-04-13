@@ -3,13 +3,14 @@ const { facilitiesService } = require("../services");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const { PG } = require("../models");
+const sendResponse = require("../utils/sendResponse");
 
 const getAllFacilities = catchAsync(async (req, res) => {
   const isAdmin = req.user.role === "admin";
 
   const facilities = await facilitiesService.getAllFacilities();
 
-  res.status(httpStatus.OK).json(facilities);
+  sendResponse(res, { data: facilities, statusCode: httpStatus.OK });
 });
 
 module.exports = {

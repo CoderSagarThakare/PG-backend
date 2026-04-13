@@ -2,15 +2,16 @@ const { pgController } = require(".");
 const httpStatus = require("http-status");
 const catchAsync = require("../utils/catchAsync");
 const { ownerService } = require("../services");
+const sendResponse = require("../utils/sendResponse");
 
 const getOwner = catchAsync(async (req, res) => {
-  res.status(httpStatus.OK).send(req.owner);
+  sendResponse(res, { data: req.owner, statusCode: httpStatus.OK });
 });
 
 const updateOwner = catchAsync(async (req, res) => {
   await ownerService.updateOwnerById(req.owner._id, req.body);
 
-  res.status(200).send({ success: true, message: "owner modified successfully" });
+  sendResponse(res, { success: true, message: "owner modified successfully" });
 });
 
 module.exports = {

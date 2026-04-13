@@ -10,6 +10,7 @@ const {
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const { ROLE_TYPES } = require("../const/constant");
+const sendResponse = require("../utils/sendResponse");
 
 const register = catchAsync(async (req, res) => {
   const staffRoles = [
@@ -24,19 +25,12 @@ const register = catchAsync(async (req, res) => {
     // Register as staff member with specified role
     await authService.registerStaff({ ...req.body });
 
-    res
-      .status(httpStatus.CREATED)
-      .json({
-        success: true,
-        message: `Staff member with role ${role} registered successfully`,
-      });
+    sendResponse(res, { success: true, message: `Staff member with role ${role} registered successfully`, statusCode: httpStatus.CREATED });
   } else if (role === ROLE_TYPES.user) {
     // Register as regular user
     await authService.registerUser({ ...req.body });
 
-    res
-      .status(httpStatus.CREATED)
-      .json({ success: true, message: "User registered successfully" });
+    sendResponse(res, { success: true, message: "User registered successfully", statusCode: httpStatus.CREATED });
   } else {
     throw new ApiError(httpStatus.BAD_REQUEST, `Invalid role: ${role}`);
   }
@@ -49,11 +43,7 @@ const login = catchAsync(async (req, res) => {
 
   const token = await tokenService.generateAuthTokens(user);
 
-  res.send({
-    success: true,
-    message: "Login successful",
-    token: token.token,
-  });
+  sendResponse(res, { success: true, message: "Login successful", data: { token: token.token } });
 });
 
 const socialLogin = catchAsync(async (req, res) => {
@@ -74,11 +64,7 @@ const socialLogin = catchAsync(async (req, res) => {
       );
   }
   const { token, expires } = await tokenService.generateAuthTokens(user);
-  res.send({
-    user,
-    token,
-    expires,
-  });
+  sendResponse(res, { data: { user, token, expires } });
 });
 
 const forgotPassword = catchAsync(async (req, res) => {
@@ -86,12 +72,12 @@ const forgotPassword = catchAsync(async (req, res) => {
     req.body.email,
   );
   await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
-  res.status(200).json({ message: "Email sent successfully" });
+  sendResponse(res, { message: "Email sent successfully" });
 });
 
 const resetPassword = catchAsync(async (req, res) => {
   const a = await authService.resetPassword(req.query.token, req.body.password);
-  res.status(200).json({ message: "Password reset successfully" });
+  sendResponse(res, { message: "Password reset successfully" });
 });
 
 const sendVerificationEmail = catchAsync(async (req, res) => {
@@ -99,12 +85,12 @@ const sendVerificationEmail = catchAsync(async (req, res) => {
     req.user,
   );
   await emailService.sendVerificationEmail(req.user.email, verifyEmailToken);
-  res.status(httpStatus.OK).json({ message: "verify email sent successfully" });
+  sendResponse(res, { message: "verify email sent successfully", statusCode: httpStatus.OK });
 });
 
 const verifyEmail = catchAsync(async (req, res) => {
   await authService.verifyEmail(req.query.token);
-  res.status(httpStatus.OK).json({ message: "e-mail verified successfully" });
+  sendResponse(res, { message: "e-mail verified successfully", statusCode: httpStatus.OK });
 });
 
 const sendVerificationOTP = catchAsync(async (req, res) => {
@@ -129,17 +115,13 @@ const sendVerificationOTP = catchAsync(async (req, res) => {
     });
   }
 
-  res
-    .status(httpStatus.OK)
-    .send({ message: "Check otp on your registered mail-id" });
+  sendResponse(res, { message: "Check otp on your registered mail-id", statusCode: httpStatus.OK });
 });
 
 const verifyOTP = catchAsync(async (req, res) => {
   await otpService.validateOTP(req.user.id, req.body.otp);
 
-  res
-    .status(httpStatus.OK)
-    .send({ success: true, message: "Email verified successfully !!!" });
+  sendResponse(res, { success: true, message: "Email verified successfully !!!", statusCode: httpStatus.OK });
 });
 
 module.exports = {
