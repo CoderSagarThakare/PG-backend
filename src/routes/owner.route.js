@@ -2,20 +2,19 @@ const express = require("express");
 const router = express.Router();
 const validate = require("../middlewares/validate");
 const { postValidation } = require("../validations");
-const {
-  postController,
-} = require("../controllers");
+const { postController } = require("../controllers");
 const { ROLE_TYPES } = require("../const/constant");
 const auth = require("../middlewares/auth");
 const pgRoute = require("./pg.route");
-const postRoutes = require("./post.route")
-
+const postRoutes = require("./post.route");
+const enquiryRoute = require("./enquiry.route");
 // All owner routes require authentication
 router.use(auth(ROLE_TYPES.owner));
 
 // PG-related routes for owners (mounted under /pg/owner)
 router.use("/pg", pgRoute);
-router.use("/post", postRoutes)
+router.use("/post", postRoutes);
+router.use("/enquiry", enquiryRoute);
 
 // Post-related routes for owners
 // router.post(

@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 // custom validation for password
 const password = (value, helpers) => {
   if (value.length < 8) {
@@ -11,6 +13,14 @@ const password = (value, helpers) => {
   return value;
 };
 
+const objectId = (value, helpers) => {
+  if (!mongoose.Types.ObjectId.isValid(value)) {
+    return helpers.message("Invalid ObjectId");
+  }
+  return value;
+};
+
 module.exports = {
-    password
-}
+  password,
+  objectId,
+};

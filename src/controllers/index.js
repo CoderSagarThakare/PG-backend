@@ -8,3 +8,4 @@ module.exports.ownerController = require("./owner.controller");
 module.exports.managerController = require("./manager.controller");
 module.exports.employeeController = require("./employee.controller");
 module.exports.userPreferenceController = require("./userPreference.controller");
+module.exports.enquiryController = require("./enquiry.controller");

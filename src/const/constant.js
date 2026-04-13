@@ -14,6 +14,7 @@ const SCHEMA_NAME = {
   post: "Post",
   user: "User",
   userPreference: "UserPreference",
+  enquiry : "Enquiry",
 };
 
 const GENDER_TYPES = {
