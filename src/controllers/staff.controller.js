@@ -52,4 +52,17 @@ const deleteStaff = catchAsync(async (req, res) => {
   sendResponse(res, { success: true, message: "staff deleted successfully", statusCode: httpStatus.OK });
 });
 
-module.exports = { getStaff, updateStaff, getAllStaff, getStaffByRole, deleteStaff };
+/**
+ * Get all managers (Owner only)
+ */
+const getManagers = catchAsync(async (req, res) => {
+  const options = {
+    limit: req.query.limit ? parseInt(req.query.limit) : 10,
+    page: req.query.page ? parseInt(req.query.page) : 1,
+  };
+
+  const result = await staffService.getManagersList(options);
+  sendResponse(res, { data: result, statusCode: httpStatus.OK });
+});
+
+module.exports = { getStaff, updateStaff, getAllStaff, getStaffByRole, deleteStaff, getManagers };

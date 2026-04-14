@@ -2,6 +2,7 @@
 const { ROLE_TYPES } = require("../const/constant");
 const auth = require("../middlewares/auth");
 const profileRoute = require("./profile.route");
+const { staffController } = require("../controllers");
 const router = require("express").Router();
 
 // // All staff routes require authentication and must be a staff member (ownermanager, employee, or admin)
@@ -13,6 +14,9 @@ router.use(
     // ROLE_TYPES.admin,
   ),
 );
+
+// Get all managers (Owner only)
+router.get("/managers", auth(ROLE_TYPES.owner), staffController.getManagers);
 
 router.use("/profile", profileRoute);
 

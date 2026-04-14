@@ -148,6 +148,23 @@ const deleteStaffById = async (staffId) => {
   }
 };
 
+/**
+ * Get all managers
+ * @param {Object} options - Query options (limit, page)
+ * @returns {Promise<{staff: Staff[], total: number, limit: number, page: number}>}
+ */
+const getManagersList = async (options = {}) => {
+  const limit = options.limit || 10;
+  const page = options.page || 1;
+  const skip = (page - 1) * limit;
+
+  const filter = { role: "manager", isDeleted: false };
+  const managers = await Staff.find(filter).limit(limit).skip(skip).select("name mobNo1 picture");
+  const total = await Staff.countDocuments(filter);
+
+  return { managers, total, limit, page };
+};
+
 module.exports = {
   createStaff,
   getStaffByEmail,
@@ -156,4 +173,5 @@ module.exports = {
   getStaffByRole,
   getAllStaff,
   deleteStaffById,
+  getManagersList,
 };

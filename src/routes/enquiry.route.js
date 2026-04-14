@@ -16,7 +16,7 @@ router.post(
 // Staff routes (owner/manager)
 // router.use(auth(ROLE_TYPES.manager, ROLE_TYPES.owner));
 
-router.get("/", enquiryController.getEnquiries);
+router.get("/",auth(ROLE_TYPES.manager, ROLE_TYPES.owner), enquiryController.getEnquiries);
 router.get(
   "/:enquiryId",
   validate(enquiryValidation.getEnquiry),
