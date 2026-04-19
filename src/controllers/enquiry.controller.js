@@ -19,9 +19,6 @@ const createEnquiry = catchAsync(async (req, res) => {
 });
 
 const getEnquiries = catchAsync(async (req, res) => {
-  if (![ROLE_TYPES.owner, ROLE_TYPES.manager].includes(req.user.role)) {
-    throw new ApiError(httpStatus.FORBIDDEN, "Access denied");
-  }
   const options = {
     limit: req.query.limit || 10,
     page: req.query.page || 1,
@@ -33,6 +30,7 @@ const getEnquiries = catchAsync(async (req, res) => {
     $or: [
       { ownerId: req.user._id },
       { managerId: req.user._id },
+      { userId: req.user._id },
     ],
   };
 
@@ -60,7 +58,10 @@ const getEnquiry = catchAsync(async (req, res) => {
   }
 
   // Check access
-  if (enquiry.ownerId.toString() !== req.user._id.toString() && enquiry.managerId?.toString() !== req.user._id.toString()) {
+  if (
+    enquiry.ownerId.toString() !== req.user._id.toString() &&
+    enquiry.managerId?.toString() !== req.user._id.toString()
+  ) {
     throw new ApiError(httpStatus.FORBIDDEN, "Access denied");
   }
 
@@ -76,7 +77,11 @@ const updateEnquiry = catchAsync(async (req, res) => {
   if (![ROLE_TYPES.owner, ROLE_TYPES.manager].includes(req.user.role)) {
     throw new ApiError(httpStatus.FORBIDDEN, "Access denied");
   }
-  const enquiry = await enquiryService.updateEnquiryById(req.params.enquiryId, req.body, req.user._id);
+  const enquiry = await enquiryService.updateEnquiryById(
+    req.params.enquiryId,
+    req.body,
+    req.user._id,
+  );
 
   return sendResponse(res, {
     success: true,

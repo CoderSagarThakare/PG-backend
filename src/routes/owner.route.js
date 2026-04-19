@@ -14,7 +14,6 @@ router.use(auth(ROLE_TYPES.owner));
 // PG-related routes for owners (mounted under /pg/owner)
 router.use("/pg", pgRoute);
 router.use("/post", postRoutes);
-router.use("/enquiry", enquiryRoute);
 
 // Post-related routes for owners
 // router.post(

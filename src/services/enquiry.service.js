@@ -33,7 +33,6 @@ const createEnquiry = async ({ userId, postId }) => {
     const post = await getActivePostById(postId);
     const pg = await getPgById(post.pgId);
 
-
     const existingEnquiry = await Enquiry.findOne({
       userId,
       postId,
@@ -92,10 +91,17 @@ const queryEnquiries = async (filter, options) => {
   const skip = (page - 1) * limit;
   const query = { ...filter };
 
-  const enquiries = await Enquiry.find(query)
-    .limit(limit)
-    .skip(skip)
-    .sort(options.sortBy);
+const enquiries = await Enquiry.find(query)
+  .limit(limit)
+  .skip(skip)
+  .sort(options.sortBy)
+  .populate("userId", "name email picture mobNo1 mobNo2") 
+  .populate("pgId", "name") 
+  .populate("postId", "title occupancyType pricePerBed")
+  .populate("ownerId", "name")
+  .populate("managerId", "name")
+  .lean();
+
   const total = await Enquiry.countDocuments(query);
 
   return { enquiries, total, limit, page };

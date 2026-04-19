@@ -9,14 +9,16 @@ const router = require("express").Router();
 // User routes
 router.post(
   "/",
+  auth(ROLE_TYPES.user),
   validate(enquiryValidation.createEnquiry),
   enquiryController.createEnquiry,
 );
-// ---------------------------------
+
 // Staff routes (owner/manager)
 // router.use(auth(ROLE_TYPES.manager, ROLE_TYPES.owner));
+router.get("/",auth(ROLE_TYPES.manager, ROLE_TYPES.owner, ROLE_TYPES.user), enquiryController.getEnquiries);
 
-router.get("/",auth(ROLE_TYPES.manager, ROLE_TYPES.owner), enquiryController.getEnquiries);
+// ---------------------------------------------------
 router.get(
   "/:enquiryId",
   validate(enquiryValidation.getEnquiry),

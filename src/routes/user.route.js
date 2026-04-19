@@ -5,13 +5,11 @@ const validate = require("../middlewares/validate");
 const { userValidation } = require("../validations");
 const userPreferenceRoute = require("./userPreference.route");
 const router = require("express").Router();
-const enquiryRoute = require("./enquiry.route");
 
 // Token authentication for all routes defined in this file
 router.use(auth(ROLE_TYPES.user));
 
 router.use("/preference", userPreferenceRoute);
-router.use("/enquiry", enquiryRoute);
 
 // get update user
 router
