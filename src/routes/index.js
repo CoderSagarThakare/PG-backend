@@ -15,7 +15,7 @@ const defaultRoutes = [
   { path: "/owner", route: ownerRoute }, // base path for owner routes
   { path: "/manager", route: managerRoute },
   { path: "/staff", route: staffRoute }, // base path for staff routes
-  { path: "/enquiries", route: enquiryRoutes } // base path for enquiry routes
+  { path: "/enquiry", route: enquiryRoutes } // base path for enquiry routes
 ];
 
 defaultRoutes.map((route) => {
