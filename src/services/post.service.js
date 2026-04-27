@@ -140,8 +140,10 @@ const updatePostById = async (postId, updateBody, staffId) => {
  */
 const deletePostById = async (postId, staffId) => {
   try {
-    const post = await Post.findOne({ _id: postId })
-    .populate("pgId", "ownerId managerId")
+    const post = await Post.findOne({ _id: postId }).populate(
+      "pgId",
+      "ownerId managerId",
+    );
 
     if (!post) {
       throw new ApiError(

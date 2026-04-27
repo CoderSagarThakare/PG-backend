@@ -49,8 +49,13 @@ const getPosts = catchAsync(async (req, res) => {
     sortBy: req.query.sortBy,
   };
 
-  // Filter posts by the current owner (Owner only sees their own ads)
-  // const filter = { ownerId: req.user.id };
+  const filter = {
+    $or: [
+      { ownerId: req.user._id },
+      { managerId: req.user._id },
+      { userId: req.user._id },
+    ],
+  };
 
   // Optional: Filter by specific PG if pgId is in query
   if (req.query.pgId) filter.pgId = req.query.pgId;
