@@ -15,8 +15,7 @@ const createPost = async (postBody) => {
       ...postBody,
       isDeleted: false,
       isActive: true,
-    })
-    return post;
+    });
   } catch (error) {
     console.log({ error });
     throw new ApiError(
@@ -71,7 +70,9 @@ const queryPosts = async (filter, options = {}) => {
  */
 const getPostById = async (postId, staffId) => {
   const post = await Post.findOne({ _id: postId })
-    .populate("pgId", "name rating checkInTime checkOutTime ownerId managerId")
+    .populate("pgId", "name rating checkInTime checkOutTime")
+    .populate("ownerId", "name mobNo1 mobNo2 role email picture")
+    .populate("managerId", "name mobNo1 mobNo2 role email picture")
     .populate("facilities")
     .populate("createdBy", "name");
 
@@ -82,17 +83,6 @@ const getPostById = async (postId, staffId) => {
     );
   }
 
-  const isOwner = post.pgId.ownerId.toString() === staffId.toString();
-  const isManager =
-    post.pgId.managerId &&
-    post.pgId.managerId.toString() === staffId.toString();
-
-  if (!isOwner && !isManager) {
-    throw new ApiError(
-      httpStatus.FORBIDDEN,
-      "Access Denied: You are not authorized to view this post.",
-    );
-  }
   return post;
 };
 
