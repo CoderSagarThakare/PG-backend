@@ -15,7 +15,8 @@ const createPost = async (postBody) => {
       ...postBody,
       isDeleted: false,
       isActive: true,
-    });
+    })
+    return post;
   } catch (error) {
     console.log({ error });
     throw new ApiError(

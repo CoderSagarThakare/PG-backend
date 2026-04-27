@@ -30,6 +30,8 @@ const createPost = catchAsync(async (req, res) => {
     },
     facilities: pg.facilities,
     createdBy: req.user.id,
+    managerId: pg.managerId,
+    ownerId: pg.ownerId,
   };
 
   const post = await postService.createPost(postData);

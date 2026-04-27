@@ -9,6 +9,17 @@ const postSchema = mongoose.Schema(
       ref: SCHEMA_NAME.pg,
       required: true,
     },
+    managerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: SCHEMA_NAME.staff,
+      required: true,
+    },
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: SCHEMA_NAME.staff,
+      required: true,
+    },
+
     title: {
       type: String,
       required: true,
