@@ -110,10 +110,18 @@ const enquiries = await Enquiry.find(query)
 /**
  * Get enquiry by id
  * @param {ObjectId} id
+ * @param {ObjectId} userId - User ID to check access
  * @returns {Promise<Enquiry>}
  */
-const getEnquiryById = async (id) => {
-  return Enquiry.findOne({ _id: id });
+const getEnquiryById = async (id, userId) => {
+  return Enquiry.findOne({ 
+    _id: id,
+    $or: [
+      { ownerId: userId },
+      { managerId: userId },
+      { userId: userId }
+    ]
+  });
 };
 
 /**
@@ -124,18 +132,12 @@ const getEnquiryById = async (id) => {
  * @returns {Promise<Enquiry>}
  */
 const updateEnquiryById = async (enquiryId, updateBody, staffId) => {
-  const enquiry = await getEnquiryById(enquiryId);
+  const enquiry = await getEnquiryById(enquiryId, staffId);
   if (!enquiry) {
     throw new ApiError(httpStatus.NOT_FOUND, "Enquiry not found");
   }
 
-  // Check if staff has access (owner or manager of the PG)
-  if (
-    enquiry.ownerId.toString() !== staffId &&
-    enquiry.managerId?.toString() !== staffId
-  ) {
-    throw new ApiError(httpStatus.FORBIDDEN, "Access denied");
-  }
+  // No need for additional access check since getEnquiryById already filters by access
 
   updateBody.updatedBy = staffId;
 
@@ -151,18 +153,12 @@ const updateEnquiryById = async (enquiryId, updateBody, staffId) => {
  * @returns {Promise<Enquiry>}
  */
 const deleteEnquiryById = async (enquiryId, staffId) => {
-  const enquiry = await getEnquiryById(enquiryId);
+  const enquiry = await getEnquiryById(enquiryId, staffId);
   if (!enquiry) {
     throw new ApiError(httpStatus.NOT_FOUND, "Enquiry not found");
   }
 
-  // Check if staff has access
-  if (
-    enquiry.ownerId.toString() !== staffId &&
-    enquiry.managerId?.toString() !== staffId
-  ) {
-    throw new ApiError(httpStatus.FORBIDDEN, "Access denied");
-  }
+  // No need for additional access check since getEnquiryById already filters by access
 
   await Enquiry.updateOne({ _id: enquiryId }, { isDeleted: true });
 };

@@ -22,18 +22,18 @@ router.get(
   enquiryController.getEnquiries,
 );
 
-// ---------------------------------------------------
 router.get(
   "/:enquiryId",
   auth(ROLE_TYPES.manager, ROLE_TYPES.owner, ROLE_TYPES.user),
   validate(enquiryValidation.getEnquiry),
   enquiryController.getEnquiry,
 );
-// router.patch(
-//   "/:enquiryId",
-//   validate(enquiryValidation.updateEnquiry),
-//   enquiryController.updateEnquiry,
-// );
+// ---------------------------------------------------
+router.patch(
+  "/:enquiryId",
+  validate(enquiryValidation.updateEnquiry),
+  enquiryController.updateEnquiry,
+);
 // router.delete(
 //   "/:enquiryId",
 //   validate(enquiryValidation.deleteEnquiry),

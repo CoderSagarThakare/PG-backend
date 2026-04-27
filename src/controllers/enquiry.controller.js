@@ -49,19 +49,11 @@ const getEnquiries = catchAsync(async (req, res) => {
 });
 
 const getEnquiry = catchAsync(async (req, res) => {
-  const enquiry = await enquiryService.getEnquiryById(req.params.enquiryId);
+  const enquiry = await enquiryService.getEnquiryById(req.params.enquiryId, req.user._id);
   if (!enquiry) {
     throw new ApiError(httpStatus.NOT_FOUND, "Enquiry not found");
   }
 
-  // Check access
-  if (
-    enquiry.ownerId.toString() !== req.user._id.toString() &&
-    enquiry.managerId?.toString() !== req.user._id.toString() &&
-    enquiry.userId.toString() !== req.user._id.toString()
-  ) {
-    throw new ApiError(httpStatus.FORBIDDEN, "Access denied");
-  }
 
   return sendResponse(res, {
     success: true,
@@ -72,9 +64,7 @@ const getEnquiry = catchAsync(async (req, res) => {
 });
 
 const updateEnquiry = catchAsync(async (req, res) => {
-  if (![ROLE_TYPES.owner, ROLE_TYPES.manager].includes(req.user.role)) {
-    throw new ApiError(httpStatus.FORBIDDEN, "Access denied");
-  }
+
   const enquiry = await enquiryService.updateEnquiryById(
     req.params.enquiryId,
     req.body,
