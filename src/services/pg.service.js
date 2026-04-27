@@ -50,8 +50,10 @@ const getPGsByOwner = async (ownerId, options = {}, isAdmin = false) => {
       query.isDeleted = false;
     }
 
-    const pgs = await PG.find(query).limit(limit).skip(skip)
-    .populate("facilities", "name");
+    const pgs = await PG.find(query)
+      .limit(limit)
+      .skip(skip)
+      .populate("facilities", "name");
     const total = await PG.countDocuments(query);
 
     return { pgs, total, limit, page };
@@ -73,7 +75,6 @@ const getPGsByOwner = async (ownerId, options = {}, isAdmin = false) => {
 
 const getPGById = async (pgId, staffId, isAdmin = false) => {
   try {
-
     const query = { _id: pgId };
 
     // only pg manager or owner can create a post
@@ -95,6 +96,7 @@ const getPGById = async (pgId, staffId, isAdmin = false) => {
 
       throw new ApiError(httpStatus.NOT_FOUND, message);
     }
+    console.log({ pg });
 
     return pg;
   } catch (error) {

@@ -13,9 +13,9 @@ const createPost = async (postBody) => {
     // Ensuring default flags are set correctly on creation
     const post = await Post.create({
       ...postBody,
-      isDeleted: false,
-      isActive: true,
     });
+
+    return post;
   } catch (error) {
     console.log({ error });
     throw new ApiError(
@@ -49,6 +49,8 @@ const queryPosts = async (filter, options = {}) => {
       .limit(limit)
       .skip(skip)
       .populate("ownerId", "name mobNo1 mobNo2 role email picture")
+      .populate("managerId", "name mobNo1 mobNo2 role email picture")
+      .populate("createdBy", "name role")
       .populate("pgId", "name rating checkInTime checkOutTime")
       .populate("facilities");
 
