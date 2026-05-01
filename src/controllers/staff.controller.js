@@ -61,7 +61,7 @@ const getManagers = catchAsync(async (req, res) => {
     page: req.query.page ? parseInt(req.query.page) : 1,
   };
 
-  const result = await staffService.getManagersList(options);
+  const result = await staffService.getManagersList(options, req.user._id);
   sendResponse(res, { data: result, statusCode: httpStatus.OK });
 });
 

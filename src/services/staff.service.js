@@ -153,13 +153,19 @@ const deleteStaffById = async (staffId) => {
  * @param {Object} options - Query options (limit, page)
  * @returns {Promise<{staff: Staff[], total: number, limit: number, page: number}>}
  */
-const getManagersList = async (options = {}) => {
+const getManagersList = async (options = {}, ownerId = null) => {
   const limit = options.limit || 10;
   const page = options.page || 1;
   const skip = (page - 1) * limit;
 
-  const filter = { role: "manager", isDeleted: false };
-  const managers = await Staff.find(filter).limit(limit).skip(skip).select("name mobNo1 picture");
+  const filter = { isDeleted: false };
+  if (ownerId) {
+    filter.$or = [{ role: "manager" }, { _id: ownerId }];
+  } else {
+    filter.role = "manager";
+  }
+
+  const managers = await Staff.find(filter).limit(limit).skip(skip).select("name mobNo1 picture role");
   const total = await Staff.countDocuments(filter);
 
   return { managers, total, limit, page };
