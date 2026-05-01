@@ -58,7 +58,7 @@ const staffSchema = mongoose.Schema(
     address: {
       pincode: {
         type: Number,
-        default: "",
+        default: null,
       },
       locationDescription: {
         type: String,

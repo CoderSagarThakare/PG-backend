@@ -8,16 +8,18 @@ let server;
 
 logger.warn("--------------------------------------");
 
-// connect to database
-server = app.listen(
-  config.port,
-  logger.info(`Node server listening on port => ${config.port}`)
-);
-
-mongoose.connect(config.mongoose.url, config.mongoose.options).then(()=>{
-  logger.info(`connected to MongoDB => ${config.mongoose.url}`);
+// Connect to DB first, then start the server
+mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
+  logger.info(`Connected to MongoDB => ${config.mongoose.url}`);
   logger.warn("--------------------------------------");
-})
+
+  server = app.listen(config.port, () => {
+    logger.info(`Node server listening on port => ${config.port}`);
+  });
+}).catch((err) => {
+  logger.error(`MongoDB connection failed: ${err.message}`);
+  process.exit(1);
+});
 
 // Manually close the server if an unhandled exception occurs
 const exitHandler = () => {
