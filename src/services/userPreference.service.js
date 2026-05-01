@@ -13,7 +13,7 @@ const getPreferenceByUserId = async (userId, preferenceId) => {
   if (!pref) {
     throw new ApiError(
       httpStatus.NOT_FOUND,
-      "Preference not found or it'sdeleted",
+      "Preference not found or it's deleted",
     );
   }
 

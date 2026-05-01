@@ -95,6 +95,7 @@ const updatePost = catchAsync(async (req, res) => {
 // for regular users: get recommendations based on preferences
 const getPostsByPreference = catchAsync(async (req, res) => {
   const options = {
+    ...req.query,
     limit: req.query.limit || 10,
     page: req.query.page || 1,
   };

@@ -1,4 +1,4 @@
-const { Post, PG } = require("../models");
+const { Post, PG, Enquiry } = require("../models");
 const userPreferenceService = require("./userPreference.service");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
@@ -175,18 +175,22 @@ const deletePostById = async (postId, staffId) => {
  * @returns {Promise<QueryResult>}
  */
 const getPostsByPreference = async (userId, options = {}) => {
-  const pref = await userPreferenceService.getPreferenceByUserId(userId);
+  let pref = {};
+  try {
+    pref = await userPreferenceService.getPreferenceByUserId(userId);
+  } catch (error) {
+    // If preference doesn't exist, the service throws a 404. 
+    // We catch it and just use the empty pref object to show all posts.
+  }
   const limit = parseInt(options.limit, 10) || 10;
   const page = parseInt(options.page, 10) || 1;
   const skip = (page - 1) * limit;
 
-  if (!pref) {
-    return { posts: [], total: 0, limit, page };
-  }
-
   // build PG filter first (for geo / pincode)
   const pgFilter = { isActive: true, isDeleted: false };
-  if (pref.location) {
+  if (options.city) {
+    pgFilter["address.city"] = { $regex: new RegExp(options.city, "i") };
+  } else if (pref.location) {
     if (pref.location.pincode) {
       pgFilter["address.pincode"] = pref.location.pincode;
     }
@@ -209,6 +213,7 @@ const getPostsByPreference = async (userId, options = {}) => {
 
   // find matching PG ids
   const pgDocs = await PG.find(pgFilter).select("_id facilities");
+
   const pgIds = pgDocs.map((p) => p._id);
 
   // build post filter
@@ -217,18 +222,31 @@ const getPostsByPreference = async (userId, options = {}) => {
     isActive: true,
     pgId: { $in: pgIds },
   };
-  if (pref.pgType) {
-    postFilter.gender = pref.pgType;
+
+  if (options.pgType) {
+    postFilter.pgType = options.pgType;
+  } else if (pref.pgType) {
+    postFilter.pgType = pref.pgType;
+  }
+
+  if (options.occupancyType) {
+    postFilter.occupancyType = options.occupancyType;
+  }
+
+  if (options.maxPrice) {
+    postFilter.pricePerBed = { $lte: Number(options.maxPrice) };
   }
 
   // initial fetch without scoring (just to get total count)
   const total = await Post.countDocuments(postFilter);
 
-  // fetch actual posts, populate for scoring
+  // fetch actual posts, project only necessary fields for UI & scoring
   let posts = await Post.find(postFilter)
-    .populate("pgId", "name address facilities location")
+    .select("title description vacancyCount occupancyType pgType pricePerBed pgId createdAt")
+    .populate("pgId", "address.city address.pincode facilities")
     .limit(limit)
-    .skip(skip);
+    .skip(skip)
+    .lean();
 
   // compute scores
   const now = Date.now();
@@ -266,6 +284,26 @@ const getPostsByPreference = async (userId, options = {}) => {
     })
     .sort((a, b) => b.score - a.score || b.post.createdAt - a.post.createdAt)
     .map((p) => p.post);
+
+  // Attach enquiry data for this user
+  if (posts.length > 0) {
+    const postIds = posts.map((p) => p._id);
+    const userEnquiries = await Enquiry.find({ userId, postId: { $in: postIds } })
+      .populate("ownerId", "name mobNo1 mobNo2")
+      .populate("managerId", "name mobNo1 mobNo2")
+      .lean();
+
+    const enqMap = {};
+    userEnquiries.forEach((e) => {
+      enqMap[e.postId.toString()] = { owner: e.ownerId, manager: e.managerId };
+    });
+
+    posts.forEach((p) => {
+      if (enqMap[p._id.toString()]) {
+        p.enquiryData = enqMap[p._id.toString()];
+      }
+    });
+  }
 
   return { posts, total, limit, page };
 };
