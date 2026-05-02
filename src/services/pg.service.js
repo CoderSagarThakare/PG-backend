@@ -53,7 +53,8 @@ const getPGsByOwner = async (staffId, options = {}, isAdmin = false) => {
     const pgs = await PG.find(query)
       .limit(limit)
       .skip(skip)
-      .populate("facilities", "name");
+      .select("name address.city address.state pgType totalRooms emptyBeds occupiedBeds managerId")
+      .populate("managerId", "name");
     const total = await PG.countDocuments(query);
 
     return { pgs, total, limit, page };

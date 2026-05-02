@@ -13,6 +13,9 @@ const { jwtStrategy } = require("./config/passport");
 
 // ------------------  MIDDLEWARES  ----------------------------
 
+// Disable ETag to prevent 304 Not Modified caching issues
+// app.set('etag', false);
+
 // JSON requests are received as plain text. We need to parse the json request body.
 app.use(bodyParser.json());
 

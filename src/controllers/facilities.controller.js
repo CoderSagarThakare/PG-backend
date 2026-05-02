@@ -6,11 +6,8 @@ const { PG } = require("../models");
 const sendResponse = require("../utils/sendResponse");
 
 const getAllFacilities = catchAsync(async (req, res) => {
-  const isAdmin = req.user.role === "admin";
-
   const facilities = await facilitiesService.getAllFacilities();
-
-  sendResponse(res, { data: facilities, statusCode: httpStatus.OK });
+  sendResponse(res, { data: { facilities }, statusCode: httpStatus.OK });
 });
 
 module.exports = {
