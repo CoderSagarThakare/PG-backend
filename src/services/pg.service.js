@@ -39,13 +39,13 @@ const createPG = async (pgBody) => {
  * @param {boolean} isAdmin - Whether user is admin (if true, returns all records including deleted)
  * @returns {Promise<PG[]>}
  */
-const getPGsByOwner = async (ownerId, options = {}, isAdmin = false) => {
+const getPGsByOwner = async (staffId, options = {}, isAdmin = false) => {
   try {
     const limit = options.limit || 10;
     const page = options.page || 1;
     const skip = (page - 1) * limit;
 
-    const query = { ownerId };
+    const query = { $or: [{ ownerId: staffId }, { managerId: staffId }] };
     if (!isAdmin) {
       query.isDeleted = false;
     }
@@ -119,7 +119,7 @@ const getPGById = async (pgId, staffId, isAdmin = false) => {
  * @param {Object} updateBody - Update data
  * @returns {Promise<PG>}
  */
-const updatePG = async (pgId, ownerId, updateBody) => {
+const updatePG = async (pgId, staffId, updateBody) => {
   try {
     // User will pass only updated data in address
     if (updateBody.address) {
@@ -130,7 +130,7 @@ const updatePG = async (pgId, ownerId, updateBody) => {
     }
 
     const pg = await PG.findOneAndUpdate(
-      { _id: pgId, ownerId, isDeleted: false },
+      { _id: pgId, $or: [{ ownerId: staffId }, { managerId: staffId }], isDeleted: false },
       { $set: updateBody },
       { runValidators: true }, // validate data before updating data in DB
     );
@@ -153,9 +153,9 @@ const updatePG = async (pgId, ownerId, updateBody) => {
  * @param {string} ownerId - Owner ID for verification
  * @returns {Promise<void>}
  */
-const deletePG = async (pgId, ownerId) => {
+const deletePG = async (pgId, staffId) => {
   try {
-    const pg = await PG.findOne({ _id: pgId, ownerId });
+    const pg = await PG.findOne({ _id: pgId, $or: [{ ownerId: staffId }, { managerId: staffId }] });
     if (!pg) {
       throw new ApiError(httpStatus.NOT_FOUND, "PG not found");
     }

@@ -15,6 +15,4 @@ const router = require("express").Router();
 
 router.use(auth(ROLE_TYPES.manager));
 
-router.use("/post", postRoutes);
-
 module.exports = router;

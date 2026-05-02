@@ -18,6 +18,7 @@ const defaultRoutes = [
   { path: "/post", route: postRoute }, // base path for post routes
   { path: "/staff", route: staffRoute }, // base path for staff routes
   { path: "/enquiry", route: enquiryRoutes }, // base path for enquiry routes
+  { path: "/pg", route: require("./pg.route") }, // base path for generic PG routes
 ];
 
 defaultRoutes.map((route) => {

@@ -11,13 +11,17 @@ const auth = require("../middlewares/auth");
 const { ROLE_TYPES } = require("../const/constant");
 
 const router = require("express").Router();
+
+// Apply auth middleware to all PG routes (owner and manager allowed)
+router.use(auth(ROLE_TYPES.owner, ROLE_TYPES.manager));
+
 // Role-based subrouters mounted under /pg
 // router.use("/owner", auth(ROLE_TYPES.owner), ownerRoute);
 // router.use("/manager", auth(ROLE_TYPES.manager), managerRoute);
 // router.use("/employee", auth(ROLE_TYPES.employee), employeeRoute);
 
-// register new PG
-router.post("/", validate(pgValidation.createPG), pgController.createPG);
+// register new PG (Owner only)
+router.post("/", auth(ROLE_TYPES.owner), validate(pgValidation.createPG), pgController.createPG);
 
 router.get("/facilities", facilitiesController.getAllFacilities);
 

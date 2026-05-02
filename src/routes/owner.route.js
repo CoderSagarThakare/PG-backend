@@ -11,10 +11,6 @@ const enquiryRoute = require("./enquiry.route");
 // All owner routes require authentication
 router.use(auth(ROLE_TYPES.owner));
 
-// PG-related routes for owners (mounted under /pg/owner)
-router.use("/pg", pgRoute);
-router.use("/post", postRoutes);
-
 // Post-related routes for owners
 // router.post(
 //   "/post",
