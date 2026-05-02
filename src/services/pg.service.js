@@ -97,8 +97,6 @@ const getPGById = async (pgId, staffId, isAdmin = false) => {
 
       throw new ApiError(httpStatus.NOT_FOUND, message);
     }
-    console.log({ pg });
-
     return pg;
   } catch (error) {
     console.log("error : ", error);
