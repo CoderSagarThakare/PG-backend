@@ -15,6 +15,8 @@ const SCHEMA_NAME = {
   user: "User",
   userPreference: "UserPreference",
   enquiry : "Enquiry",
+  room: "Room",
+  bed: "Bed",
 };
 
 const GENDER_TYPES = {
