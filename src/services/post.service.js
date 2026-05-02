@@ -295,7 +295,7 @@ const getPostsByPreference = async (userId, options = {}) => {
 
     const enqMap = {};
     userEnquiries.forEach((e) => {
-      enqMap[e.postId.toString()] = { owner: e.ownerId, manager: e.managerId };
+      enqMap[e.postId.toString()] = { owner: e.ownerId, manager: e.managerId, enquiryId: e._id, status: e.status };
     });
 
     posts.forEach((p) => {

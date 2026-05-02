@@ -31,7 +31,7 @@ router.get(
 // ---------------------------------------------------
 router.patch(
   "/:enquiryId",
-  auth(ROLE_TYPES.manager, ROLE_TYPES.owner),
+  auth(ROLE_TYPES.manager, ROLE_TYPES.owner, ROLE_TYPES.user),
   validate(enquiryValidation.updateEnquiry),
   enquiryController.updateEnquiry,
 );

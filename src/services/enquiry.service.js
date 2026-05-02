@@ -66,6 +66,8 @@ const createEnquiry = async ({ userId, postId }) => {
     return {
       owner: owner,
       manager: manager,
+      enquiryId: enquiry._id,
+      status: enquiry.status
     };
   } catch (error) {
     if (error instanceof ApiError) throw error;
