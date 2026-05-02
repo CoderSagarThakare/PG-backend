@@ -233,8 +233,14 @@ const getPostsByPreference = async (userId, options = {}) => {
     postFilter.occupancyType = options.occupancyType;
   }
 
-  if (options.maxPrice) {
-    postFilter.pricePerBed = { $lte: Number(options.maxPrice) };
+  if (options.title) {
+    postFilter.title = { $regex: new RegExp(options.title, "i") };
+  }
+
+  if (options.minPrice || options.maxPrice) {
+    postFilter.pricePerBed = {};
+    if (options.minPrice) postFilter.pricePerBed.$gte = Number(options.minPrice);
+    if (options.maxPrice) postFilter.pricePerBed.$lte = Number(options.maxPrice);
   }
 
   // initial fetch without scoring (just to get total count)
