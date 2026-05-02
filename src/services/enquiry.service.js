@@ -91,21 +91,41 @@ const queryEnquiries = async (filter, options) => {
   const limit = Number(options.limit) || 10;
   const page = Number(options.page) || 1;
   const skip = (page - 1) * limit;
+  const userName = options.userName || '';
   const query = { ...filter };
 
-const enquiries = await Enquiry.find(query)
-  .limit(limit)
-  .skip(skip)
-  .sort(options.sortBy)
-  .populate("userId", "name email picture mobNo1 mobNo2") 
-  .populate("pgId", "name") 
-  .populate("postId", "title occupancyType pricePerBed")
-  .populate("ownerId", "name mobNo1 mobNo2")
-  .populate("managerId", "name mobNo1 mobNo2")
-  .lean();
+  // If searching by userName, we need to fetch without skip/limit first, then filter
+  if (userName) {
+    const allEnquiries = await Enquiry.find(query)
+      .sort(options.sortBy || { createdAt: -1 })
+      .populate("userId", "name email picture mobNo1 mobNo2")
+      .populate("pgId", "name")
+      .populate("postId", "title occupancyType pricePerBed")
+      .populate("ownerId", "name mobNo1 mobNo2")
+      .populate("managerId", "name mobNo1 mobNo2")
+      .lean();
+
+    const filtered = allEnquiries.filter(e =>
+      e.userId?.name?.toLowerCase().includes(userName.toLowerCase())
+    );
+
+    const total = filtered.length;
+    const enquiries = filtered.slice(skip, skip + limit);
+    return { enquiries, total, limit, page };
+  }
+
+  const enquiries = await Enquiry.find(query)
+    .limit(limit)
+    .skip(skip)
+    .sort(options.sortBy || { createdAt: -1 })
+    .populate("userId", "name email picture mobNo1 mobNo2")
+    .populate("pgId", "name")
+    .populate("postId", "title occupancyType pricePerBed")
+    .populate("ownerId", "name mobNo1 mobNo2")
+    .populate("managerId", "name mobNo1 mobNo2")
+    .lean();
 
   const total = await Enquiry.countDocuments(query);
-
   return { enquiries, total, limit, page };
 };
 

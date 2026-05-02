@@ -23,6 +23,7 @@ const getEnquiries = catchAsync(async (req, res) => {
     limit: req.query.limit || 10,
     page: req.query.page || 1,
     sortBy: req.query.sortBy,
+    userName: req.query.userName || '',
   };
 
   // Filter enquiries for the current staff (owner or manager)
