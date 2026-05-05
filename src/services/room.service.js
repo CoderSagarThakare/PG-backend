@@ -7,14 +7,16 @@ const ApiError = require('../utils/ApiError');
  * @param {string} pgId
  */
 const updatePGBedStats = async (pgId) => {
-  const allBeds = await Bed.find({ pgId, isDeleted: false });
-  const totalBeds = allBeds.length;
-  const occupiedBeds = allBeds.filter(b => b.status === 'occupied').length;
-  const emptyBeds = allBeds.filter(b => b.status === 'available').length;
+  const [totalBeds, occupiedBeds, emptyBeds, totalRooms] = await Promise.all([
+    Bed.countDocuments({ pgId, isDeleted: false }),
+    Bed.countDocuments({ pgId, status: 'occupied', isDeleted: false }),
+    Bed.countDocuments({ pgId, status: 'available', isDeleted: false }),
+    Room.countDocuments({ pgId, isDeleted: false })
+  ]);
 
   await PG.updateOne(
     { _id: pgId },
-    { $set: { totalBeds, occupiedBeds, emptyBeds } }
+    { $set: { totalRooms, totalBeds, occupiedBeds, emptyBeds } }
   );
 };
 

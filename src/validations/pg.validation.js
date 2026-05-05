@@ -15,7 +15,6 @@ const createPG = {
         country: Joi.string().required(),
       })
       .required(),
-    totalRooms: Joi.number().integer().required(),
     description: Joi.string(),
     managerId: Joi.string().pattern(objectIdPattern).required().messages({
       "string.pattern.base": "Invalid manager ID format",
@@ -23,15 +22,30 @@ const createPG = {
     pgType: Joi.string()
       .valid(PG_TYPES.male, PG_TYPES.female, PG_TYPES.unisex, PG_TYPES.coLiving)
       .required(),
-    totalBeds: Joi.number().integer(),
-    occupiedBeds: Joi.number().integer().min(0),
-    emptyBeds: Joi.number().integer().min(0),
     landline: Joi.string(),
     pgStartedDate: Joi.date(),
     images: Joi.array().items(Joi.string()),
     locationLink: Joi.string().uri(),
     checkInTime: Joi.string(),
     checkOutTime: Joi.string(),
+    facilities: Joi.array()
+      .items(
+        Joi.string()
+          .pattern(objectIdPattern)
+          .messages({ "string.pattern.base": "Invalid facility ID format" }),
+      )
+      .unique()
+      .min(1)
+      .required()
+      .messages({
+        "array.base": "Facilities must be an array",
+        "array.min": "Please select at least one facility",
+        "any.required": "Facilities are required",
+      }),
+    totalRooms: Joi.any(),
+    totalBeds: Joi.any(),
+    occupiedBeds: Joi.any(),
+    emptyBeds: Joi.any(),
   }),
 };
 
@@ -55,11 +69,7 @@ const updatePG = {
       }),
        pgType: Joi.string()
       .valid(PG_TYPES.male, PG_TYPES.female, PG_TYPES.unisex, PG_TYPES.coLiving),
-      totalRooms: Joi.number().integer(),
       description: Joi.string(),
-      totalBeds: Joi.number().integer(),
-      occupiedBeds: Joi.number().integer().min(0),
-      emptyBeds: Joi.number().integer().min(0),
       landline: Joi.string(),
       pgStartedDate: Joi.date(),
       images: Joi.array().items(Joi.string()),
@@ -82,6 +92,10 @@ const updatePG = {
           "array.min":
             "Please select at least one facility if providing facilities",
         }),
+      totalRooms: Joi.any(),
+      totalBeds: Joi.any(),
+      occupiedBeds: Joi.any(),
+      emptyBeds: Joi.any(),
     })
     .min(1),
 };

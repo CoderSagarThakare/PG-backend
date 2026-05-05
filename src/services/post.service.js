@@ -249,7 +249,11 @@ const getPostsByPreference = async (userId, options = {}) => {
   // fetch actual posts, project only necessary fields for UI & scoring
   let posts = await Post.find(postFilter)
     .select("title description vacancyCount occupancyType pgType pricePerBed pgId createdAt")
-    .populate("pgId", "address.city address.pincode facilities")
+    .populate({
+      path: "pgId",
+      select: "name address checkInTime checkOutTime facilities rating",
+      populate: { path: "facilities", select: "name" }
+    })
     .limit(limit)
     .skip(skip)
     .lean();

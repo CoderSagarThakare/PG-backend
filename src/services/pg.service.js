@@ -25,7 +25,14 @@ const checkExistingPG = async (ownerId, name) => {
  */
 const createPG = async (pgBody) => {
   try {
-    const pg = await PG.create({ ...pgBody, isDeleted: false });
+    const pg = await PG.create({ 
+      ...pgBody, 
+      totalRooms: 0,
+      totalBeds: 0,
+      occupiedBeds: 0,
+      emptyBeds: 0,
+      isDeleted: false 
+    });
     return pg;
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to create PG");
@@ -53,7 +60,7 @@ const getPGsByOwner = async (staffId, options = {}, isAdmin = false) => {
     const pgs = await PG.find(query)
       .limit(limit)
       .skip(skip)
-      .select("name address.city address.state pgType totalRooms emptyBeds occupiedBeds managerId")
+      .select("name address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds managerId rating isActive")
       .populate("managerId", "name");
     const total = await PG.countDocuments(query);
 

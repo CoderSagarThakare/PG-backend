@@ -43,7 +43,19 @@ const login = catchAsync(async (req, res) => {
 
   const token = await tokenService.generateAuthTokens(user);
 
-  sendResponse(res, { success: true, message: "Login successful", data: { token: token.token } });
+  sendResponse(res, { 
+    success: true, 
+    message: "Login successful", 
+    data: { 
+      token: token.token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    } 
+  });
 });
 
 const socialLogin = catchAsync(async (req, res) => {

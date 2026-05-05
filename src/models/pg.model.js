@@ -72,12 +72,7 @@ const pgSchema = mongoose.Schema(
     },
     totalRooms: {
       type: Number,
-      required: true,
-      validate(value) {
-        if (value < 1) {
-          throw new Error("Total rooms must be at least 1");
-        }
-      },
+      default: 0,
     },
     description: {
       type: String,
@@ -94,6 +89,7 @@ const pgSchema = mongoose.Schema(
     },
     totalBeds: {
       type: Number,
+      default: 0,
     },
     occupiedBeds: {
       type: Number,
@@ -147,6 +143,18 @@ const pgSchema = mongoose.Schema(
     timestamps: true,
   },
 );
+
+// Pre-save hook to ensure PG name consistency (Title Case and Trimming)
+pgSchema.pre("save", function (next) {
+  if (this.isModified("name")) {
+    this.name = this.name
+      .trim()
+      .split(/\s+/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  }
+  next();
+});
 
 /**
  * @typedef PG
