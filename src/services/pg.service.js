@@ -57,11 +57,23 @@ const getPGsByOwner = async (staffId, options = {}, isAdmin = false) => {
       query.isDeleted = false;
     }
 
-    const pgs = await PG.find(query)
+    let pgs = await PG.find(query)
       .limit(limit)
       .skip(skip)
       .select("name address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds managerId rating isActive")
-      .populate("managerId", "name");
+      .populate("managerId", "name")
+      .lean();
+
+    // Ensure numeric fields are never null for UI stability
+    pgs = pgs.map(pg => ({
+      ...pg,
+      totalRooms: pg.totalRooms || 0,
+      totalBeds: pg.totalBeds || 0,
+      emptyBeds: pg.emptyBeds || 0,
+      occupiedBeds: pg.occupiedBeds || 0,
+      rating: pg.rating || 0
+    }));
+
     const total = await PG.countDocuments(query);
 
     return { pgs, total, limit, page };

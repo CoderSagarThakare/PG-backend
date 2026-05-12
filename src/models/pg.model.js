@@ -156,14 +156,14 @@ pgSchema.pre("save", function (next) {
   next();
 });
 
-/**
- * @typedef PG
- */
-const PG = mongoose.model(SCHEMA_NAME.pg, pgSchema);
-
 // Enables high-performance geospatial queries like "find PGs near me" (within X km radius)
 pgSchema.index({ location: "2dsphere" });
 
 pgSchema.plugin(private);
+
+/**
+ * @typedef PG
+ */
+const PG = mongoose.model(SCHEMA_NAME.pg, pgSchema);
 
 module.exports = PG;
