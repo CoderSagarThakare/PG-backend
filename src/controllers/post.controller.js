@@ -51,18 +51,10 @@ const getPosts = catchAsync(async (req, res) => {
     sortBy: req.query.sortBy,
   };
 
-  const filter = {
-    $or: [
-      { ownerId: req.user._id },
-      { managerId: req.user._id },
-      { userId: req.user._id },
-    ],
-  };
-
-  // Optional: Filter by specific PG if pgId is in query
-  if (req.query.pgId) filter.pgId = req.query.pgId;
-
-  const result = await postService.queryPosts(filter, options);
+  const result = await postService.queryPosts(req.user._id, { 
+    ...options, 
+    pgId: req.query.pgId 
+  });
   sendResponse(res, {
     success: true,
     message: "All post fetched successfully",

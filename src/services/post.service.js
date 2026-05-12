@@ -31,27 +31,37 @@ const createPost = async (postBody) => {
  * @param {Object} options - Query options
  * @returns {Promise<QueryResult>}
  */
-const queryPosts = async (filter, options = {}) => {
+const queryPosts = async (staffId, options = {}) => {
   try {
     const limit = parseInt(options.limit, 10) || 10;
     const page = parseInt(options.page, 10) || 1;
     const skip = (page - 1) * limit;
 
-    // IMPORTANT: Always exclude soft-deleted posts from results
+    // 1. Find all PGs where this staff is either the current owner or current manager
+    const managedPGs = await PG.find({
+      $or: [{ ownerId: staffId }, { managerId: staffId }],
+      isDeleted: false,
+    }).select("_id");
+
+    const pgIds = managedPGs.map((pg) => pg._id);
+
+    // 2. Build filter based on these PG IDs
     const finalFilter = {
-      ...filter,
+      pgId: { $in: pgIds },
       isDeleted: false,
     };
 
+    // If a specific pgId was requested in options, narrow it down
+    if (options.pgId) {
+      finalFilter.pgId = options.pgId;
+    }
+
     const posts = await Post.find(finalFilter)
-      .populate("pgId", "name address locationLink")
+      .populate("pgId", "name address locationLink rating checkInTime checkOutTime")
       .sort(options.sortBy || "-createdAt")
       .limit(limit)
       .skip(skip)
-      .populate("ownerId", "name mobNo1 mobNo2 role email picture")
-      .populate("managerId", "name mobNo1 mobNo2 role email picture")
       .populate("createdBy", "name role")
-      .populate("pgId", "name rating checkInTime checkOutTime")
       .populate("facilities");
 
     const total = await Post.countDocuments(finalFilter);
