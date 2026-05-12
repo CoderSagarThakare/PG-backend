@@ -87,22 +87,37 @@ const createEnquiry = async ({ userId, postId }) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryEnquiries = async (filter, options) => {
+const queryEnquiries = async (staffId, options) => {
   const limit = Number(options.limit) || 10;
   const page = Number(options.page) || 1;
   const skip = (page - 1) * limit;
   const userName = options.userName || '';
-  const query = { ...filter };
+  
+  // 1. Find all PGs where this staff is either owner or manager
+  const managedPGs = await PG.find({
+    $or: [{ ownerId: staffId }, { managerId: staffId }],
+    isDeleted: false,
+  }).select("_id");
 
-  // If searching by userName, we need to fetch without skip/limit first, then filter
+  const pgIds = managedPGs.map((pg) => pg._id);
+
+  const query = { 
+    pgId: { $in: pgIds },
+    isDeleted: false
+  };
+
+  // Optional filters from user
+  if (options.status) query.status = options.status;
+  if (options.pgId) query.pgId = options.pgId; // already subset of managedPGs or not
+  if (options.postId) query.postId = options.postId;
+
+  // If searching by userName, we need to fetch with population then filter
   if (userName) {
     const allEnquiries = await Enquiry.find(query)
       .sort(options.sortBy || { createdAt: -1 })
       .populate("userId", "name email picture mobNo1 mobNo2")
       .populate("pgId", "name")
       .populate("postId", "title occupancyType pricePerBed")
-      .populate("ownerId", "name mobNo1 mobNo2")
-      .populate("managerId", "name mobNo1 mobNo2")
       .lean();
 
     const filtered = allEnquiries.filter(e =>
@@ -121,8 +136,6 @@ const queryEnquiries = async (filter, options) => {
     .populate("userId", "name email picture mobNo1 mobNo2")
     .populate("pgId", "name")
     .populate("postId", "title occupancyType pricePerBed")
-    .populate("ownerId", "name mobNo1 mobNo2")
-    .populate("managerId", "name mobNo1 mobNo2")
     .lean();
 
   const total = await Enquiry.countDocuments(query);
@@ -135,15 +148,17 @@ const queryEnquiries = async (filter, options) => {
  * @param {ObjectId} userId - User ID to check access
  * @returns {Promise<Enquiry>}
  */
-const getEnquiryById = async (id, userId) => {
-  return Enquiry.findOne({ 
-    _id: id,
-    $or: [
-      { ownerId: userId },
-      { managerId: userId },
-      { userId: userId }
-    ]
-  });
+const getEnquiryById = async (id, staffId) => {
+  const enquiry = await Enquiry.findById(id).populate("pgId", "ownerId managerId");
+  if (!enquiry) return null;
+
+  // Check if current staff is linked to the parent PG
+  const isOwner = enquiry.pgId?.ownerId?.toString() === staffId.toString();
+  const isManager = enquiry.pgId?.managerId?.toString() === staffId.toString();
+  const isSelfUser = enquiry.userId?.toString() === staffId.toString();
+
+  if (!isOwner && !isManager && !isSelfUser) return null;
+  return enquiry;
 };
 
 /**

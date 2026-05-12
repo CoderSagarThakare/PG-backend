@@ -26,21 +26,12 @@ const getEnquiries = catchAsync(async (req, res) => {
     userName: req.query.userName || '',
   };
 
-  // Filter enquiries for the current staff (owner or manager)
-  const filter = {
-    $or: [
-      { ownerId: req.user._id },
-      { managerId: req.user._id },
-      { userId: req.user._id },
-    ],
-  };
-
-  // Optional filters
-  if (req.query.status) filter.status = req.query.status;
-  if (req.query.pgId) filter.pgId = req.query.pgId;
-  if (req.query.postId) filter.postId = req.query.postId;
-
-  const result = await enquiryService.queryEnquiries(filter, options);
+  const result = await enquiryService.queryEnquiries(req.user._id, {
+    ...options,
+    status: req.query.status,
+    pgId: req.query.pgId,
+    postId: req.query.postId
+  });
   return sendResponse(res, {
     success: true,
     message: "Enquiries fetched successfully",
