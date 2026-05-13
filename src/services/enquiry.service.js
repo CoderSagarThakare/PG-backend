@@ -87,24 +87,26 @@ const createEnquiry = async ({ userId, postId }) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryEnquiries = async (staffId, options) => {
+const queryEnquiries = async (user, options) => {
   const limit = Number(options.limit) || 10;
   const page = Number(options.page) || 1;
   const skip = (page - 1) * limit;
   const userName = options.userName || '';
   
-  // 1. Find all PGs where this staff is either owner or manager
-  const managedPGs = await PG.find({
-    $or: [{ ownerId: staffId }, { managerId: staffId }],
-    isDeleted: false,
-  }).select("_id");
+  let query = { isDeleted: false };
 
-  const pgIds = managedPGs.map((pg) => pg._id);
+  if (user.role === 'user') {
+    query.userId = user._id;
+  } else {
+    // 1. Find all PGs where this staff is either owner or manager
+    const managedPGs = await PG.find({
+      $or: [{ ownerId: user._id }, { managerId: user._id }],
+      isDeleted: false,
+    }).select("_id");
 
-  const query = { 
-    pgId: { $in: pgIds },
-    isDeleted: false
-  };
+    const pgIds = managedPGs.map((pg) => pg._id);
+    query.pgId = { $in: pgIds };
+  }
 
   // Optional filters from user
   if (options.status) query.status = options.status;

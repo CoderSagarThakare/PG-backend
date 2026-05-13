@@ -26,7 +26,7 @@ const getEnquiries = catchAsync(async (req, res) => {
     userName: req.query.userName || '',
   };
 
-  const result = await enquiryService.queryEnquiries(req.user._id, {
+  const result = await enquiryService.queryEnquiries(req.user, {
     ...options,
     status: req.query.status,
     pgId: req.query.pgId,
