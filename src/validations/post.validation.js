@@ -54,12 +54,20 @@ const updatePost = {
           otherwise: Joi.number().min(0),
         }),
 
+      pgId: Joi.string().pattern(objectIdPattern),
+      pgType: Joi.string().valid(PG_TYPES.male, PG_TYPES.female, PG_TYPES.unisex, PG_TYPES.coLiving),
+      occupancyType: Joi.string().valid(
+        OCCUPANCY_TYPES.single,
+        OCCUPANCY_TYPES.double,
+        OCCUPANCY_TYPES.triple,
+        OCCUPANCY_TYPES.four,
+        OCCUPANCY_TYPES.other,
+      ),
       gender: Joi.string().valid("male", "female", "unisex"),
       pricePerBed: Joi.number(),
       availableFrom: Joi.date(),
       images: Joi.array().items(Joi.string()),
       isActive: Joi.boolean(),
-      
     })
     .min(1),
 };
