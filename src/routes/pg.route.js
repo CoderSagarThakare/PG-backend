@@ -15,6 +15,12 @@ const router = require("express").Router();
 // Publicly accessible facilities (also for users to filter)
 router.get("/facilities", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user), facilitiesController.getAllFacilities);
 
+// Publicly accessible PG discovery
+router.get("/discover", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user), pgController.discoverPGs);
+
+// Publicly accessible individual PG details
+router.get("/:pgId", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user), pgController.getPG);
+
 // Apply auth middleware to all other PG management routes (owner and manager allowed)
 router.use(auth(ROLE_TYPES.owner, ROLE_TYPES.manager));
 

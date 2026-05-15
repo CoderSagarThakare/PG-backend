@@ -31,7 +31,7 @@ const getPGs = catchAsync(async (req, res) => {
 
 const getPG = catchAsync(async (req, res) => {
   const isAdmin = req.user.role === "admin";
-  const pg = await PgService.getPGById(req.params.pgId, req.user.id, isAdmin);
+  const pg = await PgService.getPGById(req.params.pgId, req.user, isAdmin);
 
   sendResponse(res, { data: { pg }, statusCode: httpStatus.OK });
 });
@@ -48,10 +48,26 @@ const deletePG = catchAsync(async (req, res) => {
   sendResponse(res, { success: true, message: "PG deleted successfully", statusCode: httpStatus.OK });
 });
 
+const discoverPGs = catchAsync(async (req, res) => {
+  const filter = {
+    city: req.query.city,
+    pgType: req.query.pgType,
+    facilities: req.query.facilities ? req.query.facilities.split(',') : [],
+  };
+  const options = {
+    limit: parseInt(req.query.limit) || 9,
+    page: parseInt(req.query.page) || 1,
+  };
+
+  const result = await PgService.discoverPGs(filter, options);
+  sendResponse(res, { data: result, statusCode: httpStatus.OK });
+});
+
 module.exports = {
   createPG,
   getPGs,
   getPG,
   updatePG,
   deletePG,
+  discoverPGs,
 };

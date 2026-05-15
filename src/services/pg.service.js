@@ -98,9 +98,15 @@ const getPGById = async (pgId, staffId, isAdmin = false) => {
     const query = { _id: pgId };
 
     // only pg manager or owner can create a post
+    // Allow viewing if user is admin, OR if the property is active and user is a regular 'user',
+    // OR if the user is the specific owner/manager of the property.
     if (!isAdmin) {
       query.isDeleted = false;
-      query.$or = [{ ownerId: staffId }, { managerId: staffId }];
+      if (staffId && (staffId.role === 'owner' || staffId.role === 'manager')) {
+        query.$or = [{ ownerId: staffId.id || staffId }, { managerId: staffId.id || staffId }];
+      } else {
+        query.isActive = true;
+      }
     }
 
     const pg = await PG.findOne(query)
@@ -226,6 +232,45 @@ const restorePG = async (pgId) => {
   }
 };
 
+/**
+ * Discover PGs (Public access for users)
+ * @param {Object} filter - Filter options (city, pgType, facilities)
+ * @param {Object} options - Query options (limit, page)
+ * @returns {Promise<Object>}
+ */
+const discoverPGs = async (filter = {}, options = {}) => {
+  try {
+    const limit = options.limit || 9;
+    const page = options.page || 1;
+    const skip = (page - 1) * limit;
+
+    const query = { isDeleted: false, isActive: true };
+    
+    if (filter.city) {
+      query['address.city'] = { $regex: filter.city, $options: 'i' };
+    }
+    if (filter.pgType) {
+      query.pgType = filter.pgType;
+    }
+    if (filter.facilities && filter.facilities.length > 0) {
+      query.facilities = { $all: filter.facilities };
+    }
+
+    const pgs = await PG.find(query)
+      .limit(limit)
+      .skip(skip)
+      .select("name address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds rating facilities")
+      .populate("facilities", "name")
+      .lean();
+
+    const total = await PG.countDocuments(query);
+
+    return { pgs, total, limit, page };
+  } catch (error) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to discover PGs");
+  }
+};
+
 module.exports = {
   checkExistingPG,
   createPG,
@@ -235,4 +280,5 @@ module.exports = {
   deletePG,
   getAllPGs,
   restorePG,
+  discoverPGs,
 };
