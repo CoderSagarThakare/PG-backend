@@ -19,4 +19,23 @@ const deleteUser = catchAsync(async (req, res) => {
   sendResponse(res, { success: true, message: "user deleted successfully" });
 });
 
-module.exports = { getUser, updateUser, deleteUser };
+const listUsers = catchAsync(async (req, res) => {
+  const options = {
+    limit: req.query.limit,
+    page: req.query.page,
+  };
+  const result = await userService.getAllUsers(options);
+  sendResponse(res, { data: result, statusCode: httpStatus.OK });
+});
+
+const getUsersByRole = catchAsync(async (req, res) => {
+  const { role } = req.params;
+  const options = {
+    limit: req.query.limit,
+    page: req.query.page,
+  };
+  const result = await userService.getUsersByRole(role, options);
+  sendResponse(res, { data: result, statusCode: httpStatus.OK });
+});
+
+module.exports = { getUser, updateUser, deleteUser, listUsers, getUsersByRole };

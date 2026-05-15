@@ -52,3 +52,25 @@ process.on("SIGTERM", () => {
     server.close();
   }
 });
+
+// Handle Nodemon restarts
+process.once("SIGUSR2", () => {
+  if (server) {
+    server.close(() => {
+      process.kill(process.pid, "SIGUSR2");
+    });
+  } else {
+    process.kill(process.pid, "SIGUSR2");
+  }
+});
+
+// Handle Ctrl+C
+process.on("SIGINT", () => {
+  if (server) {
+    server.close(() => {
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+});

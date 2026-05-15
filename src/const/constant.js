@@ -8,7 +8,6 @@ const ROLE_TYPES = {
 
 // schema names for mongoose models
 const SCHEMA_NAME = {
-  staff: "Staff",
   pg: "Pg",
   facilities: "Facilities",
   post: "Post",

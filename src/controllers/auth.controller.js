@@ -4,7 +4,6 @@ const {
   authService,
   emailService,
   otpService,
-  staffService,
   userService,
 } = require("../services");
 const httpStatus = require("http-status");
@@ -13,27 +12,22 @@ const { ROLE_TYPES } = require("../const/constant");
 const sendResponse = require("../utils/sendResponse");
 
 const register = catchAsync(async (req, res) => {
-  const staffRoles = [
+  const validRoles = [
     ROLE_TYPES.owner,
     ROLE_TYPES.manager,
     ROLE_TYPES.employee,
+    ROLE_TYPES.user,
+    ROLE_TYPES.admin
   ];
 
   const role = req.body.role.toLowerCase();
 
-  if (staffRoles.includes(role)) {
-    // Register as staff member with specified role
-    await authService.registerStaff({ ...req.body });
-
-    sendResponse(res, { success: true, message: `Staff member with role ${role} registered successfully`, statusCode: httpStatus.CREATED });
-  } else if (role === ROLE_TYPES.user) {
-    // Register as regular user
-    await authService.registerUser({ ...req.body });
-
-    sendResponse(res, { success: true, message: "User registered successfully", statusCode: httpStatus.CREATED });
-  } else {
+  if (!validRoles.includes(role)) {
     throw new ApiError(httpStatus.BAD_REQUEST, `Invalid role: ${role}`);
   }
+
+  await authService.registerUser({ ...req.body });
+  sendResponse(res, { success: true, message: `Registered successfully as ${role}`, statusCode: httpStatus.CREATED });
 });
 
 const login = catchAsync(async (req, res) => {
@@ -108,24 +102,10 @@ const verifyEmail = catchAsync(async (req, res) => {
 const sendVerificationOTP = catchAsync(async (req, res) => {
   const otp = await otpService.sendVerificationOTP(req.user.email);
 
-  const staffRoles = [
-    ROLE_TYPES.owner,
-    ROLE_TYPES.manager,
-    ROLE_TYPES.employee,
-  ];
-
-  // Update OTP for staff members or users based on their role
-  if (staffRoles.includes(req.user.role.toLowerCase())) {
-    await staffService.updateStaffById(req.user.id, {
-      otp: otp,
-      otpGeneratedTime: new Date(),
-    });
-  } else {
-    await userService.updateUserById(req.user.id, {
-      otp: otp,
-      otpGeneratedTime: new Date(),
-    });
-  }
+  await userService.updateUserById(req.user.id, {
+    otp: otp,
+    otpGeneratedTime: new Date(),
+  });
 
   sendResponse(res, { message: "Check otp on your registered mail-id", statusCode: httpStatus.OK });
 });

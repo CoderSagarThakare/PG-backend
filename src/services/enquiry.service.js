@@ -1,4 +1,4 @@
-const { Enquiry, PG, Post, Staff } = require("../models");
+const { Enquiry, PG, Post, User } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 
@@ -56,11 +56,11 @@ const createEnquiry = async ({ userId, postId }) => {
     const enquiry = await Enquiry.create(enquiryBody);
 
     // Fetch owner and manager mobile numbers
-    const owner = await Staff.findById(enquiry.ownerId).select(
+    const owner = await User.findById(enquiry.ownerId).select(
       "name mobNo1 mobNo2",
     );
     const manager = enquiry.managerId
-      ? await Staff.findById(enquiry.managerId).select("name mobNo1 mobNo2")
+      ? await User.findById(enquiry.managerId).select("name mobNo1 mobNo2")
       : null;
 
     return {

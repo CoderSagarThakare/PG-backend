@@ -1,4 +1,4 @@
-const { pgController } = require(".");
+const pgController = require("./pg.controller");
 
 module.exports = {
   createPG: pgController.createPG,

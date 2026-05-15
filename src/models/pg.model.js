@@ -6,12 +6,12 @@ const pgSchema = mongoose.Schema(
   {
     ownerId: {
       type: mongoose.SchemaTypes.ObjectId,
-      ref: SCHEMA_NAME.staff,
+      ref: SCHEMA_NAME.user,
       required: true,
     },
     managerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: SCHEMA_NAME.staff,
+      ref: SCHEMA_NAME.user,
       required: true,
     },
     name: {

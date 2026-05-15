@@ -11,12 +11,12 @@ const postSchema = mongoose.Schema(
     },
     managerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: SCHEMA_NAME.staff,
+      ref: SCHEMA_NAME.user,
       required: true,
     },
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: SCHEMA_NAME.staff,
+      ref: SCHEMA_NAME.user,
       required: true,
     },
 
@@ -88,7 +88,7 @@ const postSchema = mongoose.Schema(
     ],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: SCHEMA_NAME.staff,
+      ref: SCHEMA_NAME.user,
       required: true,
       immutable: true,
     },

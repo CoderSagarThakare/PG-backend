@@ -6,10 +6,6 @@ const {
   updateUserById,
   removeUserFields,
 } = require("./user.service");
-const {
-  getStaffById,
-  updateStaffById,
-} = require("./staff.service");
 
 const sendVerificationOTP = async (to) => {
   const subject = "PG_Stay: Verify Your Identity";
@@ -66,14 +62,7 @@ const generateOTP = (length = 6) => {
 
 // validate otp coming from frontned
 const validateOTP = async (userId, otp) => {
-  // Try to get user first, then staff
   let account = await getUserById(userId);
-  let isStaff = false;
-
-  if (!account) {
-    account = await getStaffById(userId);
-    isStaff = true;
-  }
 
   if (!account) {
     throw new ApiError(httpStatus.BAD_REQUEST, "User not found");
@@ -87,20 +76,11 @@ const validateOTP = async (userId, otp) => {
   if (duration > 120)
     throw new ApiError(httpStatus.BAD_REQUEST, "OTP Expired Generate New OTP ");
 
-  // Update either user or staff based on account type
-  if (isStaff) {
-    await updateStaffById(userId, {
-      isEmailVerified: true,
-      otp: undefined,
-      otpGeneratedTime: undefined,
-    });
-  } else {
-    await updateUserById(userId, {
-      isEmailVerified: true,
-      otp: undefined,
-      otpGeneratedTime: undefined,
-    });
-  }
+  await updateUserById(userId, {
+    isEmailVerified: true,
+    otp: undefined,
+    otpGeneratedTime: undefined,
+  });
 
   return true;
 };

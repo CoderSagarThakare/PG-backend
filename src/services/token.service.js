@@ -2,7 +2,7 @@ const moment = require("moment");
 const config = require("../config/config");
 const { tokenTypes } = require("../config/token");
 const httpStatus = require("http-status");
-const { userService } = require(".");
+const userService = require("./user.service");
 const ApiError = require("../utils/ApiError");
 const jwt = require("jsonwebtoken");
 

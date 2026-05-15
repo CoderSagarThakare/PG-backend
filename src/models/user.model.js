@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const { private } = require("./plugins");
-const { SCHEMA_NAME, ROLE_TYPES } = require("../const/constant");
+const { SCHEMA_NAME, ROLE_TYPES, GENDER_TYPES } = require("../const/constant");
 
 const userSchema = mongoose.Schema(
   {
@@ -14,7 +14,7 @@ const userSchema = mongoose.Schema(
     role: {
       type: String,
       required: true,
-      enum: [ROLE_TYPES.user, ROLE_TYPES.admin],
+      enum: [ROLE_TYPES.user, ROLE_TYPES.admin, ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.employee],
     },
     email: {
       type: String,
@@ -85,6 +85,10 @@ const userSchema = mongoose.Schema(
         default: "India",
         trim: true,
       },
+    },
+    gender: {
+      type: String,
+      enum: [GENDER_TYPES.male, GENDER_TYPES.female, GENDER_TYPES.transgender, GENDER_TYPES.preferNotToSay],
     },
     picture: {
       type: String,

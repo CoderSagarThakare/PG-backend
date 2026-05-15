@@ -23,13 +23,13 @@ const enquirySchema = mongoose.Schema(
     // Denormalized for fast access control & filtering
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: SCHEMA_NAME.staff,
+      ref: SCHEMA_NAME.user,
       required: true,
       index: true,
     },
     managerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: SCHEMA_NAME.staff,
+      ref: SCHEMA_NAME.user,
       index: true,
     },
     status: {
@@ -58,7 +58,7 @@ const enquirySchema = mongoose.Schema(
     // To track who moved the lead to the final stage
     updatedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: SCHEMA_NAME.staff,
+      ref: SCHEMA_NAME.user,
     },
     isDeleted: {
       type: Boolean,

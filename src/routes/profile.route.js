@@ -1,14 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const { staffController } = require("../controllers");
+const { userController } = require("../controllers");
 const validate = require("../middlewares/validate");
-const { staffValidation } = require("../validations");
+const { userValidation } = require("../validations");
 
-// Staff profile routes
+// User profile routes
 router
   .route("/")
-  .get(staffController.getStaff)
-  .patch(validate(staffValidation.updateStaff), staffController.updateStaff)
-  .delete(staffController.deleteStaff);
+  .get(userController.getUser)
+  .patch(validate(userValidation.updateUser), userController.updateUser)
+  .delete(userController.deleteUser);
 
 module.exports = router;

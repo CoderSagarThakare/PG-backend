@@ -1,4 +1,4 @@
-const { User, Staff } = require("../models");
+const { User } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 
@@ -9,14 +9,6 @@ const httpStatus = require("http-status");
  */
 
 const createUser = async (userBody) => {
-  const staff = await Staff.findOne({ email: userBody.email });
-
-  if (staff) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "PG Staff already exists with this email",
-    );
-  }
 
   // User.isEmailTaken => return true/false
   if (await User.isEmailTaken(userBody.email)) {
@@ -130,10 +122,34 @@ const deleteUserById = async (userId) => {
   }
 };
 
+const getUsersByRole = async (role, options = {}) => {
+  const { limit = 10, page = 1 } = options;
+  const skip = (page - 1) * limit;
+
+  const filter = { role, isDeleted: false };
+  const users = await User.find(filter).limit(limit).skip(skip);
+  const total = await User.countDocuments(filter);
+
+  return { users, total, limit, page };
+};
+
+const getAllUsers = async (options = {}) => {
+  const { limit = 10, page = 1 } = options;
+  const skip = (page - 1) * limit;
+
+  const filter = { isDeleted: false };
+  const users = await User.find(filter).limit(limit).skip(skip);
+  const total = await User.countDocuments(filter);
+
+  return { users, total, limit, page };
+};
+
 module.exports = {
   createUser,
   getUserByEmail,
   getUserById,
   updateUserById,
   deleteUserById,
+  getUsersByRole,
+  getAllUsers,
 };

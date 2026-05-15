@@ -1,4 +1,4 @@
-const { pgController } = require(".");
+const pgController = require("./pg.controller");
 const httpStatus = require("http-status");
 const catchAsync = require("../utils/catchAsync");
 const { ownerService } = require("../services");

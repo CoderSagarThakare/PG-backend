@@ -1,4 +1,4 @@
-const { Staff } = require("../models");
+const { User } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 

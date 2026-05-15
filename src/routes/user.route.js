@@ -18,4 +18,8 @@ router
   .patch(validate(userValidation.updateUser), userController.updateUser)
   .delete(userController.deleteUser);
 
+// Admin routes for viewing all users
+router.get("/all", auth(ROLE_TYPES.admin, ROLE_TYPES.owner), userController.listUsers);
+router.get("/role/:role", auth(ROLE_TYPES.admin, ROLE_TYPES.owner), userController.getUsersByRole);
+
 module.exports = router;
