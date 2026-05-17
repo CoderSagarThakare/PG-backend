@@ -12,6 +12,10 @@ const envVarsSchema = Joi.object()
     JWT_RESET_PASSWORD_EXPIRATION_MINUTES: Joi.number()
       .default(10)
       .description("minutes after which reset password token expires"),
+    AWS_REGION: Joi.string().required().description("AWS Region"),
+    AWS_ACCESS_KEY_ID: Joi.string().required().description("AWS Access Key ID"),
+    AWS_SECRET_ACCESS_KEY: Joi.string().required().description("AWS Secret Access Key"),
+    AWS_S3_BUCKET_NAME: Joi.string().required().description("AWS S3 Bucket Name"),
   })
   .unknown();
 
@@ -68,5 +72,13 @@ module.exports = {
       user: envVars.GMAIL_USERNAME,
       pass: envVars.GMAIL_PASSWORD
     }
+  },
+  aws: {
+    s3: {
+      region: envVars.AWS_REGION,
+      accessKeyId: envVars.AWS_ACCESS_KEY_ID,
+      secretAccessKey: envVars.AWS_SECRET_ACCESS_KEY,
+      bucketName: envVars.AWS_S3_BUCKET_NAME,
+    },
   },
 };

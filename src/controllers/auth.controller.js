@@ -5,6 +5,7 @@ const {
   emailService,
   otpService,
   userService,
+  awsService,
 } = require("../services");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
@@ -37,6 +38,12 @@ const login = catchAsync(async (req, res) => {
 
   const token = await tokenService.generateAuthTokens(user);
 
+  // Generate a fresh presigned picture URL if the user has a custom avatar
+  let picture = user.picture;
+  if (user.profileImageKey) {
+    picture = await awsService.getFileUrl(user.profileImageKey);
+  }
+
   sendResponse(res, { 
     success: true, 
     message: "Login successful", 
@@ -46,7 +53,12 @@ const login = catchAsync(async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        picture,
+        profileImageKey: user.profileImageKey || null,
+        mobNo1: user.mobNo1,
+        mobNo2: user.mobNo2 || null,
+        address: user.address,
       }
     } 
   });

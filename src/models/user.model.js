@@ -94,6 +94,10 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "https://i.imgur.com/CR1iy7U.png",
     },
+    profileImageKey: {
+      type: String,
+      default: null, // S3 object key, null means using default picture
+    },
     isEmailVerified: {
       type: Boolean,
       default: false,
