@@ -63,6 +63,11 @@ const discoverPGs = catchAsync(async (req, res) => {
   sendResponse(res, { data: result, statusCode: httpStatus.OK });
 });
 
+const getPriceRange = catchAsync(async (req, res) => {
+  const result = await PgService.getPriceRange(req.params.pgId);
+  sendResponse(res, { data: result, statusCode: httpStatus.OK });
+});
+
 module.exports = {
   createPG,
   getPGs,
@@ -70,4 +75,6 @@ module.exports = {
   updatePG,
   deletePG,
   discoverPGs,
+  getPriceRange,
 };
+

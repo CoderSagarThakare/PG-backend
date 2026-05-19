@@ -1,4 +1,4 @@
-const { PG } = require("../models");
+const { PG, Bed } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 
@@ -271,6 +271,20 @@ const discoverPGs = async (filter = {}, options = {}) => {
   }
 };
 
+const getPriceRange = async (pgId) => {
+  const beds = await Bed.find({ pgId, status: "available", isDeleted: false });
+  if (!beds || beds.length === 0) {
+    return { minPrice: 0, maxPrice: 0 };
+  }
+  let min = beds[0].price;
+  let max = beds[0].price;
+  for (const bed of beds) {
+    if (bed.price < min) min = bed.price;
+    if (bed.price > max) max = bed.price;
+  }
+  return { minPrice: min, maxPrice: max };
+};
+
 module.exports = {
   checkExistingPG,
   createPG,
@@ -281,4 +295,5 @@ module.exports = {
   getAllPGs,
   restorePG,
   discoverPGs,
+  getPriceRange,
 };

@@ -33,6 +33,9 @@ router.use(auth(ROLE_TYPES.owner, ROLE_TYPES.manager));
 router.post("/", auth(ROLE_TYPES.owner), validate(pgValidation.createPG), pgController.createPG);
 
 
+// Get price range for beds in a PG
+router.get("/:pgId/price-range", validate(pgValidation.getPG), pgController.getPriceRange);
+
 // Get PG Details
 router.get("/:pgId", validate(pgValidation.getPG), pgController.getPG);
 

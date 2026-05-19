@@ -65,7 +65,12 @@ const postSchema = mongoose.Schema(
         PG_TYPES.coLiving,
       ],
     },
-    pricePerBed: {
+    minPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    maxPrice: {
       type: Number,
       required: true,
       min: 0,

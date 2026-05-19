@@ -16,7 +16,8 @@ const createPost = {
     pgType: Joi.string()
       .valid(PG_TYPES.male, PG_TYPES.female, PG_TYPES.unisex, PG_TYPES.coLiving)
       .required(),
-    pricePerBed: Joi.number().required(),
+    minPrice: Joi.number().required(),
+    maxPrice: Joi.number().required(),
     occupancyType: Joi.string()
       .valid(
         OCCUPANCY_TYPES.single,
@@ -64,7 +65,8 @@ const updatePost = {
         OCCUPANCY_TYPES.other,
       ),
       gender: Joi.string().valid("male", "female", "unisex"),
-      pricePerBed: Joi.number(),
+      minPrice: Joi.number(),
+      maxPrice: Joi.number(),
       availableFrom: Joi.date(),
       images: Joi.array().items(Joi.string()),
       isActive: Joi.boolean(),
