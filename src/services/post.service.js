@@ -248,9 +248,12 @@ const getPostsByPreference = async (userId, options = {}) => {
   }
 
   if (options.minPrice || options.maxPrice) {
-    postFilter.pricePerBed = {};
-    if (options.minPrice) postFilter.pricePerBed.$gte = Number(options.minPrice);
-    if (options.maxPrice) postFilter.pricePerBed.$lte = Number(options.maxPrice);
+    if (options.minPrice) {
+      postFilter.minPrice = { $gte: Number(options.minPrice) };
+    }
+    if (options.maxPrice) {
+      postFilter.maxPrice = { $lte: Number(options.maxPrice) };
+    }
   }
 
   // initial fetch without scoring (just to get total count)
@@ -258,7 +261,7 @@ const getPostsByPreference = async (userId, options = {}) => {
 
   // fetch actual posts, project only necessary fields for UI & scoring
   let posts = await Post.find(postFilter)
-    .select("title description vacancyCount occupancyType pgType pricePerBed pgId createdAt")
+    .select("title description vacancyCount occupancyType pgType minPrice maxPrice pgId createdAt")
     .populate({
       path: "pgId",
       select: "name address checkInTime checkOutTime facilities rating",
@@ -282,8 +285,8 @@ const getPostsByPreference = async (userId, options = {}) => {
       ) {
         score += 50;
       }
-      // budget match (assume pricePerBed <= budget)
-      if (pref.budget !== undefined && post.pricePerBed <= pref.budget) {
+      // budget match (assume minPrice <= budget)
+      if (pref.budget !== undefined && post.minPrice <= pref.budget) {
         score += 30;
       }
       // facilities match

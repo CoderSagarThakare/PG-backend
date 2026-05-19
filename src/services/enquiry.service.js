@@ -119,7 +119,7 @@ const queryEnquiries = async (user, options) => {
       .sort(options.sortBy || { createdAt: -1 })
       .populate("userId", "name email picture mobNo1 mobNo2")
       .populate("pgId", "name")
-      .populate({ path: "postId", select: "title occupancyType pricePerBed isDeleted isActive", match: { isDeleted: { $in: [true, false] } } })
+      .populate({ path: "postId", select: "title occupancyType minPrice maxPrice isDeleted isActive", match: { isDeleted: { $in: [true, false] } } })
       .lean();
 
     const filtered = allEnquiries.filter(e =>
@@ -137,7 +137,7 @@ const queryEnquiries = async (user, options) => {
     .sort(options.sortBy || { createdAt: -1 })
     .populate("userId", "name email picture mobNo1 mobNo2")
     .populate("pgId", "name")
-    .populate({ path: "postId", select: "title occupancyType pricePerBed isDeleted isActive", match: { isDeleted: { $in: [true, false] } } })
+    .populate({ path: "postId", select: "title occupancyType minPrice maxPrice isDeleted isActive", match: { isDeleted: { $in: [true, false] } } })
     .lean();
 
   const total = await Enquiry.countDocuments(query);
