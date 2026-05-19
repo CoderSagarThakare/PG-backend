@@ -9,13 +9,37 @@ let server;
 logger.warn("--------------------------------------");
 
 // Connect to DB first, then start the server
-mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
+mongoose.connect(config.mongoose.url, config.mongoose.options).then(async () => {
   logger.info(`Connected to MongoDB => ${config.mongoose.url}`);
   logger.warn("--------------------------------------");
+
+  // Self-correcting migration: Align occupied bed prices with their enquiry vacancy post pricePerBed!
+  try {
+    const Bed = mongoose.model("Bed");
+    const Enquiry = mongoose.model("Enquiry");
+    const Post = mongoose.model("Post");
+    const occupiedBeds = await Bed.find({ status: "occupied", isDeleted: false });
+    
+    for (const bed of occupiedBeds) {
+      if (!bed.userId) continue;
+      const enquiry = await Enquiry.findOne({ userId: bed.userId, pgId: bed.pgId, status: "dealDone", isDeleted: false });
+      if (enquiry) {
+        const post = await Post.findById(enquiry.postId);
+        if (post && post.pricePerBed && bed.price !== post.pricePerBed) {
+          logger.info(`Self-Correcting bed price: Bed ${bed.bedNumber} price updated from ₹${bed.price} to ₹${post.pricePerBed} (matched Vacancy Post)`);
+          bed.price = post.pricePerBed;
+          await bed.save();
+        }
+      }
+    }
+  } catch (e) {
+    logger.error("Failed to execute self-correcting bed price migration:", e);
+  }
 
   server = app.listen(config.port, () => {
     logger.info(`Node server listening on port => ${config.port}`);
   });
+
 }).catch((err) => {
   logger.error(`MongoDB connection failed: ${err.message}`);
   process.exit(1);

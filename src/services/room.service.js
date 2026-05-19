@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
-const { Room, Bed, PG, Enquiry } = require('../models');
+const { Room, Bed, PG, Enquiry, Post } = require('../models');
+
 const ApiError = require('../utils/ApiError');
 
 /**
@@ -102,12 +103,19 @@ const assignTenant = async (bedId, userId) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Cannot assign bed: Tenant already has an active occupancy in this property.');
   }
 
+  // Fetch the vacancy post to align bed rent price exactly with what was shown on the post!
+  const post = await Post.findById(enquiry.postId);
+  if (post && post.pricePerBed) {
+    bed.price = post.pricePerBed;
+  }
+
   bed.userId = userId;
   bed.status = 'occupied';
   await bed.save();
 
   await updatePGBedStats(bed.pgId);
   return bed;
+
 };
 
 /**
