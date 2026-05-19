@@ -33,6 +33,10 @@ const bedSchema = mongoose.Schema(
       ref: SCHEMA_NAME.user,
       default: null,
     },
+    assignedAt: {
+      type: Date,
+      default: null,
+    },
     status: {
       type: String,
       enum: ["available", "occupied", "maintenance"],

@@ -52,7 +52,11 @@ const userSchema = mongoose.Schema(
     mobNo2: {
       type: String,
       trim: true,
-      match: [/^[6-9]\d{9}$/, "Please provide a valid 10-digit mobile number"],
+      validate(value) {
+        if (value && !value.match(/^[6-9]\d{9}$/)) {
+          throw new Error("Please provide a valid 10-digit mobile number");
+        }
+      },
       default: null,
     },
     address: {

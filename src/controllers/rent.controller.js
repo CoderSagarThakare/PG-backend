@@ -2,6 +2,8 @@ const httpStatus = require("http-status");
 const catchAsync = require("../utils/catchAsync");
 const sendResponse = require("../utils/sendResponse");
 const rentService = require("../services/rent.service");
+const { PG } = require("../models");
+const ApiError = require("../utils/ApiError");
 
 const recordPayment = catchAsync(async (req, res) => {
   const rent = await rentService.recordPayment(req.body, req.user._id);
@@ -9,13 +11,48 @@ const recordPayment = catchAsync(async (req, res) => {
 });
 
 const getRentPayments = catchAsync(async (req, res) => {
+  // Find all PGs owned or managed by this user
+  const userPgs = await PG.find({
+    $or: [{ ownerId: req.user._id }, { managerId: req.user._id }],
+    isDeleted: false
+  }, "_id");
+  const pgIds = userPgs.map(p => p._id);
+
+  if (req.query.pgId) {
+    if (!pgIds.map(String).includes(String(req.query.pgId))) {
+      return sendResponse(res, { data: { records: [], total: 0, page: 1, limit: 20 }, statusCode: httpStatus.OK });
+    }
+  } else {
+    req.query.pgId = { $in: pgIds };
+  }
+
   const result = await rentService.getRentPayments(req.query);
   sendResponse(res, { data: result, statusCode: httpStatus.OK });
 });
 
 const getMonthlySummary = catchAsync(async (req, res) => {
   const { pgId, rentMonth } = req.query;
-  const summary = await rentService.getMonthlySummary(pgId, rentMonth);
+
+  // Find all PGs owned or managed by this user
+  const userPgs = await PG.find({
+    $or: [{ ownerId: req.user._id }, { managerId: req.user._id }],
+    isDeleted: false
+  }, "_id");
+  const pgIds = userPgs.map(p => p._id);
+
+  let targetPgId = pgId;
+  if (pgId) {
+    if (!pgIds.map(String).includes(String(pgId))) {
+      return sendResponse(res, { 
+        data: { paid: 0, pending: 0, partial: 0, overdue: 0, under_review: 0, totalDue: 0, totalCollected: 0, tenantCount: 0, collectionRate: 0 }, 
+        statusCode: httpStatus.OK 
+      });
+    }
+  } else {
+    targetPgId = { $in: pgIds };
+  }
+
+  const summary = await rentService.getMonthlySummary(targetPgId, rentMonth);
   sendResponse(res, { data: summary, statusCode: httpStatus.OK });
 });
 

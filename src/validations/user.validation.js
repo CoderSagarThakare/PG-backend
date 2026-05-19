@@ -11,7 +11,7 @@ const updateUser = {
           "Primary mobile number must be a valid 10-digit Indian number.",
         "any.required": "Primary mobile number is mandatory.",
       }),
-      mobNo2: Joi.string().pattern(mobileRegex).messages({
+      mobNo2: Joi.string().pattern(mobileRegex).allow("").messages({
         "string.pattern.base":
           "Secondary mobile number must be a valid 10-digit Indian number.",
       }),

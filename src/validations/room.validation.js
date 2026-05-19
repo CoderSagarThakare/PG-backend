@@ -35,6 +35,7 @@ const assignTenant = {
   }),
   body: Joi.object().keys({
     userId: Joi.string().required(),
+    joiningDate: Joi.date().iso().optional().allow("", null),
   }),
 };
 

@@ -74,9 +74,10 @@ const getRoomsByPg = async (pgId) => {
  * Assign a tenant to a bed
  * @param {string} bedId
  * @param {string} userId
+ * @param {Date|string} [joiningDate]
  * @returns {Promise<Bed>}
  */
-const assignTenant = async (bedId, userId) => {
+const assignTenant = async (bedId, userId, joiningDate) => {
   const bed = await Bed.findById(bedId);
   if (!bed || bed.isDeleted) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Bed not found');
@@ -105,6 +106,7 @@ const assignTenant = async (bedId, userId) => {
 
   bed.userId = userId;
   bed.status = 'occupied';
+  bed.assignedAt = joiningDate ? new Date(joiningDate) : new Date();
   await bed.save();
 
   await updatePGBedStats(bed.pgId);
@@ -125,6 +127,7 @@ const unassignTenant = async (bedId) => {
 
   bed.userId = null;
   bed.status = 'available';
+  bed.assignedAt = null;
   await bed.save();
 
   await updatePGBedStats(bed.pgId);

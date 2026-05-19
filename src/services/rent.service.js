@@ -80,8 +80,12 @@ const getRentPayments = async ({ pgId, userId, rentMonth, status, paymentMode, p
  */
 const getMonthlySummary = async (pgId, rentMonth) => {
   const filter = { isDeleted: false };
-  if (pgId && mongoose.Types.ObjectId.isValid(pgId)) {
-    filter.pgId = new mongoose.Types.ObjectId(pgId);
+  if (pgId) {
+    if (mongoose.Types.ObjectId.isValid(pgId)) {
+      filter.pgId = new mongoose.Types.ObjectId(pgId);
+    } else {
+      filter.pgId = pgId;
+    }
   }
   if (rentMonth) filter.rentMonth = rentMonth;
 
@@ -98,15 +102,17 @@ const getMonthlySummary = async (pgId, rentMonth) => {
     },
   ]);
 
-  const summary = { paid: 0, pending: 0, partial: 0, overdue: 0, totalDue: 0, totalCollected: 0, tenantCount: 0 };
+  const summary = { paid: 0, pending: 0, partial: 0, overdue: 0, under_review: 0, totalDue: 0, totalCollected: 0, tenantCount: 0 };
   stats.forEach(({ _id, count, totalDue, totalPaid }) => {
     summary[_id] = count;
     summary.totalDue += totalDue;
-    summary.totalCollected += totalPaid;
+    if (_id === "paid" || _id === "partial") {
+      summary.totalCollected += totalPaid;
+    }
     summary.tenantCount += count;
   });
-  summary.collectionRate = summary.totalDue > 0
-    ? Math.round((summary.totalCollected / summary.totalDue) * 100)
+  summary.collectionRate = summary.tenantCount > 0
+    ? Math.round(((summary.paid || 0) / summary.tenantCount) * 100)
     : 0;
 
   return summary;
@@ -158,18 +164,46 @@ const generateMonthlyRent = async (pgId, rentMonth, recordedBy) => {
   const beds = await Bed.find({ pgId, status: "occupied", isDeleted: false }).populate("roomId");
   const results = { created: 0, skipped: 0 };
 
+  const [yearStr, monthStr] = rentMonth.split("-");
+  const year = parseInt(yearStr, 10);
+  const month = parseInt(monthStr, 10);
+
+  const totalDaysInMonth = new Date(year, month, 0).getDate();
+  const lastDateOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+
   await Promise.all(beds.map(async (bed) => {
     const exists = await RentPayment.exists({ bedId: bed._id, userId: bed.userId, rentMonth });
     if (exists) { results.skipped++; return; }
+
+    let rentAmount = bed.price;
+    let rentNotes = null;
+
+    if (bed.assignedAt) {
+      const assignYear = bed.assignedAt.getFullYear();
+      const assignMonth = bed.assignedAt.getMonth() + 1;
+
+      if (assignYear === year && assignMonth === month) {
+        const startDay = bed.assignedAt.getDate();
+        const activeDays = (totalDaysInMonth - startDay) + 1;
+        rentAmount = Math.round((activeDays / totalDaysInMonth) * bed.price);
+        const formattedDate = bed.assignedAt.toISOString().slice(0, 10);
+        rentNotes = `Prorated rent: ${activeDays} active days (joined on ${formattedDate})`;
+      } else if (bed.assignedAt > lastDateOfMonth) {
+        results.skipped++;
+        return;
+      }
+    }
+
     await RentPayment.create({
       bedId: bed._id,
       userId: bed.userId,
       roomId: bed.roomId._id,
       pgId,
       rentMonth,
-      amount: bed.price,
+      amount: rentAmount,
       amountPaid: 0,
       status: "pending",
+      notes: rentNotes,
       recordedBy,
     });
     results.created++;

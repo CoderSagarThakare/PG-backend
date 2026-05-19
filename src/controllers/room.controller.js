@@ -33,9 +33,9 @@ const getRooms = catchAsync(async (req, res) => {
 
 const assignTenant = catchAsync(async (req, res) => {
   const { bedId } = req.params;
-  const { userId } = req.body;
+  const { userId, joiningDate } = req.body;
   
-  const bed = await roomService.assignTenant(bedId, userId);
+  const bed = await roomService.assignTenant(bedId, userId, joiningDate);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
