@@ -161,6 +161,12 @@ const deletePayment = async (rentId, pgId) => {
  * Useful for bulk rent generation at month start.
  */
 const generateMonthlyRent = async (pgId, rentMonth, recordedBy) => {
+  const now = new Date();
+  const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  if (rentMonth > currentMonthStr) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "You cannot generate rent bills for future months");
+  }
+
   const beds = await Bed.find({ pgId, status: "occupied", isDeleted: false }).populate("roomId");
   const results = { created: 0, skipped: 0 };
 
