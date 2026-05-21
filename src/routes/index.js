@@ -18,7 +18,7 @@ const defaultRoutes = [
   { path: "/pg", route: require("./pg.route") }, // base path for generic PG routes
   { path: "/room", route: require("./room.route") }, // base path for room routes
   { path: "/rent", route: require("./rent.route") }, // base path for rent tracking
-  { path: "/staff", route: require("./staff.route") }, // base path for staff profile
+  { path: "/profile", route: require("./profile.route") }, // unified profile routes
 ];
 
 defaultRoutes.map((route) => {
