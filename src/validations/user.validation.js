@@ -36,6 +36,10 @@ const updateUser = {
         .min(1),
       isEmailVerified: Joi.boolean(),
       isPasswordUpdated: Joi.boolean(),
+      aadharNumber: Joi.string().pattern(/^\d{12}$/).allow("", null).optional().messages({
+        "string.pattern.base": "Aadhaar number must be a valid 12-digit number.",
+      }),
+      aadharFileKey: Joi.string().allow("", null).optional(),
     })
     .min(1),
 };

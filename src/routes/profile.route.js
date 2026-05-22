@@ -20,6 +20,11 @@ router.get("/avatar", allRoles, avatarController.getAvatarUrl);
 router.patch("/avatar", allRoles, avatarController.saveAvatar);
 router.delete("/avatar", allRoles, avatarController.deleteAvatar);
 
+// Aadhaar routes
+router.get("/aadhar/upload-url", allRoles, userController.getAadharUploadUrl);
+router.post("/aadhar/verify", allRoles, userController.verifyAadharOCR);
+router.delete("/aadhar", allRoles, userController.deleteAadharFile);
+
 // Profile CRUD
 router
   .route("/")

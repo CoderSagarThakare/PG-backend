@@ -102,6 +102,20 @@ const userSchema = mongoose.Schema(
       type: String,
       default: null, // S3 object key, null means using default picture
     },
+    aadharNumber: {
+      type: String,
+      trim: true,
+      validate(value) {
+        if (value && !value.match(/^\d{12}$/)) {
+          throw new Error("Please provide a valid 12-digit Aadhaar number");
+        }
+      },
+      default: null,
+    },
+    aadharFileKey: {
+      type: String,
+      default: null,
+    },
     isEmailVerified: {
       type: Boolean,
       default: false,

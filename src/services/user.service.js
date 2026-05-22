@@ -1,4 +1,5 @@
 const { User } = require("../models");
+const awsService = require("./aws.service");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 
@@ -84,6 +85,12 @@ const updateUserById = async (userId, updateBody) => {
       });
       delete updateBody.address;
     }
+
+    // Clean up old Aadhaar document from S3 if it was replaced
+    if (updateBody.aadharFileKey && user.aadharFileKey && user.aadharFileKey !== updateBody.aadharFileKey) {
+      awsService.deleteFile(user.aadharFileKey).catch(() => {});
+    }
+
     const users = await User.findByIdAndUpdate(
       userId,
       { $set: updateBody },

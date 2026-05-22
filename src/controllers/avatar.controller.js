@@ -14,7 +14,7 @@ const getAvatarUploadUrl = catchAsync(async (req, res) => {
     return res.status(httpStatus.BAD_REQUEST).json({ message: "fileName and fileType are required" });
   }
 
-  const { uploadUrl, key } = await awsService.getAvatarUploadUrl(fileName, fileType);
+  const { uploadUrl, key } = await awsService.getAvatarUploadUrl(fileName, fileType, req.user);
   sendResponse(res, { data: { uploadUrl, key }, statusCode: httpStatus.OK });
 });
 

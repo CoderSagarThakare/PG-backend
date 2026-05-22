@@ -5,6 +5,7 @@ const {
   DeleteObjectCommand,
 } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const { RekognitionClient, DetectTextCommand } = require("@aws-sdk/client-rekognition");
 const config = require("../config/config");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
@@ -20,6 +21,14 @@ const s3Client = new S3Client({
   // the checksum header. Setting WHEN_REQUIRED disables this default behaviour.
   requestChecksumCalculation: "WHEN_REQUIRED",
   responseChecksumValidation: "WHEN_REQUIRED",
+});
+
+const rekognitionClient = new RekognitionClient({
+  region: config.aws.s3.region,
+  credentials: {
+    accessKeyId: config.aws.s3.accessKeyId,
+    secretAccessKey: config.aws.s3.secretAccessKey,
+  },
 });
 
 const BUCKET = config.aws.s3.bucketName;
@@ -71,10 +80,13 @@ const deleteFile = async (key) => {
  * Get a presigned upload URL for a profile avatar.
  * @param {string} fileName
  * @param {string} fileType
+ * @param {Object} user
  * @returns {Promise<{ uploadUrl: string, key: string }>}
  */
-const getAvatarUploadUrl = (fileName, fileType) =>
-  generateUploadPresignedUrl(fileName, fileType, "avatars");
+const getAvatarUploadUrl = (fileName, fileType, user) => {
+  const folder = user ? `private/${user.role}s/${user.role}-${user.id || user._id}/profile` : "avatars";
+  return generateUploadPresignedUrl(fileName, fileType, folder);
+};
 
 /**
  * After the client uploads the file to S3, save the key in the DB
@@ -112,6 +124,168 @@ const deleteAvatar = async (userDoc, defaultPicture = "https://i.imgur.com/CR1iy
   await userDoc.save();
 };
 
+// ── Aadhaar Card verification & OCR ──────────────────────────────────────────
+
+// Verhoeff algorithm lookup tables
+const verhoeffD = [
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
+  [2, 3, 4, 0, 1, 7, 8, 9, 5, 6],
+  [3, 4, 0, 1, 2, 8, 9, 5, 6, 7],
+  [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],
+  [5, 9, 8, 7, 6, 0, 4, 3, 2, 1],
+  [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],
+  [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],
+  [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
+  [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+];
+
+const verhoeffP = [
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],
+  [5, 8, 0, 3, 7, 9, 6, 1, 4, 2],
+  [8, 9, 1, 6, 0, 4, 3, 5, 2, 7],
+  [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],
+  [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],
+  [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
+  [7, 0, 4, 6, 9, 1, 3, 2, 5, 8]
+];
+
+const validateVerhoeff = (array) => {
+  let c = 0;
+  const invertedArray = array.split("").map(Number).reverse();
+  for (let i = 0; i < invertedArray.length; i++) {
+    c = verhoeffD[c][verhoeffP[i % 8][invertedArray[i]]];
+  }
+  return c === 0;
+};
+
+/**
+ * Get a presigned upload URL for an Aadhaar document.
+ * @param {string} fileName
+ * @param {string} fileType
+ * @param {Object} user
+ * @returns {Promise<{ uploadUrl: string, key: string }>}
+ */
+const getAadharUploadUrl = (fileName, fileType, user) => {
+  const folder = user ? `private/${user.role}s/${user.role}-${user.id || user._id}/kyc` : "aadhar";
+  return generateUploadPresignedUrl(fileName, fileType, folder);
+};
+
+/**
+ * Validates an uploaded S3 image using AWS Rekognition.
+ * Checks for Aadhaar keywords and extracts/verifies the 12-digit number.
+ * @param {string} key - S3 object key
+ * @returns {Promise<string>} Verified Aadhaar Number
+ */
+const validateAadharImageOCR = async (key) => {
+  try {
+    const command = new DetectTextCommand({
+      Image: {
+        S3Object: {
+          Bucket: BUCKET,
+          Name: key,
+        },
+      },
+    });
+
+    const response = await rekognitionClient.send(command);
+    const detections = response.TextDetections || [];
+    const texts = detections.map((d) => d.DetectedText || "");
+
+    const keywords = [
+      "government of india",
+      "bharat sarkar",
+      "unique identification",
+      "authority of india",
+      "aadhaar",
+      "aadhar",
+      "enrollment",
+      "male",
+      "female",
+      "dob:",
+      "year of birth",
+      "yob"
+    ];
+
+    const textCombined = texts.join(" ").toLowerCase();
+    const hasKeywords = keywords.some((kw) => textCombined.includes(kw));
+
+    if (!hasKeywords) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Invalid Aadhaar document. Please upload a clear photo of your Aadhaar card.");
+    }
+
+    // Try finding contiguous 12 digits first
+    let foundAadhar = null;
+    const contiguousRegex = /\b\d{12}\b/g;
+    let contMatch;
+    while ((contMatch = contiguousRegex.exec(textCombined)) !== null) {
+      const candidate = contMatch[0];
+      if (validateVerhoeff(candidate)) {
+        foundAadhar = candidate;
+        break;
+      }
+    }
+
+    // Try finding sliding window blocks if not found
+    if (!foundAadhar) {
+      const blockRegex = /\b\d{4}\b/g;
+      let match;
+      const blocks = [];
+      while ((match = blockRegex.exec(textCombined)) !== null) {
+        blocks.push({
+          value: match[0],
+          index: match.index
+        });
+      }
+
+      for (let i = 0; i <= blocks.length - 3; i++) {
+        const b1 = blocks[i];
+        const b2 = blocks[i+1];
+        const b3 = blocks[i+2];
+
+        const mid1 = textCombined.substring(b1.index + 4, b2.index);
+        const mid2 = textCombined.substring(b2.index + 4, b3.index);
+
+        const validSeparator = /^[-\s\.]+$/;
+        if (validSeparator.test(mid1) && mid1.length <= 5 &&
+            validSeparator.test(mid2) && mid2.length <= 5) {
+          const candidate = b1.value + b2.value + b3.value;
+          if (validateVerhoeff(candidate)) {
+            foundAadhar = candidate;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!foundAadhar) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Could not detect a valid 12-digit Aadhaar number. Please upload a clearer, well-lit image."
+      );
+    }
+
+    return foundAadhar;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    
+    console.error("Aadhaar Verification AWS Service Error:", error);
+
+    if (error.name === 'AccessDeniedException') {
+      throw new ApiError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        "Aadhaar verification system configuration error (AccessDeniedException). Please ensure the AWS IAM user has 'rekognition:DetectText' permissions."
+      );
+    }
+
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      `Aadhaar text detection failed: ${error.message || "Please ensure you upload a valid document image."}`
+    );
+  }
+};
+
 module.exports = {
   generateUploadPresignedUrl,
   getFileUrl,
@@ -119,6 +293,8 @@ module.exports = {
   getAvatarUploadUrl,
   saveAvatarKey,
   deleteAvatar,
+  getAadharUploadUrl,
+  validateAadharImageOCR,
 };
 
  
