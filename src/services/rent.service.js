@@ -1,7 +1,86 @@
 const mongoose = require("mongoose");
-const { RentPayment, Bed } = require("../models");
+const { RentPayment, Bed, PG } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
+
+/**
+ * Helper to validate and clean mongoose ObjectId
+ */
+const validateAndGetCleanId = (id, fieldName = "record") => {
+  if (typeof id === "string") {
+    id = id.trim();
+  }
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError(httpStatus.NOT_FOUND, `${fieldName} not found`);
+  }
+  return id;
+};
+
+/**
+ * Dynamic checker to scan pending/partial rent bills and transition them to overdue + apply penalties
+ */
+const checkAndApplyOverduePayments = async (pgIdOrIds) => {
+  if (!pgIdOrIds) return;
+
+  let pgIds = [];
+  if (Array.isArray(pgIdOrIds)) {
+    pgIds = pgIdOrIds;
+  } else if (pgIdOrIds && pgIdOrIds.$in && Array.isArray(pgIdOrIds.$in)) {
+    pgIds = pgIdOrIds.$in;
+  } else {
+    pgIds = [pgIdOrIds];
+  }
+
+  pgIds = pgIds.filter(id => mongoose.Types.ObjectId.isValid(id));
+  if (pgIds.length === 0) return;
+
+  const pgs = await PG.find({ _id: { $in: pgIds }, isDeleted: false });
+  const pgMap = new Map(pgs.map(p => [String(p._id), p]));
+
+  const unpaidRents = await RentPayment.find({
+    pgId: { $in: pgIds },
+    status: { $in: ["pending", "partial"] },
+    isDeleted: false,
+  }).populate("bedId");
+
+  if (unpaidRents.length === 0) return;
+
+  const now = new Date();
+
+  for (const rent of unpaidRents) {
+    const pg = pgMap.get(String(rent.pgId));
+    if (!pg) continue;
+
+    // Check if user joined mid-month for this bill's month
+    const bed = rent.bedId;
+    if (bed && bed.assignedAt) {
+      const [rentYear, rentMonthNum] = rent.rentMonth.split("-").map(Number);
+      const assignYear = bed.assignedAt.getFullYear();
+      const assignMonth = bed.assignedAt.getMonth() + 1;
+      const assignDay = bed.assignedAt.getDate();
+
+      // If they joined mid-month (day > 1) in this exact rentMonth, skip overdue check
+      if (assignYear === rentYear && assignMonth === rentMonthNum && assignDay > 1) {
+        continue;
+      }
+    }
+
+    const dueDay = pg.dueDayOfMonth || 10;
+    const lateFee = pg.lateFee || 0;
+
+    const [rentYear, rentMonth] = rent.rentMonth.split("-").map(Number);
+    const dueDate = new Date(rentYear, rentMonth - 1, dueDay, 23, 59, 59, 999);
+
+    if (now > dueDate) {
+      rent.status = "overdue";
+      if (!rent.isPenaltyApplied && lateFee > 0) {
+        rent.penaltyAmount = lateFee;
+        rent.isPenaltyApplied = true;
+      }
+      await rent.save();
+    }
+  }
+};
 
 
 /**
@@ -51,6 +130,18 @@ const recordPayment = async (data, recordedBy) => {
  * Get paginated rent records with filters.
  */
 const getRentPayments = async ({ pgId, userId, rentMonth, status, paymentMode, page = 1, limit = 20 }) => {
+  if (pgId) {
+    await checkAndApplyOverduePayments(pgId);
+  } else if (userId) {
+    const studentUnpaid = await RentPayment.find({
+      userId,
+      status: { $in: ["pending", "partial"] },
+      isDeleted: false
+    }, "pgId");
+    const studentPgIds = [...new Set(studentUnpaid.map(r => String(r.pgId)))];
+    await checkAndApplyOverduePayments(studentPgIds);
+  }
+
   const filter = { isDeleted: false };
   if (pgId) filter.pgId = pgId;
   if (userId) filter.userId = userId;
@@ -79,6 +170,10 @@ const getRentPayments = async ({ pgId, userId, rentMonth, status, paymentMode, p
  * Monthly summary stats for a given PG and month.
  */
 const getMonthlySummary = async (pgId, rentMonth) => {
+  if (pgId) {
+    await checkAndApplyOverduePayments(pgId);
+  }
+
   const filter = { isDeleted: false };
   if (pgId) {
     if (mongoose.Types.ObjectId.isValid(pgId)) {
@@ -122,6 +217,9 @@ const getMonthlySummary = async (pgId, rentMonth) => {
  * Update a single rent payment (partial to full, add reference, etc.)
  */
 const updatePayment = async (rentId, updates, pgId) => {
+  rentId = validateAndGetCleanId(rentId, "Rent record");
+  if (pgId && typeof pgId === "string") pgId = pgId.trim();
+
   const query = { _id: rentId, isDeleted: false };
   if (pgId && mongoose.Types.ObjectId.isValid(pgId)) query.pgId = pgId;
 
@@ -129,11 +227,13 @@ const updatePayment = async (rentId, updates, pgId) => {
   if (!rent) throw new ApiError(httpStatus.NOT_FOUND, "Rent record not found");
 
   const paid = updates.amountPaid ?? rent.amountPaid;
-  const due = updates.amount ?? rent.amount;
+  const baseDue = updates.amount ?? rent.amount;
+  const penalty = rent.penaltyAmount || 0;
+  const totalDue = baseDue + penalty;
   let status = rent.status;
-  if (paid >= due) status = "paid";
+  if (paid >= totalDue) status = "paid";
   else if (paid > 0) status = "partial";
-  else status = "pending";
+  else status = rent.isPenaltyApplied ? "overdue" : "pending";
 
   Object.assign(rent, { ...updates, status });
   if (paid > 0 && !rent.paidDate) rent.paidDate = new Date();
@@ -146,6 +246,9 @@ const updatePayment = async (rentId, updates, pgId) => {
  * Soft-delete a rent record.
  */
 const deletePayment = async (rentId, pgId) => {
+  rentId = validateAndGetCleanId(rentId, "Rent record");
+  if (pgId && typeof pgId === "string") pgId = pgId.trim();
+
   const query = { _id: rentId, isDeleted: false };
   if (pgId && mongoose.Types.ObjectId.isValid(pgId)) query.pgId = pgId;
 
@@ -222,6 +325,9 @@ const generateMonthlyRent = async (pgId, rentMonth, recordedBy) => {
  * Student submits payment proof (scanned QR/made payment online)
  */
 const submitPaymentProof = async (userId, rentId, data) => {
+  userId = validateAndGetCleanId(userId, "User");
+  rentId = validateAndGetCleanId(rentId, "Rent record");
+
   const rent = await RentPayment.findOne({ _id: rentId, userId, isDeleted: false });
   if (!rent) throw new ApiError(httpStatus.NOT_FOUND, "Rent record not found for this tenant");
   
@@ -234,7 +340,7 @@ const submitPaymentProof = async (userId, rentId, data) => {
   rent.paymentMode = paymentMode;
   rent.referenceNo = referenceNo;
   rent.notes = notes;
-  rent.amountPaid = amountPaid || rent.amount; // default to full bed price
+  rent.amountPaid = amountPaid || (rent.amount + (rent.penaltyAmount || 0)); // default to full price + penalty
   rent.status = "under_review";
   rent.paidDate = new Date(); // date when transaction took place
 
@@ -246,14 +352,19 @@ const submitPaymentProof = async (userId, rentId, data) => {
  * Owner/Manager approves a payment proof
  */
 const approvePayment = async (rentId, recordedBy, pgId) => {
+  rentId = validateAndGetCleanId(rentId, "Rent record");
+  recordedBy = validateAndGetCleanId(recordedBy, "User");
+  if (pgId && typeof pgId === "string") pgId = pgId.trim();
+
   const query = { _id: rentId, isDeleted: false };
   if (pgId && mongoose.Types.ObjectId.isValid(pgId)) query.pgId = pgId;
 
   const rent = await RentPayment.findOne(query);
   if (!rent) throw new ApiError(httpStatus.NOT_FOUND, "Rent record not found");
 
-  const paid = rent.amountPaid || rent.amount;
-  const status = paid >= rent.amount ? "paid" : "partial";
+  const totalDue = rent.amount + (rent.penaltyAmount || 0);
+  const paid = rent.amountPaid || totalDue;
+  const status = paid >= totalDue ? "paid" : "partial";
 
   rent.status = status;
   rent.amountPaid = paid;
@@ -268,6 +379,9 @@ const approvePayment = async (rentId, recordedBy, pgId) => {
  * Owner/Manager rejects a payment proof (resets back to pending)
  */
 const rejectPayment = async (rentId, pgId, rejectionNotes) => {
+  rentId = validateAndGetCleanId(rentId, "Rent record");
+  if (pgId && typeof pgId === "string") pgId = pgId.trim();
+
   const query = { _id: rentId, isDeleted: false };
   if (pgId && mongoose.Types.ObjectId.isValid(pgId)) query.pgId = pgId;
 

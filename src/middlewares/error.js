@@ -40,6 +40,17 @@ const errorHandler = (err, req, res, next) => {
     ...(config.env === "development" && { stack: err.stack }),
   };
 
+  // Log error to a local file for debugging
+  try {
+    const fs = require("fs");
+    const path = require("path");
+    const logPath = path.join(__dirname, "../../error_debug.log");
+    const logMessage = `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}\nStatus: ${statusCode}\nError: ${err.message}\nStack: ${err.stack}\n\n`;
+    fs.appendFileSync(logPath, logMessage);
+  } catch (logErr) {
+    logger.error("Failed to write to error_debug.log", logErr);
+  }
+
   if (config.env === "development") {
     logger.error("========================", err);  
   }

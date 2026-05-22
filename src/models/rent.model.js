@@ -71,6 +71,15 @@ const rentPaymentSchema = mongoose.Schema(
       ref: SCHEMA_NAME.user,
       default: null,
     },
+    penaltyAmount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    isPenaltyApplied: {
+      type: Boolean,
+      default: false,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

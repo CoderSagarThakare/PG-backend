@@ -17,7 +17,19 @@ const { jwtStrategy } = require("./config/passport");
 // app.set('etag', false);
 
 // JSON requests are received as plain text. We need to parse the json request body.
-app.use(bodyParser.json());
+// Enable cors to accept requests from any frontend domain
+app.use(cors());
+
+// JSON requests are received as plain text. We need to parse the json request body.
+app.use(bodyParser.json({ strict: false }));
+
+// Normalize parsed body to prevent errors on null or non-object payloads
+app.use((req, res, next) => {
+  if (req.body === null || typeof req.body !== "object") {
+    req.body = {};
+  }
+  next();
+});
 
 // Parse urlencoded request body if provided with any of the requests
 app.use(express.urlencoded({ extended: true }));
@@ -27,9 +39,6 @@ app.use(passport.initialize());
 
 // Define jwt token authentication strategy
 passport.use('jwt', jwtStrategy); 
-
-// Enable cors to accept requests from any frontend domain,
-app.use(cors());
 
 // Limit repeated failed requests to auth endpoints/routes
 if (config.env == "production") {

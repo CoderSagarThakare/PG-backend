@@ -128,6 +128,17 @@ const pgSchema = mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    dueDayOfMonth: {
+      type: Number,
+      default: 10,
+      min: 1,
+      max: 28,
+    },
+    lateFee: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     facilities: [
       {
         type: mongoose.Schema.Types.ObjectId,
