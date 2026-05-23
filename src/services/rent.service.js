@@ -87,7 +87,7 @@ const checkAndApplyOverduePayments = async (pgIdOrIds) => {
  * Create or upsert a rent payment record for a given tenant/bed/month.
  */
 const recordPayment = async (data, recordedBy) => {
-  const { bedId, userId, rentMonth, amount, amountPaid, paymentMode, paidDate, referenceNo, notes } = data;
+  const { bedId, userId, rentMonth, amount, amountPaid, paymentMode, paidDate, referenceNo, notes, activeDays, status: inputStatus } = data;
 
   // Validate the bed belongs to this PG and is occupied by this user
   const bed = await Bed.findById(bedId).populate("roomId").populate("pgId");
@@ -95,9 +95,12 @@ const recordPayment = async (data, recordedBy) => {
   if (String(bed.userId) !== String(userId)) throw new ApiError(httpStatus.BAD_REQUEST, "User is not assigned to this bed");
 
   const paid = amountPaid ?? amount;
-  let status = "pending";
-  if (paid >= amount) status = "paid";
-  else if (paid > 0) status = "partial";
+  let status = inputStatus;
+  if (!status) {
+    status = "pending";
+    if (paid >= amount) status = "paid";
+    else if (paid > 0) status = "partial";
+  }
 
   // Upsert — update if record for this bed/user/month already exists
   const rent = await RentPayment.findOneAndUpdate(
@@ -115,6 +118,7 @@ const recordPayment = async (data, recordedBy) => {
         referenceNo: referenceNo || null,
         notes: notes || null,
         recordedBy,
+        activeDays: activeDays || null,
       },
     },
     { upsert: true, new: true }
@@ -286,6 +290,7 @@ const generateMonthlyRent = async (pgId, rentMonth, recordedBy) => {
 
     let rentAmount = bed.price;
     let rentNotes = null;
+    let computedActiveDays = totalDaysInMonth;
 
     if (bed.assignedAt) {
       const assignYear = bed.assignedAt.getFullYear();
@@ -293,10 +298,10 @@ const generateMonthlyRent = async (pgId, rentMonth, recordedBy) => {
 
       if (assignYear === year && assignMonth === month) {
         const startDay = bed.assignedAt.getDate();
-        const activeDays = (totalDaysInMonth - startDay) + 1;
-        rentAmount = Math.round((activeDays / totalDaysInMonth) * bed.price);
+        computedActiveDays = (totalDaysInMonth - startDay) + 1;
+        rentAmount = Math.round((computedActiveDays / totalDaysInMonth) * bed.price);
         const formattedDate = bed.assignedAt.toISOString().slice(0, 10);
-        rentNotes = `Prorated rent: ${activeDays} active days (joined on ${formattedDate})`;
+        rentNotes = `Prorated rent: ${computedActiveDays} active days (joined on ${formattedDate})`;
       } else if (bed.assignedAt > lastDateOfMonth) {
         results.skipped++;
         return;
@@ -314,6 +319,7 @@ const generateMonthlyRent = async (pgId, rentMonth, recordedBy) => {
       status: "pending",
       notes: rentNotes,
       recordedBy,
+      activeDays: computedActiveDays,
     });
     results.created++;
   }));

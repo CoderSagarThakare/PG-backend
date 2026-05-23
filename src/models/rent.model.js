@@ -80,6 +80,10 @@ const rentPaymentSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    activeDays: {
+      type: Number,
+      default: null,
+    },
     isDeleted: {
       type: Boolean,
       default: false,
