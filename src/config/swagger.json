@@ -1,0 +1,1121 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "PG Management System API Documentation",
+    "description": "Exhaustive API documentation for the PG Management System backend. Register users, manage PGs, assign rooms, submit rent proofs, view stats, and trigger cron jobs. Set your Bearer Token to test authenticated routes.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8022",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "password", "role"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" },
+                  "role": { "type": "string", "enum": ["user", "owner", "manager", "employee", "admin"] },
+                  "mobNo1": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Successfully registered" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Log in an existing user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Successfully logged in, returns tokens (access & refresh) and user details" }
+        }
+      }
+    },
+    "/auth/login/{provider}": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Social authentication (Google, etc.)",
+        "parameters": [
+          { "name": "provider", "in": "path", "required": true, "schema": { "type": "string", "enum": ["google"] } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["idToken"],
+                "properties": {
+                  "idToken": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Successfully authenticated via provider" }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Request a password reset email",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password reset email sent" }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Reset password using token",
+        "parameters": [
+          { "name": "token", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["password"],
+                "properties": {
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password reset successfully" }
+        }
+      }
+    },
+    "/auth/send-verification-email": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Send email verification link to authenticated user",
+        "responses": {
+          "200": { "description": "Verification email sent successfully" }
+        }
+      }
+    },
+    "/auth/verify-email": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Verify user email with token",
+        "parameters": [
+          { "name": "token", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Email verified successfully" }
+        }
+      }
+    },
+    "/auth/send-verification-otp": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Send a verification OTP to the user's registered phone",
+        "responses": {
+          "200": { "description": "OTP sent successfully" }
+        }
+      }
+    },
+    "/auth/verify-otp": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Verify phone OTP code",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["otp"],
+                "properties": {
+                  "otp": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OTP verified successfully" }
+        }
+      }
+    },
+    "/user/all": {
+      "get": {
+        "tags": ["User Management"],
+        "summary": "List all registered users (Admin/Owner only)",
+        "responses": {
+          "200": { "description": "List of all users" }
+        }
+      }
+    },
+    "/user/role/{role}": {
+      "get": {
+        "tags": ["User Management"],
+        "summary": "Get all users belonging to a specific role (Admin/Owner only)",
+        "parameters": [
+          { "name": "role", "in": "path", "required": true, "schema": { "type": "string", "enum": ["user", "owner", "manager", "employee", "admin"] } }
+        ],
+        "responses": {
+          "200": { "description": "List of users matching role" }
+        }
+      }
+    },
+    "/user/preference": {
+      "post": {
+        "tags": ["User Preferences"],
+        "summary": "Create user search/PG preferences",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "preferredLocation": { "type": "string" },
+                  "budgetMin": { "type": "number" },
+                  "budgetMax": { "type": "number" },
+                  "sharingType": { "type": "integer" },
+                  "genderPreference": { "type": "string", "enum": ["male", "female", "unisex"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Preferences created successfully" }
+        }
+      }
+    },
+    "/user/preference/{preferenceId}": {
+      "get": {
+        "tags": ["User Preferences"],
+        "summary": "Get specific user preference record",
+        "parameters": [
+          { "name": "preferenceId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "User preference returned successfully" }
+        }
+      },
+      "patch": {
+        "tags": ["User Preferences"],
+        "summary": "Update preference details",
+        "parameters": [
+          { "name": "preferenceId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "preferredLocation": { "type": "string" },
+                  "budgetMin": { "type": "number" },
+                  "budgetMax": { "type": "number" },
+                  "sharingType": { "type": "integer" },
+                  "genderPreference": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Preferences updated successfully" }
+        }
+      },
+      "delete": {
+        "tags": ["User Preferences"],
+        "summary": "Delete preference record",
+        "parameters": [
+          { "name": "preferenceId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Preferences deleted successfully" }
+        }
+      }
+    },
+    "/profile": {
+      "get": {
+        "tags": ["Profile"],
+        "summary": "Get authenticated user profile details",
+        "responses": {
+          "200": { "description": "Profile details returned successfully" }
+        }
+      },
+      "patch": {
+        "tags": ["Profile"],
+        "summary": "Update user profile details",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "mobNo1": { "type": "string" },
+                  "mobNo2": { "type": "string" },
+                  "address": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Profile updated successfully" }
+        }
+      },
+      "delete": {
+        "tags": ["Profile"],
+        "summary": "Deactivate/Delete user profile",
+        "responses": {
+          "200": { "description": "User profile deleted successfully" }
+        }
+      }
+    },
+    "/profile/avatar/upload-url": {
+      "get": {
+        "tags": ["Profile"],
+        "summary": "Generate presigned S3 URL for uploading profile avatar",
+        "responses": {
+          "200": { "description": "Presigned URL details" }
+        }
+      }
+    },
+    "/profile/avatar": {
+      "get": {
+        "tags": ["Profile"],
+        "summary": "Get avatar URL",
+        "responses": {
+          "200": { "description": "Avatar URL returned" }
+        }
+      },
+      "patch": {
+        "tags": ["Profile"],
+        "summary": "Save uploaded avatar key in profile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["key"],
+                "properties": {
+                  "key": { "type": "string", "description": "S3 object key" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Avatar updated successfully" }
+        }
+      },
+      "delete": {
+        "tags": ["Profile"],
+        "summary": "Delete avatar from profile",
+        "responses": {
+          "200": { "description": "Avatar deleted successfully" }
+        }
+      }
+    },
+    "/profile/aadhar/upload-url": {
+      "get": {
+        "tags": ["Profile"],
+        "summary": "Generate presigned S3 URL for Aadhaar proof PDF/image upload",
+        "responses": {
+          "200": { "description": "Presigned URL details" }
+        }
+      }
+    },
+    "/profile/aadhar/verify": {
+      "post": {
+        "tags": ["Profile"],
+        "summary": "Run Aadhaar verification OCR via AWS Rekognition",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["key"],
+                "properties": {
+                  "key": { "type": "string", "description": "S3 file key" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Aadhaar verified successfully" }
+        }
+      }
+    },
+    "/profile/aadhar": {
+      "delete": {
+        "tags": ["Profile"],
+        "summary": "Delete uploaded Aadhaar verification records",
+        "responses": {
+          "200": { "description": "Aadhaar records deleted successfully" }
+        }
+      }
+    },
+    "/pg": {
+      "get": {
+        "tags": ["PG Management"],
+        "summary": "Get all PGs belonging to the owner/manager",
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of PGs" }
+        }
+      },
+      "post": {
+        "tags": ["PG Management"],
+        "summary": "Register a new PG (Owner only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "address", "city", "dueDayOfMonth"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "address": { "type": "string" },
+                  "city": { "type": "string" },
+                  "dueDayOfMonth": { "type": "integer", "default": 10 },
+                  "lateFee": { "type": "number", "default": 0 },
+                  "facilities": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "PG created successfully" }
+        }
+      }
+    },
+    "/pg/facilities": {
+      "get": {
+        "tags": ["PG Management"],
+        "summary": "Get all available facilities / amenities",
+        "responses": {
+          "200": { "description": "List of facilities" }
+        }
+      }
+    },
+    "/pg/discover": {
+      "get": {
+        "tags": ["PG Management"],
+        "summary": "Public/User discovery to search and filter PGs",
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "city", "in": "query", "schema": { "type": "string" } },
+          { "name": "gender", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Matching PGs" }
+        }
+      }
+    },
+    "/pg/{pgId}": {
+      "get": {
+        "tags": ["PG Management"],
+        "summary": "Get PG details",
+        "parameters": [
+          { "name": "pgId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "PG details object" }
+        }
+      },
+      "patch": {
+        "tags": ["PG Management"],
+        "summary": "Update PG details",
+        "parameters": [
+          { "name": "pgId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "dueDayOfMonth": { "type": "integer" },
+                  "lateFee": { "type": "number" },
+                  "address": { "type": "string" },
+                  "city": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "PG updated successfully" }
+        }
+      },
+      "delete": {
+        "tags": ["PG Management"],
+        "summary": "Delete PG",
+        "parameters": [
+          { "name": "pgId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "PG deleted successfully" }
+        }
+      }
+    },
+    "/pg/{pgId}/price-range": {
+      "get": {
+        "tags": ["PG Management"],
+        "summary": "Get minimum and maximum price range for beds in a PG",
+        "parameters": [
+          { "name": "pgId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Price range details" }
+        }
+      }
+    },
+    "/room": {
+      "post": {
+        "tags": ["Room Management"],
+        "summary": "Create a room inside a PG",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["pgId", "roomNumber", "sharingType", "beds"],
+                "properties": {
+                  "pgId": { "type": "string" },
+                  "roomNumber": { "type": "string" },
+                  "floor": { "type": "integer" },
+                  "sharingType": { "type": "integer" },
+                  "beds": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["bedNumber", "price"],
+                      "properties": {
+                        "bedNumber": { "type": "string" },
+                        "price": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Room created successfully" }
+        }
+      }
+    },
+    "/room/pg/{pgId}": {
+      "get": {
+        "tags": ["Room Management"],
+        "summary": "Get all rooms in a PG",
+        "parameters": [
+          { "name": "pgId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of rooms" }
+        }
+      }
+    },
+    "/room/{roomId}": {
+      "patch": {
+        "tags": ["Room Management"],
+        "summary": "Update room details",
+        "parameters": [
+          { "name": "roomId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "roomNumber": { "type": "string" },
+                  "floor": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Room updated successfully" }
+        }
+      },
+      "delete": {
+        "tags": ["Room Management"],
+        "summary": "Delete room from PG",
+        "parameters": [
+          { "name": "roomId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Room deleted successfully" }
+        }
+      }
+    },
+    "/room/eligible-tenants/{pgId}": {
+      "get": {
+        "tags": ["Room Management"],
+        "summary": "Get all approved users/students eligible to be assigned a bed in this PG",
+        "parameters": [
+          { "name": "pgId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of eligible users" }
+        }
+      }
+    },
+    "/room/assign/{bedId}": {
+      "post": {
+        "tags": ["Room Management"],
+        "summary": "Assign a tenant to a bed",
+        "parameters": [
+          { "name": "bedId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Tenant assigned successfully" }
+        }
+      }
+    },
+    "/room/unassign/{bedId}": {
+      "post": {
+        "tags": ["Room Management"],
+        "summary": "Unassign a tenant from a bed",
+        "parameters": [
+          { "name": "bedId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Tenant unassigned successfully" }
+        }
+      }
+    },
+    "/room/bed/{bedId}": {
+      "patch": {
+        "tags": ["Room Management"],
+        "summary": "Update specific bed pricing and attributes",
+        "parameters": [
+          { "name": "bedId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "price": { "type": "number" },
+                  "bedNumber": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Bed details updated successfully" }
+        }
+      }
+    },
+    "/rent": {
+      "get": {
+        "tags": ["Rent Management"],
+        "summary": "Get paginated rent payment records (triggers overdue scans)",
+        "parameters": [
+          { "name": "pgId", "in": "query", "schema": { "type": "string" } },
+          { "name": "rentMonth", "in": "query", "schema": { "type": "string" }, "description": "Format: YYYY-MM" },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["pending", "under_review", "paid", "partial", "overdue"] } },
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Rent payments list" }
+        }
+      },
+      "post": {
+        "tags": ["Rent Management"],
+        "summary": "Record or update a single rent payment request/receipt",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["bedId", "userId", "rentMonth", "amount"],
+                "properties": {
+                  "bedId": { "type": "string" },
+                  "userId": { "type": "string" },
+                  "rentMonth": { "type": "string", "description": "YYYY-MM" },
+                  "amount": { "type": "number" },
+                  "amountPaid": { "type": "number" },
+                  "paymentMode": { "type": "string", "enum": ["cash", "upi", "bank_transfer", "cheque", "online"] },
+                  "status": { "type": "string", "enum": ["pending", "under_review", "paid", "partial", "overdue"] },
+                  "activeDays": { "type": "integer" },
+                  "notes": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Payment recorded successfully" }
+        }
+      }
+    },
+    "/rent/summary": {
+      "get": {
+        "tags": ["Rent Management"],
+        "summary": "Get aggregate rent statistics summary for a PG and month",
+        "parameters": [
+          { "name": "pgId", "in": "query", "schema": { "type": "string" } },
+          { "name": "rentMonth", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Stats summary object" }
+        }
+      }
+    },
+    "/rent/generate": {
+      "post": {
+        "tags": ["Rent Management"],
+        "summary": "Bulk generate pending rent bills for all occupied beds in a PG",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["pgId", "rentMonth"],
+                "properties": {
+                  "pgId": { "type": "string" },
+                  "rentMonth": { "type": "string", "description": "YYYY-MM" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Generation stats" }
+        }
+      }
+    },
+    "/rent/bulk-approve": {
+      "post": {
+        "tags": ["Rent Management"],
+        "summary": "Bulk verify and approve multiple pending student proof receipts",
+        "parameters": [
+          { "name": "pgId", "in": "query", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["rentIds"],
+                "properties": {
+                  "rentIds": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Bulk approval stats" }
+        }
+      }
+    },
+    "/rent/my-rent": {
+      "get": {
+        "tags": ["Rent Management"],
+        "summary": "Student/Tenant endpoint to fetch their own rent records",
+        "responses": {
+          "200": { "description": "Tenant rent list" }
+        }
+      }
+    },
+    "/rent/{id}/submit-proof": {
+      "post": {
+        "tags": ["Rent Management"],
+        "summary": "Student submits transaction ID and payment proof details",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["paymentMode", "amountPaid"],
+                "properties": {
+                  "paymentMode": { "type": "string", "enum": ["cash", "upi", "bank_transfer", "cheque", "online"] },
+                  "referenceNo": { "type": "string" },
+                  "amountPaid": { "type": "number" },
+                  "notes": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Payment proof submitted, status under_review" }
+        }
+      }
+    },
+    "/rent/{id}/approve": {
+      "post": {
+        "tags": ["Rent Management"],
+        "summary": "Owner/Manager approves a payment proof receipt",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "pgId", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Payment approved successfully" }
+        }
+      }
+    },
+    "/rent/{id}/reject": {
+      "post": {
+        "tags": ["Rent Management"],
+        "summary": "Owner/Manager rejects a payment proof (resets back to pending/overdue)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "pgId", "in": "query", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "notes": { "type": "string", "description": "Reason for rejection" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Payment rejected successfully" }
+        }
+      }
+    },
+    "/rent/{id}": {
+      "patch": {
+        "tags": ["Rent Management"],
+        "summary": "Update specific fields of a rent payment record",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "pgId", "in": "query", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": { "type": "number" },
+                  "amountPaid": { "type": "number" },
+                  "notes": { "type": "string" },
+                  "status": { "type": "string", "enum": ["pending", "under_review", "paid", "partial", "overdue"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Rent record updated successfully" }
+        }
+      },
+      "delete": {
+        "tags": ["Rent Management"],
+        "summary": "Delete a rent record (soft delete)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "pgId", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Rent record deleted successfully" }
+        }
+      }
+    },
+    "/post": {
+      "get": {
+        "tags": ["Post Management"],
+        "summary": "Get all active PG promotional/listing posts",
+        "responses": {
+          "200": { "description": "List of posts" }
+        }
+      },
+      "post": {
+        "tags": ["Post Management"],
+        "summary": "Create a new PG listing/post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["pgId", "title", "description"],
+                "properties": {
+                  "pgId": { "type": "string" },
+                  "title": { "type": "string" },
+                  "description": { "type": "string" },
+                  "mediaUrls": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Post created successfully" }
+        }
+      }
+    },
+    "/post/search": {
+      "get": {
+        "tags": ["Post Management"],
+        "summary": "Get posts filtered by user preferences",
+        "responses": {
+          "200": { "description": "List of matching posts" }
+        }
+      }
+    },
+    "/post/{postId}": {
+      "get": {
+        "tags": ["Post Management"],
+        "summary": "Get specific post details",
+        "parameters": [
+          { "name": "postId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Post details" }
+        }
+      },
+      "patch": {
+        "tags": ["Post Management"],
+        "summary": "Update post details",
+        "parameters": [
+          { "name": "postId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "description": { "type": "string" },
+                  "mediaUrls": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Post updated successfully" }
+        }
+      },
+      "delete": {
+        "tags": ["Post Management"],
+        "summary": "Delete post",
+        "parameters": [
+          { "name": "postId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Post deleted successfully" }
+        }
+      }
+    },
+    "/enquiry": {
+      "get": {
+        "tags": ["Enquiry Management"],
+        "summary": "Get list of tenant PGs queries/enquiries",
+        "responses": {
+          "200": { "description": "List of enquiries" }
+        }
+      },
+      "post": {
+        "tags": ["Enquiry Management"],
+        "summary": "Submit a new enquiry request for a PG room (User/Student only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["pgId", "roomId"],
+                "properties": {
+                  "pgId": { "type": "string" },
+                  "roomId": { "type": "string" },
+                  "message": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Enquiry submitted successfully" }
+        }
+      }
+    },
+    "/enquiry/{enquiryId}": {
+      "get": {
+        "tags": ["Enquiry Management"],
+        "summary": "Get specific enquiry details",
+        "parameters": [
+          { "name": "enquiryId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Enquiry details" }
+        }
+      },
+      "patch": {
+        "tags": ["Enquiry Management"],
+        "summary": "Update enquiry details or status (e.g. approved, rejected)",
+        "parameters": [
+          { "name": "enquiryId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+                  "message": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Enquiry updated successfully" }
+        }
+      }
+    },
+    "/cron/generate-monthly": {
+      "post": {
+        "tags": ["Cron Tasks"],
+        "summary": "Webhook to manually trigger monthly rent generation for all active PGs",
+        "parameters": [
+          { "name": "cron_secret", "in": "query", "schema": { "type": "string" }, "description": "API Key token matching CRON_SECRET" }
+        ],
+        "responses": {
+          "200": { "description": "Billing check complete" }
+        }
+      }
+    },
+    "/cron/check-overdue": {
+      "post": {
+        "tags": ["Cron Tasks"],
+        "summary": "Webhook to manually trigger overdue payment/penalty scans for all PGs",
+        "parameters": [
+          { "name": "cron_secret", "in": "query", "schema": { "type": "string" }, "description": "API Key token matching CRON_SECRET" }
+        ],
+        "responses": {
+          "200": { "description": "Overdue scan complete" }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": ["System"],
+        "summary": "Simple service health probe endpoint",
+        "responses": {
+          "200": { "description": "OK" }
+        }
+      }
+    }
+  }
+}

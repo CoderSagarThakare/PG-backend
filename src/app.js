@@ -10,6 +10,8 @@ const httpStatus = require("http-status");
 const passport = require('passport')
 const { errorConverter, errorHandler } = require("./middlewares/error");
 const { jwtStrategy } = require("./config/passport");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./config/swagger.json");
 
 // ------------------  MIDDLEWARES  ----------------------------
 
@@ -44,6 +46,9 @@ passport.use('jwt', jwtStrategy);
 if (config.env == "production") {
   app.use("/auth", authLimiter);
 }
+
+// Serve interactive API documentation (Swagger UI)
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Define routes index in separate file.
 app.use("/", routes);
