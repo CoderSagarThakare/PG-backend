@@ -23,11 +23,13 @@ const createPG = {
       .valid(PG_TYPES.male, PG_TYPES.female, PG_TYPES.unisex, PG_TYPES.coLiving)
       .required(),
     landline: Joi.string(),
-    pgStartedDate: Joi.date(),
+    pgStartedDate: Joi.date().required(),
     images: Joi.array().items(Joi.string()),
     locationLink: Joi.string().uri(),
     checkInTime: Joi.string(),
     checkOutTime: Joi.string(),
+    dueDayOfMonth: Joi.number().integer().min(1).max(28).default(10),
+    lateFee: Joi.number().min(0).default(0),
     facilities: Joi.array()
       .items(
         Joi.string()
@@ -76,6 +78,8 @@ const updatePG = {
       locationLink: Joi.string().uri(),
       checkInTime: Joi.string(),
       checkOutTime: Joi.string(),
+      dueDayOfMonth: Joi.number().integer().min(1).max(28),
+      lateFee: Joi.number().min(0),
       isActive: Joi.boolean(),
       isDeleted: Joi.boolean(),
       facilities: Joi.array()

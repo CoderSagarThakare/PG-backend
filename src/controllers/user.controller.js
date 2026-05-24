@@ -128,6 +128,27 @@ const getUsersByRole = catchAsync(async (req, res) => {
   sendResponse(res, { data: result, statusCode: httpStatus.OK });
 });
 
+const getManagersAndOwners = catchAsync(async (req, res) => {
+  const managerUsers = await userService.getUsersByRoles(["manager"]);
+  const managers = [];
+
+  if (req.user && req.user.role === "owner") {
+    managers.push({
+      _id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      role: req.user.role,
+      mobNo1: req.user.mobNo1,
+    });
+  }
+
+  if (Array.isArray(managerUsers)) {
+    managers.push(...managerUsers);
+  }
+
+  sendResponse(res, { data: { managers }, statusCode: httpStatus.OK });
+});
+
 module.exports = {
   getUser,
   updateUser,
@@ -137,4 +158,5 @@ module.exports = {
   getAadharUploadUrl,
   verifyAadharOCR,
   deleteAadharFile,
+  getManagersAndOwners,
 };

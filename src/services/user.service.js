@@ -151,6 +151,10 @@ const getAllUsers = async (options = {}) => {
   return { users, total, limit, page };
 };
 
+const getUsersByRoles = async (roles) => {
+  return User.find({ role: { $in: roles }, isDeleted: false }, "_id name email role mobNo1");
+};
+
 module.exports = {
   createUser,
   getUserByEmail,
@@ -159,4 +163,5 @@ module.exports = {
   deleteUserById,
   getUsersByRole,
   getAllUsers,
+  getUsersByRoles,
 };

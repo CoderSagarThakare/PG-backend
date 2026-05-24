@@ -19,4 +19,6 @@ router
   .get(staffRoles, userController.getUser)
   .patch(staffRoles, validate(userValidation.updateUser), userController.updateUser);
 
+router.get("/managers", auth(ROLE_TYPES.owner, ROLE_TYPES.manager), userController.getManagersAndOwners);
+
 module.exports = router;

@@ -20,6 +20,7 @@ const defaultRoutes = [
   { path: "/rent", route: require("./rent.route") }, // base path for rent tracking
   { path: "/profile", route: require("./profile.route") }, // unified profile routes
   { path: "/cron", route: require("./cron.route") }, // base path for external cron triggers
+  { path: "/staff", route: require("./staff.route") }, // base path for staff management
 ];
 
 defaultRoutes.map((route) => {

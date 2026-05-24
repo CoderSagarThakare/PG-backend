@@ -501,3 +501,113 @@ Stack: Error: /staff/managers URL NOT FOUND
     at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
     at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
 
+[2026-05-24T14:39:58.466Z] GET /staff/managers
+Status: 404
+Error: /staff/managers URL NOT FOUND 
+Stack: Error: /staff/managers URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-05-24T14:39:59.499Z] GET /staff/managers
+Status: 404
+Error: /staff/managers URL NOT FOUND 
+Stack: Error: /staff/managers URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-05-24T14:44:13.857Z] GET /staff/managers
+Status: 404
+Error: /staff/managers URL NOT FOUND 
+Stack: Error: /staff/managers URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-05-24T14:44:14.877Z] GET /staff/managers
+Status: 404
+Error: /staff/managers URL NOT FOUND 
+Stack: Error: /staff/managers URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-05-24T14:44:19.920Z] GET /staff/managers
+Status: 404
+Error: /staff/managers URL NOT FOUND 
+Stack: Error: /staff/managers URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-05-24T14:44:20.957Z] GET /staff/managers
+Status: 404
+Error: /staff/managers URL NOT FOUND 
+Stack: Error: /staff/managers URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-05-24T15:40:15.570Z] POST /pg
+Status: 400
+Error: "dueDayOfMonth" is not allowed, "lateFee" is not allowed
+Stack: Error: "dueDayOfMonth" is not allowed, "lateFee" is not allowed
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:18:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-05-24T15:40:21.834Z] POST /pg
+Status: 400
+Error: "dueDayOfMonth" is not allowed, "lateFee" is not allowed
+Stack: Error: "dueDayOfMonth" is not allowed, "lateFee" is not allowed
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:18:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
