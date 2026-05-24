@@ -7,8 +7,16 @@
   },
   "servers": [
     {
+      "url": "/",
+      "description": "Current Server (Dynamic)"
+    },
+    {
       "url": "http://localhost:8022",
       "description": "Local Development Server"
+    },
+    {
+      "url": "https://pg-backend-l3q4.onrender.com",
+      "description": "Production Server (Render)"
     }
   ],
   "components": {
