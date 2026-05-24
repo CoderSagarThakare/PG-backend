@@ -94,13 +94,19 @@ const recordPayment = async (data, recordedBy) => {
   if (!bed || bed.isDeleted) throw new ApiError(httpStatus.NOT_FOUND, "Bed not found");
   if (String(bed.userId) !== String(userId)) throw new ApiError(httpStatus.BAD_REQUEST, "User is not assigned to this bed");
 
-  const paid = amountPaid ?? amount;
+  const initialPaid = amountPaid ?? amount;
   let status = inputStatus;
   if (!status) {
     status = "pending";
-    if (paid >= amount) status = "paid";
-    else if (paid > 0) status = "partial";
+    if (initialPaid >= amount) status = "paid";
+    else if (initialPaid > 0) status = "partial";
   }
+
+  const isPendingOrOverdue = status === "pending" || status === "overdue";
+  const paid = isPendingOrOverdue ? 0 : (amountPaid ?? amount);
+  const paymentModeVal = isPendingOrOverdue ? null : (paymentMode || null);
+  const paidDateVal = isPendingOrOverdue ? null : (paidDate || (paid > 0 ? new Date() : null));
+  const referenceNoVal = isPendingOrOverdue ? null : (referenceNo || null);
 
   // Upsert — update if record for this bed/user/month already exists
   const rent = await RentPayment.findOneAndUpdate(
@@ -113,9 +119,9 @@ const recordPayment = async (data, recordedBy) => {
         amount,
         amountPaid: paid,
         status,
-        paymentMode: paymentMode || null,
-        paidDate: paidDate || (paid > 0 ? new Date() : null),
-        referenceNo: referenceNo || null,
+        paymentMode: paymentModeVal,
+        paidDate: paidDateVal,
+        referenceNo: referenceNoVal,
         notes: notes || null,
         recordedBy,
         activeDays: activeDays || null,
