@@ -19,10 +19,16 @@ const defaultRoutes = [
   { path: "/room", route: require("./room.route") }, // base path for room routes
   { path: "/rent", route: require("./rent.route") }, // base path for rent tracking
   { path: "/profile", route: require("./profile.route") }, // unified profile routes
+  { path: "/cron", route: require("./cron.route") }, // base path for external cron triggers
 ];
 
 defaultRoutes.map((route) => {
   router.use(route.path, route.route);
+});
+
+// General health check route for keeping the server warm (e.g. Render)
+router.get("/health", (req, res) => {
+  res.status(200).send("OK");
 });
 
 module.exports = router;

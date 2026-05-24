@@ -19,6 +19,10 @@ mongoose.connect(config.mongoose.url, config.mongoose.options).then(async () => 
     logger.error("Failed to execute self-correcting bed price migration:", e);
   }
 
+  // Start Cron Jobs
+  const { startCronJobs } = require("./cron/scheduler");
+  startCronJobs();
+
   server = app.listen(config.port, () => {
     logger.info(`Node server listening on port => ${config.port}`);
   });
