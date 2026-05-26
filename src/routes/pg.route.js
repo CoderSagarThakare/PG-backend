@@ -21,6 +21,9 @@ router.get("/discover", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.us
 // Presigned upload url route for PG images
 router.get("/upload-url", auth(ROLE_TYPES.owner, ROLE_TYPES.manager), pgController.getPGImageUploadUrl);
 
+// Delete uploaded PG image route
+router.delete("/file", auth(ROLE_TYPES.owner, ROLE_TYPES.manager), pgController.deletePGImageFile);
+
 // Publicly accessible individual PG details
 router.get("/:pgId", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user), pgController.getPG);
 

@@ -79,6 +79,22 @@ const getPGImageUploadUrl = catchAsync(async (req, res) => {
   sendResponse(res, { data: { uploadUrl, key }, statusCode: httpStatus.OK });
 });
 
+const deletePGImageFile = catchAsync(async (req, res) => {
+  const { key } = req.body;
+  if (!key) {
+    return res.status(httpStatus.BAD_REQUEST).json({ message: "key is required" });
+  }
+
+  // Security check: only allow deleting files under public/pgs/
+  if (!key.startsWith("public/pgs/")) {
+    return res.status(httpStatus.BAD_REQUEST).json({ message: "Invalid key prefix or permission denied" });
+  }
+
+  const { awsService } = require("../services");
+  await awsService.deleteFile(key);
+  sendResponse(res, { success: true, message: "File deleted successfully from S3", statusCode: httpStatus.OK });
+});
+
 module.exports = {
   createPG,
   getPGs,
@@ -88,5 +104,6 @@ module.exports = {
   discoverPGs,
   getPriceRange,
   getPGImageUploadUrl,
+  deletePGImageFile,
 };
 
