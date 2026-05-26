@@ -626,3 +626,39 @@ Stack: Error: please authenticate
     at module.exports [as JwtVerifier] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
     at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
 
+[2026-05-26T19:41:20.941Z] POST /post
+Status: 400
+Error: Only 0 beds are currently empty in this PG.
+Stack: Error: Only 0 beds are currently empty in this PG.
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\post.controller.js:17:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-05-26T19:41:28.532Z] POST /post
+Status: 400
+Error: Only 0 beds are currently empty in this PG.
+Stack: Error: Only 0 beds are currently empty in this PG.
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\post.controller.js:17:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-05-26T19:42:19.729Z] POST /post
+Status: 400
+Error: Only 3 beds are currently empty in this PG.
+Stack: Error: Only 3 beds are currently empty in this PG.
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\post.controller.js:17:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-05-26T19:45:35.786Z] GET /profile
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+

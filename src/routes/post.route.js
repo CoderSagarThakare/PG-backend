@@ -15,6 +15,16 @@ router.get(
 
 // owner endpoints
 // router.use(auth(ROLE_TYPES.owner));
+router.get(
+  "/upload-url",
+  auth(ROLE_TYPES.owner, ROLE_TYPES.manager),
+  postController.getPostImageUploadUrl
+);
+router.delete(
+  "/file",
+  auth(ROLE_TYPES.owner, ROLE_TYPES.manager),
+  postController.deletePostImageFile
+);
 router.post(
   "/",
   auth(ROLE_TYPES.owner, ROLE_TYPES.manager),

@@ -107,6 +107,33 @@ const deletePost = catchAsync(async (req, res) => {
   });
 });
 
+const getPostImageUploadUrl = catchAsync(async (req, res) => {
+  const { fileName, fileType } = req.query;
+  if (!fileName || !fileType) {
+    return res.status(httpStatus.BAD_REQUEST).json({ message: "fileName and fileType are required" });
+  }
+
+  const { awsService } = require("../services");
+  const { uploadUrl, key } = await awsService.getPostShowcaseUploadUrl(fileName, fileType);
+  sendResponse(res, { data: { uploadUrl, key }, statusCode: httpStatus.OK });
+});
+
+const deletePostImageFile = catchAsync(async (req, res) => {
+  const { key } = req.body;
+  if (!key) {
+    return res.status(httpStatus.BAD_REQUEST).json({ message: "key is required" });
+  }
+
+  // Security check: only allow deleting files under public/posts/
+  if (!key.startsWith("public/posts/")) {
+    return res.status(httpStatus.BAD_REQUEST).json({ message: "Invalid key prefix or permission denied" });
+  }
+
+  const { awsService } = require("../services");
+  await awsService.deleteFile(key);
+  sendResponse(res, { success: true, message: "File deleted successfully from S3", statusCode: httpStatus.OK });
+});
+
 module.exports = {
   createPost,
   getPosts,
@@ -114,4 +141,6 @@ module.exports = {
   updatePost,
   deletePost,
   getPostsByPreference,
+  getPostImageUploadUrl,
+  deletePostImageFile,
 };

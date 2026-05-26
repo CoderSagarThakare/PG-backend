@@ -2,6 +2,20 @@ const { Post, PG, Enquiry } = require("../models");
 const userPreferenceService = require("./userPreference.service");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
+const awsService = require("./aws.service");
+
+const extractS3Key = (urlOrKey) => {
+  if (!urlOrKey) return urlOrKey;
+  if (urlOrKey.startsWith("http://") || urlOrKey.startsWith("https://")) {
+    try {
+      const url = new URL(urlOrKey);
+      return decodeURIComponent(url.pathname.substring(1));
+    } catch (e) {
+      return urlOrKey;
+    }
+  }
+  return urlOrKey;
+};
 
 /**
  * Create a Vacancy Post
@@ -10,6 +24,9 @@ const httpStatus = require("http-status");
  */
 const createPost = async (postBody) => {
   try {
+    if (postBody.images) {
+      postBody.images = postBody.images.map(extractS3Key);
+    }
     // Ensuring default flags are set correctly on creation
     const post = await Post.create({
       ...postBody,
@@ -64,6 +81,13 @@ const queryPosts = async (staffId, options = {}) => {
       .populate("createdBy", "name role")
       .populate("facilities");
 
+    // Resolve S3 image keys to signed GET URLs
+    for (const post of posts) {
+      if (post.images && post.images.length > 0) {
+        post.images = await Promise.all(post.images.map(img => awsService.getFileUrl(img)));
+      }
+    }
+
     const total = await Post.countDocuments(finalFilter);
 
     return { posts, total, limit, page };
@@ -95,13 +119,18 @@ const getPostById = async (postId, staffId) => {
     );
   }
 
+  // Resolve S3 image keys to signed GET URLs
+  if (post.images && post.images.length > 0) {
+    post.images = await Promise.all(post.images.map(img => awsService.getFileUrl(img)));
+  }
+
   return post;
 };
 
 /**
  * Update Post by ID
  * @param {string} postId
- * @param {string} ownerId - For verification
+ * @param {string} staffId - For verification
  * @param {Object} updateBody
  * @returns {Promise<Post>}
  */
@@ -130,6 +159,22 @@ const updatePostById = async (postId, updateBody, staffId) => {
     );
   }
 
+  // Normalize image urls to keys and delete S3 orphaned files
+  if (updateBody.images) {
+    updateBody.images = updateBody.images.map(extractS3Key);
+    try {
+      const oldPost = await Post.findById(postId);
+      if (oldPost && oldPost.images) {
+        const removedImages = oldPost.images.filter(img => !updateBody.images.includes(img));
+        for (const img of removedImages) {
+          await awsService.deleteFile(img).catch(() => {});
+        }
+      }
+    } catch (e) {
+      console.error("Error cleaning S3 vacancy post images:", e);
+    }
+  }
+
   Object.assign(post, updateBody);
   await post.save();
   return post;
@@ -138,7 +183,7 @@ const updatePostById = async (postId, updateBody, staffId) => {
 /**
  * Delete Post by ID (Soft Delete)
  * @param {string} postId
- * @param {string} ownerId - For verification
+ * @param {string} staffId - For verification
  * @returns {Promise<void>}
  */
 const deletePostById = async (postId, staffId) => {
@@ -261,7 +306,7 @@ const getPostsByPreference = async (userId, options = {}) => {
 
   // fetch actual posts, project only necessary fields for UI & scoring
   let posts = await Post.find(postFilter)
-    .select("title description vacancyCount occupancyType pgType minPrice maxPrice pgId createdAt")
+    .select("title description vacancyCount occupancyType pgType minPrice maxPrice pgId createdAt images")
     .populate({
       path: "pgId",
       select: "name address checkInTime checkOutTime facilities rating",
@@ -270,6 +315,13 @@ const getPostsByPreference = async (userId, options = {}) => {
     .limit(limit)
     .skip(skip)
     .lean();
+
+  // Resolve S3 image keys to signed GET URLs
+  for (const post of posts) {
+    if (post.images && post.images.length > 0) {
+      post.images = await Promise.all(post.images.map(img => awsService.getFileUrl(img)));
+    }
+  }
 
   // compute scores
   const now = Date.now();
