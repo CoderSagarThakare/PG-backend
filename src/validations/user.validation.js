@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { GENDER_TYPES } = require("../const/constant");
 const mobileRegex = /^[6-9]\d{9}$/;
 
 const updateUser = {
@@ -40,6 +41,10 @@ const updateUser = {
         "string.pattern.base": "Aadhaar number must be a valid 12-digit number.",
       }),
       aadharFileKey: Joi.string().allow("", null).optional(),
+      gender: Joi.string()
+        .valid(...Object.values(GENDER_TYPES).filter(g => g !== 'unisex'))
+        .allow("", null)
+        .optional(),
     })
     .min(1),
 };

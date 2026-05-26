@@ -25,6 +25,7 @@ const getUser = catchAsync(async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      gender: user.gender || null,
       picture,
       profileImageKey: user.profileImageKey || null,
       aadharNumber: user.aadharNumber || null,
