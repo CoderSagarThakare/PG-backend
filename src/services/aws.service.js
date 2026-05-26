@@ -89,6 +89,26 @@ const getAvatarUploadUrl = (fileName, fileType, user) => {
 };
 
 /**
+ * Get a presigned upload URL for a PG showcase image.
+ * @param {string} fileName
+ * @param {string} fileType
+ * @returns {Promise<{ uploadUrl: string, key: string }>}
+ */
+const getPGShowcaseUploadUrl = (fileName, fileType) => {
+  return generateUploadPresignedUrl(fileName, fileType, "public/pgs/showcase");
+};
+
+/**
+ * Get a presigned upload URL for a vacancy post showcase image.
+ * @param {string} fileName
+ * @param {string} fileType
+ * @returns {Promise<{ uploadUrl: string, key: string }>}
+ */
+const getPostShowcaseUploadUrl = (fileName, fileType) => {
+  return generateUploadPresignedUrl(fileName, fileType, "public/posts/showcase");
+};
+
+/**
  * After the client uploads the file to S3, save the key in the DB
  * and return a fresh presigned view URL.
  * @param {import("mongoose").Document} userDoc  - Mongoose user/staff document
@@ -295,6 +315,8 @@ module.exports = {
   deleteAvatar,
   getAadharUploadUrl,
   validateAadharImageOCR,
+  getPGShowcaseUploadUrl,
+  getPostShowcaseUploadUrl,
 };
 
  

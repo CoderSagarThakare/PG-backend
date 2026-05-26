@@ -68,6 +68,17 @@ const getPriceRange = catchAsync(async (req, res) => {
   sendResponse(res, { data: result, statusCode: httpStatus.OK });
 });
 
+const getPGImageUploadUrl = catchAsync(async (req, res) => {
+  const { fileName, fileType } = req.query;
+  if (!fileName || !fileType) {
+    return res.status(httpStatus.BAD_REQUEST).json({ message: "fileName and fileType are required" });
+  }
+
+  const { awsService } = require("../services");
+  const { uploadUrl, key } = await awsService.getPGShowcaseUploadUrl(fileName, fileType);
+  sendResponse(res, { data: { uploadUrl, key }, statusCode: httpStatus.OK });
+});
+
 module.exports = {
   createPG,
   getPGs,
@@ -76,5 +87,6 @@ module.exports = {
   deletePG,
   discoverPGs,
   getPriceRange,
+  getPGImageUploadUrl,
 };
 

@@ -1,6 +1,20 @@
 const { PG, Bed } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
+const awsService = require("./aws.service");
+
+const extractS3Key = (urlOrKey) => {
+  if (!urlOrKey) return urlOrKey;
+  if (urlOrKey.startsWith("http://") || urlOrKey.startsWith("https://")) {
+    try {
+      const url = new URL(urlOrKey);
+      return decodeURIComponent(url.pathname.substring(1));
+    } catch (e) {
+      return urlOrKey;
+    }
+  }
+  return urlOrKey;
+};
 
 const checkExistingPG = async (ownerId, name) => {
   const existingPG = await PG.findOne({
@@ -25,6 +39,9 @@ const checkExistingPG = async (ownerId, name) => {
  */
 const createPG = async (pgBody) => {
   try {
+    if (pgBody.images) {
+      pgBody.images = pgBody.images.map(extractS3Key);
+    }
     const pg = await PG.create({ 
       ...pgBody, 
       totalRooms: 0,
@@ -41,7 +58,7 @@ const createPG = async (pgBody) => {
 
 /**
  * Get PGs by Owner
- * @param {string} ownerId - Owner ID
+ * @param {string} staffId - Staff ID (Owner or Manager)
  * @param {Object} options - Query options (limit, page, sortBy)
  * @param {boolean} isAdmin - Whether user is admin (if true, returns all records including deleted)
  * @returns {Promise<PG[]>}
@@ -60,9 +77,16 @@ const getPGsByOwner = async (staffId, options = {}, isAdmin = false) => {
     let pgs = await PG.find(query)
       .limit(limit)
       .skip(skip)
-      .select("name address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds managerId rating isActive")
+      .select("name address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds managerId rating isActive images")
       .populate("managerId", "name")
       .lean();
+
+    // Resolve S3 image keys to signed GET URLs
+    for (const pg of pgs) {
+      if (pg.images && pg.images.length > 0) {
+        pg.images = await Promise.all(pg.images.map(img => awsService.getFileUrl(img)));
+      }
+    }
 
     // Ensure numeric fields are never null for UI stability
     pgs = pgs.map(pg => ({
@@ -88,11 +112,10 @@ const getPGsByOwner = async (staffId, options = {}, isAdmin = false) => {
 /**
  * Get PG by ID
  * @param {string} pgId - PG ID
- * @param {string} ownerId - Owner ID for verification
+ * @param {string} staffId - Staff ID for verification
  * @param {boolean} isAdmin - Whether user is admin (if true, returns deleted records too)
  * @returns {Promise<PG>}
  */
-
 const getPGById = async (pgId, staffId, isAdmin = false) => {
   try {
     const query = { _id: pgId };
@@ -122,6 +145,11 @@ const getPGById = async (pgId, staffId, isAdmin = false) => {
 
       throw new ApiError(httpStatus.NOT_FOUND, message);
     }
+
+    // Resolve S3 image keys to signed GET URLs
+    if (pg.images && pg.images.length > 0) {
+      pg.images = await Promise.all(pg.images.map(img => awsService.getFileUrl(img)));
+    }
     return pg;
   } catch (error) {
     console.log("error : ", error);
@@ -139,12 +167,28 @@ const getPGById = async (pgId, staffId, isAdmin = false) => {
 /**
  * Update PG
  * @param {string} pgId - PG ID
- * @param {string} ownerId - Owner ID for verification
+ * @param {string} staffId - Staff ID for verification
  * @param {Object} updateBody - Update data
  * @returns {Promise<PG>}
  */
 const updatePG = async (pgId, staffId, updateBody) => {
   try {
+    // Normalize image urls to keys and delete orphaned S3 files
+    if (updateBody.images) {
+      updateBody.images = updateBody.images.map(extractS3Key);
+      try {
+        const oldPg = await PG.findOne({ _id: pgId, $or: [{ ownerId: staffId }, { managerId: staffId }], isDeleted: false });
+        if (oldPg && oldPg.images) {
+          const removedImages = oldPg.images.filter(img => !updateBody.images.includes(img));
+          for (const img of removedImages) {
+            await awsService.deleteFile(img).catch(() => {});
+          }
+        }
+      } catch (e) {
+        console.error("Error cleaning orphaned PG images from S3:", e);
+      }
+    }
+
     // User will pass only updated data in address
     if (updateBody.address) {
       Object.keys(updateBody.address).forEach((key) => {
@@ -174,7 +218,7 @@ const updatePG = async (pgId, staffId, updateBody) => {
 /**
  * Delete PG (Soft Delete)
  * @param {string} pgId - PG ID
- * @param {string} ownerId - Owner ID for verification
+ * @param {string} staffId - Staff ID for verification
  * @returns {Promise<void>}
  */
 const deletePG = async (pgId, staffId) => {
@@ -259,9 +303,16 @@ const discoverPGs = async (filter = {}, options = {}) => {
     const pgs = await PG.find(query)
       .limit(limit)
       .skip(skip)
-      .select("name address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds rating facilities")
+      .select("name address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds rating facilities images")
       .populate("facilities", "name")
       .lean();
+
+    // Resolve S3 image keys to signed GET URLs
+    for (const pg of pgs) {
+      if (pg.images && pg.images.length > 0) {
+        pg.images = await Promise.all(pg.images.map(img => awsService.getFileUrl(img)));
+      }
+    }
 
     const total = await PG.countDocuments(query);
 

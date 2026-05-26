@@ -18,6 +18,9 @@ router.get("/facilities", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.
 // Publicly accessible PG discovery
 router.get("/discover", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user), pgController.discoverPGs);
 
+// Presigned upload url route for PG images
+router.get("/upload-url", auth(ROLE_TYPES.owner, ROLE_TYPES.manager), pgController.getPGImageUploadUrl);
+
 // Publicly accessible individual PG details
 router.get("/:pgId", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user), pgController.getPG);
 
