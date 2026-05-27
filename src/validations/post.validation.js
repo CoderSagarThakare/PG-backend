@@ -21,14 +21,17 @@ const createPost = {
       .required(),
     minPrice: Joi.number().required(),
     maxPrice: Joi.number().required(),
-    occupancyType: Joi.string()
-      .valid(
-        OCCUPANCY_TYPES.single,
-        OCCUPANCY_TYPES.double,
-        OCCUPANCY_TYPES.triple,
-        OCCUPANCY_TYPES.four,
-        OCCUPANCY_TYPES.other,
+    occupancyTypes: Joi.array()
+      .items(
+        Joi.string().valid(
+          OCCUPANCY_TYPES.single,
+          OCCUPANCY_TYPES.double,
+          OCCUPANCY_TYPES.triple,
+          OCCUPANCY_TYPES.four,
+          OCCUPANCY_TYPES.other,
+        )
       )
+      .min(1)
       .required(),
 
     availableFrom: Joi.date().default(Date.now),
@@ -51,13 +54,15 @@ const updatePost = {
 
       pgId: Joi.string().pattern(objectIdPattern),
       pgType: Joi.string().valid(PG_TYPES.male, PG_TYPES.female, PG_TYPES.unisex, PG_TYPES.coLiving),
-      occupancyType: Joi.string().valid(
-        OCCUPANCY_TYPES.single,
-        OCCUPANCY_TYPES.double,
-        OCCUPANCY_TYPES.triple,
-        OCCUPANCY_TYPES.four,
-        OCCUPANCY_TYPES.other,
-      ),
+      occupancyTypes: Joi.array().items(
+        Joi.string().valid(
+          OCCUPANCY_TYPES.single,
+          OCCUPANCY_TYPES.double,
+          OCCUPANCY_TYPES.triple,
+          OCCUPANCY_TYPES.four,
+          OCCUPANCY_TYPES.other,
+        )
+      ).min(1),
       gender: Joi.string().valid("male", "female", "unisex"),
       minPrice: Joi.number(),
       maxPrice: Joi.number(),

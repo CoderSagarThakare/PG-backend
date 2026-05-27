@@ -55,8 +55,8 @@ const postSchema = mongoose.Schema(
       type: { type: String, enum: ["Point"], default: "Point" },
       coordinates: { type: [Number], default: [0, 0] },
     },
-    occupancyType: {
-      type: String,
+    occupancyTypes: {
+      type: [String],
       enum: [
         OCCUPANCY_TYPES.single,
         OCCUPANCY_TYPES.double,
@@ -65,6 +65,12 @@ const postSchema = mongoose.Schema(
         OCCUPANCY_TYPES.other,
       ],
       required: true,
+      validate: {
+        validator: function(v) {
+          return Array.isArray(v) && v.length > 0;
+        },
+        message: "At least one occupancy type must be selected."
+      }
     },
     pgType: {
       type: String,

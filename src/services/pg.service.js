@@ -1,4 +1,4 @@
-const { PG, Bed } = require("../models");
+const { PG, Bed, Room } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 const awsService = require("./aws.service");
@@ -342,6 +342,64 @@ const getPriceRange = async (pgId) => {
   return { minPrice: min, maxPrice: max };
 };
 
+const getPgOccupancyStats = async (pgId) => {
+  const [rooms, beds] = await Promise.all([
+    Room.find({ pgId, isDeleted: false }),
+    Bed.find({ pgId, isDeleted: false })
+  ]);
+
+  // Calculate price range of available beds
+  const availableBeds = beds.filter(b => b.status === "available");
+  let minPrice = 0;
+  let maxPrice = 0;
+  if (availableBeds.length > 0) {
+    minPrice = availableBeds[0].price;
+    maxPrice = availableBeds[0].price;
+    for (const bed of availableBeds) {
+      if (bed.price < minPrice) minPrice = bed.price;
+      if (bed.price > maxPrice) maxPrice = bed.price;
+    }
+  }
+
+  // Helper to map sharingType number to occupancy label string
+  const getOccupancyLabel = (sharingType) => {
+    if (sharingType === 1) return 'single';
+    if (sharingType === 2) return 'double';
+    if (sharingType === 3) return 'triple';
+    if (sharingType === 4) return 'four';
+    return 'other';
+  };
+
+  const allOccupancies = new Set();
+  const availableOccupancies = new Set();
+  const roomCountsBySharingType = { single: 0, double: 0, triple: 0, four: 0, other: 0 };
+  const availableBedsBySharingType = { single: 0, double: 0, triple: 0, four: 0, other: 0 };
+
+  // Track room occupancy types
+  for (const room of rooms) {
+    const label = getOccupancyLabel(room.sharingType);
+    allOccupancies.add(label);
+    roomCountsBySharingType[label]++;
+
+    // Check if this room has available beds
+    const roomBeds = beds.filter(b => b.roomId.toString() === room._id.toString() && b.status === "available");
+    if (roomBeds.length > 0) {
+      availableOccupancies.add(label);
+      availableBedsBySharingType[label] += roomBeds.length;
+    }
+  }
+
+  return {
+    minPrice,
+    maxPrice,
+    emptyBeds: availableBeds.length,
+    allOccupancies: Array.from(allOccupancies),
+    availableOccupancies: Array.from(availableOccupancies),
+    roomCountsBySharingType,
+    availableBedsBySharingType
+  };
+};
+
 module.exports = {
   checkExistingPG,
   createPG,
@@ -353,4 +411,5 @@ module.exports = {
   restorePG,
   discoverPGs,
   getPriceRange,
+  getPgOccupancyStats,
 };

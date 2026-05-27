@@ -68,6 +68,11 @@ const getPriceRange = catchAsync(async (req, res) => {
   sendResponse(res, { data: result, statusCode: httpStatus.OK });
 });
 
+const getPgOccupancyStats = catchAsync(async (req, res) => {
+  const result = await PgService.getPgOccupancyStats(req.params.pgId);
+  sendResponse(res, { data: result, statusCode: httpStatus.OK });
+});
+
 const getPGImageUploadUrl = catchAsync(async (req, res) => {
   const { fileName, fileType } = req.query;
   if (!fileName || !fileType) {
@@ -103,6 +108,7 @@ module.exports = {
   deletePG,
   discoverPGs,
   getPriceRange,
+  getPgOccupancyStats,
   getPGImageUploadUrl,
   deletePGImageFile,
 };

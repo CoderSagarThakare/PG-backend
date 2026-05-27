@@ -42,6 +42,9 @@ router.post("/", auth(ROLE_TYPES.owner), validate(pgValidation.createPG), pgCont
 // Get price range for beds in a PG
 router.get("/:pgId/price-range", validate(pgValidation.getPG), pgController.getPriceRange);
 
+// Get occupancy stats for PG vacancy form
+router.get("/:pgId/occupancy-stats", validate(pgValidation.getPG), pgController.getPgOccupancyStats);
+
 // Get PG Details
 router.get("/:pgId", validate(pgValidation.getPG), pgController.getPG);
 
