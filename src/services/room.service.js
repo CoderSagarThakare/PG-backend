@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
-const { Room, Bed, PG, Enquiry, Post } = require('../models');
-
+const { Room, Bed, PG, Enquiry, Post, User } = require('../models');
+const postService = require('./post.service');
 const ApiError = require('../utils/ApiError');
 
 /**
@@ -104,14 +104,50 @@ const assignTenant = async (bedId, userId, joiningDate) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Cannot assign bed: Tenant already has an active occupancy in this property.');
   }
 
-  bed.userId = userId;
-  bed.status = 'occupied';
+  // ── Gender validation against PG type ──────────────────────────────────────
+  const [pg, user] = await Promise.all([
+    PG.findById(bed.pgId).select('pgType'),
+    User.findById(userId).select('gender'),
+  ]);
+
+  if (!user || !user.gender) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Please set your gender in Profile before being assigned a bed.',
+    );
+  }
+
+  if (pg.pgType === 'male' && user.gender !== 'male') {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'This is a Male PG. Only male tenants can be assigned here.',
+    );
+  }
+  if (pg.pgType === 'female' && user.gender !== 'female') {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'This is a Female PG. Only female tenants can be assigned here.',
+    );
+  }
+  if (pg.pgType === 'unisex' && !['male', 'female'].includes(user.gender)) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Gender must be Male or Female for Unisex PG bed assignment.',
+    );
+  }
+  // coLiving: any gender is fine as long as it is set (already checked above)
+
+  bed.userId    = userId;
+  bed.status    = 'occupied';
   bed.assignedAt = joiningDate ? new Date(joiningDate) : new Date();
   await bed.save();
 
   await updatePGBedStats(bed.pgId);
-  return bed;
 
+  // Sync vacancy post count (non-critical — errors are swallowed inside syncPostVacancy)
+  await postService.syncPostVacancy(bed.pgId, { userGender: user.gender, delta: -1 });
+
+  return bed;
 };
 
 /**
@@ -125,12 +161,25 @@ const unassignTenant = async (bedId) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Bed not found');
   }
 
-  bed.userId = null;
-  bed.status = 'available';
+  // Capture the previous occupant's gender BEFORE clearing the bed
+  // so syncPostVacancy knows which counter to increment
+  const prevUser = bed.userId
+    ? await User.findById(bed.userId).select('gender')
+    : null;
+
+  bed.userId    = null;
+  bed.status    = 'available';
   bed.assignedAt = null;
   await bed.save();
 
   await updatePGBedStats(bed.pgId);
+
+  // Sync vacancy post count back up
+  await postService.syncPostVacancy(bed.pgId, {
+    userGender: prevUser?.gender,
+    delta: +1,
+  });
+
   return bed;
 };
 
@@ -252,20 +301,31 @@ const deleteRoom = async (roomId) => {
  * @returns {Promise<Array>}
  */
 const getEligibleTenants = async (pgId) => {
-  const enquiries = await Enquiry.find({ pgId, status: 'dealDone', isDeleted: false })
-    .populate('userId', 'name email mobNo1')
-    .lean();
-  
+  const [enquiries, pg] = await Promise.all([
+    Enquiry.find({ pgId, status: 'dealDone', isDeleted: false })
+      .populate('userId', 'name email mobNo1 gender')
+      .lean(),
+    PG.findById(pgId).select('pgType'),
+  ]);
+
   // Get all users who are already assigned to a bed in this PG
   const occupiedBeds = await Bed.find({ pgId, status: 'occupied', isDeleted: false });
   const occupiedUserIds = new Set(occupiedBeds.map(b => b.userId?.toString()));
 
-  // Extract unique users who DON'T have a bed yet
+  // Extract unique users who don’t have a bed yet
   const users = enquiries
     .map(e => e.userId)
     .filter(user => user && !occupiedUserIds.has(user._id.toString()));
-    
-  return users;
+
+  // Filter by gender compatibility with the PG type
+  return users.filter(user => {
+    if (!user.gender) return false; // no gender = not eligible (must set profile first)
+    if (pg.pgType === 'male')     return user.gender === 'male';
+    if (pg.pgType === 'female')   return user.gender === 'female';
+    if (pg.pgType === 'unisex')   return ['male', 'female'].includes(user.gender);
+    if (pg.pgType === 'coLiving') return true; // any gender
+    return true;
+  });
 };
 
 module.exports = {

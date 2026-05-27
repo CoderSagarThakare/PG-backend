@@ -5,29 +5,27 @@ const ApiError = require("../utils/ApiError");
 const sendResponse = require("../utils/sendResponse");
 
 const createPost = catchAsync(async (req, res) => {
-  // 1. Check if the PG belongs to the logged-in owner
-
+  // 1. Verify PG belongs to this owner/manager
   const pg = await PgService.getPGById(req.body.pgId, req.user.id);
+  if (!pg) throw new ApiError(httpStatus.NOT_FOUND, "PG not found or Access denied");
 
-  if (!pg) {
-    throw new ApiError(httpStatus.NOT_FOUND, "PG not found or Access denied");
-  }
+  // 2. Vacancy count must not exceed actual empty beds
+  const requestedTotal = req.body.pgType === 'unisex'
+    ? (Number(req.body.maleVacancyCount) || 0) + (Number(req.body.femaleVacancyCount) || 0)
+    : Number(req.body.vacancyCount) || 0;
 
-  if (req.body.vacancyCount > pg.emptyBeds) {
+  if (requestedTotal > pg.emptyBeds) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      `Only ${pg.emptyBeds} beds are currently empty in this PG.`,
+      `Total vacancy count (${requestedTotal}) cannot exceed the number of empty beds in this PG (${pg.emptyBeds}).`,
     );
   }
 
-  // 3. Denormalization: Copying PG location/address to PostData
+  // 3. Denormalize PG location/address into the post
   const postData = {
     ...req.body,
     location: pg.location,
-    address: {
-      pincode: pg.address.pincode,
-      city: pg.address.city,
-    },
+    address: { pincode: pg.address.pincode, city: pg.address.city },
     facilities: pg.facilities,
     createdBy: req.user.id,
     managerId: pg.managerId,
@@ -35,7 +33,6 @@ const createPost = catchAsync(async (req, res) => {
   };
 
   const post = await postService.createPost(postData);
-
   sendResponse(res, {
     success: true,
     data: post,
@@ -75,8 +72,27 @@ const getPost = catchAsync(async (req, res) => {
 });
 
 const updatePost = catchAsync(async (req, res) => {
-  await postService.updatePostById(req.params.postId, req.body, req.user._id);
+  // Fetch the existing post to know which PG it belongs to
+  const existingPost = await postService.getPostById(req.params.postId, req.user._id);
+  const pg = await PgService.getPGById(existingPost.pgId._id || existingPost.pgId, req.user.id);
 
+  if (pg) {
+    // Determine the requested total from the update body (fall back to current post values)
+    const isUnisex = (req.body.pgType || existingPost.pgType) === 'unisex';
+    const requestedTotal = isUnisex
+      ? (Number(req.body.maleVacancyCount)   ?? existingPost.maleVacancyCount   ?? 0)
+        + (Number(req.body.femaleVacancyCount) ?? existingPost.femaleVacancyCount ?? 0)
+      : Number(req.body.vacancyCount) ?? existingPost.vacancyCount ?? 0;
+
+    if (requestedTotal > pg.emptyBeds) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        `Total vacancy count (${requestedTotal}) cannot exceed the number of empty beds in this PG (${pg.emptyBeds}).`,
+      );
+    }
+  }
+
+  await postService.updatePostById(req.params.postId, req.body, req.user._id);
   sendResponse(res, {
     success: true,
     message: "Post updated successfully",

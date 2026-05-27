@@ -197,6 +197,12 @@ const updatePG = async (pgId, staffId, updateBody) => {
       delete updateBody.address;
     }
 
+    // Prevent manual update of computed stats fields
+    delete updateBody.totalRooms;
+    delete updateBody.totalBeds;
+    delete updateBody.occupiedBeds;
+    delete updateBody.emptyBeds;
+
     const pg = await PG.findOneAndUpdate(
       { _id: pgId, $or: [{ ownerId: staffId }, { managerId: staffId }], isDeleted: false },
       { $set: updateBody },

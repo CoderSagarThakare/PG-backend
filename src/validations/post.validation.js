@@ -12,7 +12,10 @@ const createPost = {
     title: Joi.string().required().trim().max(100),
     description: Joi.string().required().trim(),
 
-    vacancyCount: Joi.number().integer().min(1).required(),
+    // For unisex PGs vacancyCount is computed server-side from male+female counts
+    vacancyCount: Joi.number().integer().min(0).allow(null, '').optional(),
+    maleVacancyCount: Joi.number().integer().min(0).allow(null, '').optional(),
+    femaleVacancyCount: Joi.number().integer().min(0).allow(null, '').optional(),
     pgType: Joi.string()
       .valid(PG_TYPES.male, PG_TYPES.female, PG_TYPES.unisex, PG_TYPES.coLiving)
       .required(),
@@ -42,18 +45,9 @@ const updatePost = {
       title: Joi.string().trim().max(100),
       description: Joi.string().trim(),
 
-      // Conditional Validation
-      vacancyCount: Joi.number()
-        .integer()
-        .min(0)
-        .when("isActive", {
-          is: Joi.equal(true),
-          then: Joi.number().min(1).messages({
-            "number.min":
-              "Vacancy count must be at least 1 when post is active",
-          }),
-          otherwise: Joi.number().min(0),
-        }),
+      vacancyCount: Joi.number().integer().min(0).allow(null, '').optional(),
+      maleVacancyCount: Joi.number().integer().min(0).allow(null, '').optional(),
+      femaleVacancyCount: Joi.number().integer().min(0).allow(null, '').optional(),
 
       pgId: Joi.string().pattern(objectIdPattern),
       pgType: Joi.string().valid(PG_TYPES.male, PG_TYPES.female, PG_TYPES.unisex, PG_TYPES.coLiving),

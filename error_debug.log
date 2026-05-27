@@ -677,3 +677,97 @@ Stack: Error: please authenticate
     at module.exports [as JwtVerifier] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
     at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
 
+[2026-05-26T21:51:20.517Z] PATCH /post/6a0b6101951496fc390f8791
+Status: 400
+Error: Total vacancy count (61) cannot exceed the number of empty beds in this PG (10).
+Stack: Error: Total vacancy count (61) cannot exceed the number of empty beds in this PG (10).
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\post.controller.js:88:13
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-05-26T21:51:52.664Z] PATCH /post/6a0b6101951496fc390f8791
+Status: 400
+Error: Total vacancy count (11) cannot exceed the number of empty beds in this PG (10).
+Stack: Error: Total vacancy count (11) cannot exceed the number of empty beds in this PG (10).
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\post.controller.js:88:13
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-05-27T20:10:25.037Z] GET /profile
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+
+[2026-05-27T20:16:24.725Z] GET /profile
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+
+[2026-05-27T20:20:29.750Z] PATCH /post/6a062bdcc843a783f8b92b7c
+Status: 400
+Error: Total vacancy count (97) cannot exceed the number of empty beds in this PG (9).
+Stack: Error: Total vacancy count (97) cannot exceed the number of empty beds in this PG (9).
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\post.controller.js:88:13
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-05-27T20:20:36.507Z] PATCH /post/6a062bdcc843a783f8b92b7c
+Status: 400
+Error: Total vacancy count (97) cannot exceed the number of empty beds in this PG (9).
+Stack: Error: Total vacancy count (97) cannot exceed the number of empty beds in this PG (9).
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\post.controller.js:88:13
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-05-27T20:36:14.098Z] POST /post
+Status: 400
+Error: "maleVacancyCount" must be a number, "femaleVacancyCount" must be a number
+Stack: Error: "maleVacancyCount" must be a number, "femaleVacancyCount" must be a number
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:18:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-05-27T20:36:25.055Z] POST /post
+Status: 400
+Error: "maleVacancyCount" must be a number, "femaleVacancyCount" must be a number
+Stack: Error: "maleVacancyCount" must be a number, "femaleVacancyCount" must be a number
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:18:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-05-27T20:39:30.600Z] POST /post
+Status: 400
+Error: This PG already has an active vacancy post. Edit or delete the existing one first.
+Stack: Error: This PG already has an active vacancy post. Edit or delete the existing one first.
+    at Object.createPost (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\post.service.js:34:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\post.controller.js:35:16
+
+[2026-05-27T20:52:16.039Z] PATCH /post/6a062bdcc843a783f8b92b7c
+Status: 500
+Error: E11000 duplicate key error collection: pg-stay.posts index: pgId_1 dup key: { pgId: ObjectId('6a131c78790a4727b6a84cfa') }
+Stack: MongoServerError: E11000 duplicate key error collection: pg-stay.posts index: pgId_1 dup key: { pgId: ObjectId('6a131c78790a4727b6a84cfa') }
+    at UpdateOneOperation.execute (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\mongodb\lib\operations\update.js:70:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async executeOperationAsync (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\mongodb\lib\operations\execute_operation.js:106:16)
+

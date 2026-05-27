@@ -27,17 +27,46 @@ const createPost = async (postBody) => {
     if (postBody.images) {
       postBody.images = postBody.images.map(extractS3Key);
     }
-    // Ensuring default flags are set correctly on creation
-    const post = await Post.create({
-      ...postBody,
-    });
 
+    // Enforce one active post per PG
+    const existing = await Post.findOne({ pgId: postBody.pgId, isDeleted: false });
+    if (existing) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'This PG already has an active vacancy post. Edit or delete the existing one first.',
+      );
+    }
+
+    // For unisex PGs: compute vacancyCount from male + female split
+    if (postBody.pgType === 'unisex') {
+      const male   = Number(postBody.maleVacancyCount)   || 0;
+      const female = Number(postBody.femaleVacancyCount) || 0;
+      if (male === 0 && female === 0) {
+        throw new ApiError(
+          httpStatus.BAD_REQUEST,
+          'Please specify Male and/or Female vacancy count for a Unisex PG.',
+        );
+      }
+      postBody.maleVacancyCount   = male;
+      postBody.femaleVacancyCount = female;
+      postBody.vacancyCount       = male + female;
+    } else {
+      // Non-unisex: vacancyCount is required
+      if (!postBody.vacancyCount && postBody.vacancyCount !== 0) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'vacancyCount is required.');
+      }
+      // Keep male/female counts null for non-unisex
+      postBody.maleVacancyCount   = null;
+      postBody.femaleVacancyCount = null;
+    }
+
+    const post = await Post.create({ ...postBody });
     return post;
   } catch (error) {
-    console.log({ error });
+    if (error instanceof ApiError) throw error;
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to create post",
+      'Failed to create post',
     );
   }
 };
@@ -224,6 +253,47 @@ const deletePostById = async (postId, staffId) => {
 };
 
 /**
+ * Sync vacancy counts on a PG's active post after a bed assign / unassign.
+ * Called by room.service — fails silently if no post exists for the PG.
+ *
+ * @param {ObjectId|string} pgId
+ * @param {Object}          opts
+ * @param {string}          opts.userGender  - 'male' | 'female' | 'transgender' | 'preferNotToSay'
+ * @param {number}          opts.delta       - -1 (assign) or +1 (unassign)
+ */
+const syncPostVacancy = async (pgId, { userGender, delta }) => {
+  try {
+    const post = await Post.findOne({ pgId, isDeleted: false });
+    if (!post) return; // No vacancy post for this PG — silently skip
+
+    if (post.pgType === 'unisex') {
+      // For unisex track male and female separately
+      if (userGender === 'male') {
+        post.maleVacancyCount = Math.max(0, (post.maleVacancyCount || 0) + delta);
+      } else if (userGender === 'female') {
+        post.femaleVacancyCount = Math.max(0, (post.femaleVacancyCount || 0) + delta);
+      }
+      // Recompute total
+      post.vacancyCount = (post.maleVacancyCount || 0) + (post.femaleVacancyCount || 0);
+    } else {
+      // male / female / coLiving — single counter
+      post.vacancyCount = Math.max(0, post.vacancyCount + delta);
+    }
+
+    // Auto-deactivate when all vacancies filled
+    if (post.vacancyCount === 0) {
+      post.isActive = false;
+    }
+    // NOTE: never auto-reactivate — owner must manually turn it back on
+
+    await post.save();
+  } catch (err) {
+    // Non-critical — log but do not block the bed assignment flow
+    console.error('[syncPostVacancy] Error syncing post vacancy for pgId', pgId, err.message);
+  }
+};
+
+/**
  * Fetch vacancy posts tailored to a user's preferences with scoring and pagination.
  * @param {string} userId
  * @param {Object} options - { limit, page }
@@ -390,4 +460,5 @@ module.exports = {
   updatePostById,
   deletePostById,
   getPostsByPreference,
+  syncPostVacancy,
 };

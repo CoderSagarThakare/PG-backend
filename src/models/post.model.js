@@ -36,6 +36,17 @@ const postSchema = mongoose.Schema(
       required: true,
       min: 0,
     },
+    // For unisex PGs only — null for male/female/coLiving
+    maleVacancyCount: {
+      type: Number,
+      min: 0,
+      default: null,
+    },
+    femaleVacancyCount: {
+      type: Number,
+      min: 0,
+      default: null,
+    },
     address: {
       pincode: { type: Number, required: true, index: true },
       city: { type: String, required: true, trim: true },
@@ -112,6 +123,11 @@ const postSchema = mongoose.Schema(
 );
 postSchema.plugin(private);
 postSchema.index({ location: "2dsphere" });
+// Enforce one active post per PG (soft-deleted posts are excluded by partialFilterExpression)
+postSchema.index(
+  { pgId: 1 },
+  { unique: true, partialFilterExpression: { isDeleted: false } }
+);
 
 // Sirf wahi records dikhao jo deleted nahi hain
 // Agar query mein manually 'isDeleted' nahi bheja gaya, toh default false set karo
