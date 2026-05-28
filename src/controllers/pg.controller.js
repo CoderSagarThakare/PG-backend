@@ -49,10 +49,19 @@ const deletePG = catchAsync(async (req, res) => {
 });
 
 const discoverPGs = catchAsync(async (req, res) => {
+  let facilities = [];
+  if (req.query.facilities) {
+    if (Array.isArray(req.query.facilities)) {
+      facilities = req.query.facilities;
+    } else if (typeof req.query.facilities === 'string') {
+      facilities = req.query.facilities.split(',');
+    }
+  }
+
   const filter = {
     city: req.query.city,
     pgType: req.query.pgType,
-    facilities: req.query.facilities ? req.query.facilities.split(',') : [],
+    facilities,
   };
   const options = {
     limit: parseInt(req.query.limit) || 9,

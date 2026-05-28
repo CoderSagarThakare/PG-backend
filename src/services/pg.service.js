@@ -297,7 +297,12 @@ const discoverPGs = async (filter = {}, options = {}) => {
     const query = { isDeleted: false, isActive: true };
     
     if (filter.city) {
-      query['address.city'] = { $regex: filter.city, $options: 'i' };
+      query.$or = [
+        { name: { $regex: filter.city, $options: 'i' } },
+        { 'address.city': { $regex: filter.city, $options: 'i' } },
+        { 'address.state': { $regex: filter.city, $options: 'i' } },
+        { 'address.landmark': { $regex: filter.city, $options: 'i' } }
+      ];
     }
     if (filter.pgType) {
       query.pgType = filter.pgType;
