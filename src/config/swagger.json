@@ -480,6 +480,31 @@
         }
       }
     },
+    "/pg/upload-url": {
+      "get": {
+        "tags": ["PG Management"],
+        "summary": "Generate presigned S3 URL for uploading PG image",
+        "parameters": [
+          { "name": "fileName", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "fileType", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Presigned URL details" }
+        }
+      }
+    },
+    "/pg/file": {
+      "delete": {
+        "tags": ["PG Management"],
+        "summary": "Delete PG image file from S3",
+        "parameters": [
+          { "name": "key", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Successfully deleted" }
+        }
+      }
+    },
     "/pg/discover": {
       "get": {
         "tags": ["PG Management"],
@@ -551,6 +576,18 @@
         ],
         "responses": {
           "200": { "description": "Price range details" }
+        }
+      }
+    },
+    "/pg/{pgId}/occupancy-stats": {
+      "get": {
+        "tags": ["PG Management"],
+        "summary": "Get occupancy stats for PG vacancy form",
+        "parameters": [
+          { "name": "pgId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Occupancy stats returned successfully" }
         }
       }
     },
@@ -967,6 +1004,31 @@
         },
         "responses": {
           "201": { "description": "Post created successfully" }
+        }
+      }
+    },
+    "/post/upload-url": {
+      "get": {
+        "tags": ["Post Management"],
+        "summary": "Generate presigned S3 URL for uploading post image",
+        "parameters": [
+          { "name": "fileName", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "fileType", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Presigned URL details" }
+        }
+      }
+    },
+    "/post/file": {
+      "delete": {
+        "tags": ["Post Management"],
+        "summary": "Delete post image file from S3",
+        "parameters": [
+          { "name": "key", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Successfully deleted" }
         }
       }
     },
