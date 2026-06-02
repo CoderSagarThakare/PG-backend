@@ -16,6 +16,9 @@ const SCHEMA_NAME = {
   enquiry : "Enquiry",
   room: "Room",
   bed: "Bed",
+  employee: "Employee",
+  expense: "Expense",
+  staffPayment: "StaffPayment",
 };
 
 const GENDER_TYPES = {

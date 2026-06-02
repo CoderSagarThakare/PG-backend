@@ -21,6 +21,9 @@ const defaultRoutes = [
   { path: "/profile", route: require("./profile.route") }, // unified profile routes
   { path: "/cron", route: require("./cron.route") }, // base path for external cron triggers
   { path: "/staff", route: require("./staff.route") }, // base path for staff management
+  { path: "/employees", route: require("./employee.route") }, // Staff member registry
+  { path: "/expenses", route: require("./expense.route") }, // Expense claims
+  { path: "/staff-payments", route: require("./staffPayment.route") }, // Monthly payroll
 ];
 
 defaultRoutes.map((route) => {

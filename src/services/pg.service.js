@@ -1,4 +1,4 @@
-const { PG, Bed, Room } = require("../models");
+const { PG, Bed, Room, Employee } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 const awsService = require("./aws.service");
@@ -50,6 +50,28 @@ const createPG = async (pgBody) => {
       emptyBeds: 0,
       isDeleted: false 
     });
+
+    // Auto-create or append Employee staff record for the assigned manager
+    if (pg.managerId) {
+      const existing = await Employee.findOne({ userId: pg.managerId, isDeleted: false });
+      if (existing) {
+        if (!existing.pgIds.some(id => String(id) === String(pg._id))) {
+          existing.pgIds.push(pg._id);
+          existing.status = "active";
+          await existing.save();
+        }
+      } else {
+        await Employee.create({
+          userId: pg.managerId,
+          pgIds: [pg._id],
+          joinedDate: new Date(),
+          monthlySalary: 0, // default 0, owner can edit
+          status: "active",
+          addedBy: pg.ownerId
+        }).catch(err => console.error("Error auto-creating manager employee record:", err));
+      }
+    }
+
     return pg;
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to create PG");
@@ -173,19 +195,19 @@ const getPGById = async (pgId, staffId, isAdmin = false) => {
  */
 const updatePG = async (pgId, staffId, updateBody) => {
   try {
+    const oldPg = await PG.findOne({ _id: pgId, $or: [{ ownerId: staffId }, { managerId: staffId }], isDeleted: false });
+    if (!oldPg) {
+      throw new ApiError(httpStatus.NOT_FOUND, "PG not found or access denied");
+    }
+
     // Normalize image urls to keys and delete orphaned S3 files
     if (updateBody.images) {
       updateBody.images = updateBody.images.map(extractS3Key);
-      try {
-        const oldPg = await PG.findOne({ _id: pgId, $or: [{ ownerId: staffId }, { managerId: staffId }], isDeleted: false });
-        if (oldPg && oldPg.images) {
-          const removedImages = oldPg.images.filter(img => !updateBody.images.includes(img));
-          for (const img of removedImages) {
-            await awsService.deleteFile(img).catch(() => {});
-          }
+      if (oldPg.images) {
+        const removedImages = oldPg.images.filter(img => !updateBody.images.includes(img));
+        for (const img of removedImages) {
+          await awsService.deleteFile(img).catch(() => {});
         }
-      } catch (e) {
-        console.error("Error cleaning orphaned PG images from S3:", e);
       }
     }
 
@@ -206,11 +228,47 @@ const updatePG = async (pgId, staffId, updateBody) => {
     const pg = await PG.findOneAndUpdate(
       { _id: pgId, $or: [{ ownerId: staffId }, { managerId: staffId }], isDeleted: false },
       { $set: updateBody },
-      { runValidators: true }, // validate data before updating data in DB
+      { runValidators: true, new: true }, // validate data before updating data in DB
     );
 
     if (!pg) {
       throw new ApiError(httpStatus.NOT_FOUND, "PG not found or access denied");
+    }
+
+    // Sync manager staff records if changing
+    const oldManagerId = oldPg.managerId?.toString();
+    const newManagerId = updateBody.managerId?.toString();
+    if (newManagerId && oldManagerId !== newManagerId) {
+      // 1. Remove PG ID from old manager's pgIds list
+      if (oldManagerId) {
+        const oldManager = await Employee.findOne({ userId: oldManagerId, isDeleted: false });
+        if (oldManager) {
+          oldManager.pgIds = oldManager.pgIds.filter(id => String(id) !== String(pgId));
+          if (oldManager.pgIds.length === 0) {
+            oldManager.status = "inactive";
+          }
+          await oldManager.save().catch(() => {});
+        }
+      }
+
+      // 2. Append PG ID to new manager's pgIds list
+      const existing = await Employee.findOne({ userId: newManagerId, isDeleted: false });
+      if (existing) {
+        if (!existing.pgIds.some(id => String(id) === String(pgId))) {
+          existing.pgIds.push(pgId);
+        }
+        existing.status = "active";
+        await existing.save();
+      } else {
+        await Employee.create({
+          userId: newManagerId,
+          pgIds: [pgId],
+          joinedDate: new Date(),
+          monthlySalary: 0,
+          status: "active",
+          addedBy: staffId,
+        }).catch(() => {});
+      }
     }
 
     return;

@@ -801,3 +801,341 @@ Stack: Error: please authenticate
     at module.exports [as JwtVerifier] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
     at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
 
+[2026-06-02T18:48:20.074Z] POST /employees
+Status: 409
+Error: This user is already registered as staff for this PG
+Stack: Error: This user is already registered as staff for this PG
+    at Object.addEmployee (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\employee.service.js:28:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\employee.controller.js:19:20
+
+[2026-06-02T18:49:23.076Z] GET /enquiry?page=1&limit=10
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T18:49:23.102Z] GET /pg
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T18:49:24.126Z] GET /enquiry?page=1&limit=10
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T18:49:24.160Z] GET /pg
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T18:49:50.734Z] PATCH /profile/avatar
+Status: 400
+Error: User validation failed: mobNo1: Path `mobNo1` is required.
+Stack: ValidationError: User validation failed: mobNo1: Path `mobNo1` is required.
+    at Document.invalidate (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\mongoose\lib\document.js:3201:32)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\mongoose\lib\document.js:2994:17
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\mongoose\lib\schemaType.js:1370:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+
+[2026-06-02T18:50:21.732Z] PATCH /profile/avatar
+Status: 400
+Error: User validation failed: mobNo1: Path `mobNo1` is required.
+Stack: ValidationError: User validation failed: mobNo1: Path `mobNo1` is required.
+    at Document.invalidate (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\mongoose\lib\document.js:3201:32)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\mongoose\lib\document.js:2994:17
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\mongoose\lib\schemaType.js:1370:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+
+[2026-06-02T18:50:29.793Z] PATCH /profile/avatar
+Status: 400
+Error: User validation failed: mobNo1: Path `mobNo1` is required.
+Stack: ValidationError: User validation failed: mobNo1: Path `mobNo1` is required.
+    at Document.invalidate (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\mongoose\lib\document.js:3201:32)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\mongoose\lib\document.js:2994:17
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\mongoose\lib\schemaType.js:1370:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+
+[2026-06-02T19:13:43.528Z] GET /enquiry?page=1&limit=10
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T19:13:43.537Z] GET /pg
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T19:13:44.581Z] GET /enquiry?page=1&limit=10
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T19:13:44.619Z] GET /pg
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T19:54:31.450Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T19:54:32.505Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:05:19.853Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:05:20.967Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:05:27.570Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:05:28.636Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:07:01.979Z] POST /auth/login
+Status: 401
+Error: Incorrect email or password
+Stack: Error: Incorrect email or password
+    at Object.loginUserWithEmailAndPassword (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\auth.service.js:18:11)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\auth.controller.js:37:14
+
+[2026-06-02T20:07:11.973Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:07:13.029Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:07:18.688Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:07:19.907Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:07:27.117Z] GET /profile
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+
+[2026-06-02T20:08:16.690Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:08:17.752Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:08:23.229Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:08:24.266Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:12:00.793Z] GET /employees?limit=1
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:16:34.882Z] PATCH /expenses/6a1f39d18d8e51aa35db584e/pay
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:16:36.393Z] PATCH /expenses/6a1f39d18d8e51aa35db584e/pay
+Status: 403
+Error: Access denied: Insufficient permissions
+Stack: Error: Access denied: Insufficient permissions
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:43:9
+    at strategy.success (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:222:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:115:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:22:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-06-02T20:54:37.839Z] GET /profile
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+
+[2026-06-02T21:13:24.857Z] PATCH /employees/6a1f3d0398f36d23203bcf56
+Status: 400
+Error: Cannot remove manager from PG 'Sagar Thakare's Premium Stay 2' because it must have at least one manager assigned. Please assign another manager to this PG first.
+Stack: Error: Cannot remove manager from PG 'Sagar Thakare's Premium Stay 2' because it must have at least one manager assigned. Please assign another manager to this PG first.
+    at Object.updateEmployee (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\employee.service.js:162:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\employee.controller.js:46:20
+
+[2026-06-02T21:14:45.842Z] PATCH /employees/6a1f3d0398f36d23203bcf56
+Status: 400
+Error: 'Sagar Thakare's Premium Stay 2' needs a manager. Assign another manager first.
+Stack: Error: 'Sagar Thakare's Premium Stay 2' needs a manager. Assign another manager first.
+    at Object.updateEmployee (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\employee.service.js:162:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\employee.controller.js:46:20
+
