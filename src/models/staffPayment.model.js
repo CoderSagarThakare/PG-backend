@@ -78,8 +78,8 @@ const staffPaymentSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-// One payroll record per employee per month
-staffPaymentSchema.index({ employeeId: 1, month: 1 }, { unique: true });
+// One payroll record per employee per month per PG
+staffPaymentSchema.index({ employeeId: 1, month: 1, pgId: 1 }, { unique: true });
 staffPaymentSchema.index({ pgId: 1, month: 1 });
 
 const StaffPayment = mongoose.model("StaffPayment", staffPaymentSchema);

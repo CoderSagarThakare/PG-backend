@@ -78,4 +78,36 @@ router.post(
   })
 );
 
+/**
+ * Trigger monthly payroll generation for the current month across all active staff.
+ * POST /cron/generate-payroll
+ */
+router.post(
+  "/generate-payroll",
+  catchAsync(async (req, res) => {
+    const { Employee } = require("../models");
+    const staffPaymentService = require("../services/staffPayment.service");
+
+    const employees = await Employee.find({ status: "active", isDeleted: false }, "_id");
+    const now = new Date();
+    const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    let totalGenerated = 0;
+    for (const emp of employees) {
+      try {
+        await staffPaymentService.generatePayroll(emp._id, month, null);
+        totalGenerated++;
+      } catch (err) {
+        console.error(`Cron trigger failed for Employee ${emp._id}:`, err);
+      }
+    }
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: `Successfully executed monthly payroll generation for ${month}`,
+      data: { totalGenerated, staffCount: employees.length }
+    });
+  })
+);
+
 module.exports = router;

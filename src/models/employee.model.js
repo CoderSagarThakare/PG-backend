@@ -26,6 +26,11 @@ const employeeSchema = mongoose.Schema(
       required: true,
       min: 0,
     },
+    pgSalaries: {
+      type: Map,
+      of: Number,
+      default: {},
+    },
     status: {
       type: String,
       enum: ["active", "inactive"],

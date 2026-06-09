@@ -35,11 +35,17 @@ const createExpense = async (data, submittedByUserId) => {
 /**
  * Get paginated expense claims for PGs managed by the user.
  */
-const getExpenses = async ({ pgId, spentBy, status, page = 1, limit = 20 }) => {
+const getExpenses = async ({ pgId, spentBy, status, month, page = 1, limit = 20 }) => {
   const filter = { isDeleted: false };
   if (pgId) filter.pgId = pgId;
   if (spentBy) filter.spentBy = spentBy;
   if (status) filter.status = status;
+  if (month) {
+    const [year, monthNum] = month.split("-").map(Number);
+    const startDate = new Date(year, monthNum - 1, 1);
+    const endDate = new Date(year, monthNum, 0, 23, 59, 59, 999);
+    filter.spentDate = { $gte: startDate, $lte: endDate };
+  }
 
   const skip = (page - 1) * limit;
   const [expenses, total] = await Promise.all([

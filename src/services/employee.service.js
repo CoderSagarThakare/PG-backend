@@ -55,7 +55,7 @@ const syncManagerWithPgs = async (managerUserId, oldPgIds = [], newPgIds = []) =
  * The role is derived from the existing User account — no role override allowed.
  */
 const addEmployee = async (data, addedBy) => {
-  const { userId, pgId, pgIds, joinedDate, monthlySalary, notes } = data;
+  const { userId, pgId, pgIds, joinedDate, monthlySalary, notes, pgSalaries } = data;
 
   // Validate user exists and has an allowed role
   const user = await User.findOne({ _id: userId, isDeleted: false });
@@ -91,6 +91,7 @@ const addEmployee = async (data, addedBy) => {
     if (monthlySalary !== undefined) employee.monthlySalary = monthlySalary;
     if (joinedDate) employee.joinedDate = joinedDate;
     if (notes) employee.notes = notes;
+    if (pgSalaries !== undefined) employee.pgSalaries = pgSalaries;
     await employee.save();
   } else {
     // Create new profile record
@@ -99,6 +100,7 @@ const addEmployee = async (data, addedBy) => {
       pgIds: resolvedPgIds,
       joinedDate,
       monthlySalary,
+      pgSalaries: pgSalaries || {},
       notes: notes || null,
       addedBy,
     });
@@ -110,7 +112,7 @@ const addEmployee = async (data, addedBy) => {
   }
 
   return employee.populate([
-    { path: "userId", select: "name email mobNo1 role picture" },
+    { path: "userId", select: "name email mobNo1 role picture profileImageKey" },
     { path: "pgIds", select: "name" },
   ]);
 };
@@ -127,7 +129,7 @@ const getEmployees = async ({ pgId, userId, status, page = 1, limit = 20 }) => {
   const skip = (page - 1) * limit;
   const [employees, total] = await Promise.all([
     Employee.find(filter)
-      .populate({ path: "userId", select: "name email mobNo1 role picture gender" })
+      .populate({ path: "userId", select: "name email mobNo1 role picture gender profileImageKey" })
       .populate({ path: "pgIds", select: "name" })
       .populate({ path: "addedBy", select: "name" })
       .sort({ createdAt: -1 })
@@ -179,7 +181,7 @@ const updateEmployee = async (employeeId, updates) => {
     }
   }
 
-  const allowed = ["monthlySalary", "status", "notes", "joinedDate", "pgIds"];
+  const allowed = ["monthlySalary", "status", "notes", "joinedDate", "pgIds", "pgSalaries"];
   allowed.forEach((key) => {
     if (updates[key] !== undefined) employee[key] = updates[key];
   });
@@ -192,7 +194,7 @@ const updateEmployee = async (employeeId, updates) => {
   }
 
   return employee.populate([
-    { path: "userId", select: "name email mobNo1 role picture" },
+    { path: "userId", select: "name email mobNo1 role picture profileImageKey" },
     { path: "pgIds", select: "name" },
   ]);
 };
