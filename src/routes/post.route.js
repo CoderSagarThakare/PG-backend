@@ -6,10 +6,10 @@ const { postValidation } = require("../validations");
 
 const router = require("express").Router();
 
-// public/user recommendation route (requires user auth)
+// public/user recommendation route (requires user/employee auth)
 router.get(
   "/search",
-  auth(ROLE_TYPES.user),
+  auth(ROLE_TYPES.user, ROLE_TYPES.employee),
   postController.getPostsByPreference,
 );
 

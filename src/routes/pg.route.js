@@ -13,10 +13,10 @@ const { ROLE_TYPES } = require("../const/constant");
 const router = require("express").Router();
 
 // Publicly accessible facilities (also for users to filter)
-router.get("/facilities", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user), facilitiesController.getAllFacilities);
+router.get("/facilities", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user, ROLE_TYPES.employee), facilitiesController.getAllFacilities);
 
 // Publicly accessible PG discovery
-router.get("/discover", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user), pgController.discoverPGs);
+router.get("/discover", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user, ROLE_TYPES.employee), pgController.discoverPGs);
 
 // Presigned upload url route for PG images
 router.get("/upload-url", auth(ROLE_TYPES.owner, ROLE_TYPES.manager), pgController.getPGImageUploadUrl);
@@ -25,7 +25,7 @@ router.get("/upload-url", auth(ROLE_TYPES.owner, ROLE_TYPES.manager), pgControll
 router.delete("/file", auth(ROLE_TYPES.owner, ROLE_TYPES.manager), pgController.deletePGImageFile);
 
 // Publicly accessible individual PG details
-router.get("/:pgId", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user), pgController.getPG);
+router.get("/:pgId", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user, ROLE_TYPES.employee), pgController.getPG);
 
 // Apply auth middleware to all other PG management routes (owner and manager allowed)
 router.use(auth(ROLE_TYPES.owner, ROLE_TYPES.manager));
