@@ -313,7 +313,9 @@ const getPostsByPreference = async (userId, options = {}) => {
 
   // build PG filter first (for geo / pincode)
   const pgFilter = { isActive: true, isDeleted: false };
-  if (options.city) {
+  if (options.pgId) {
+    pgFilter._id = options.pgId;
+  } else if (options.city) {
     pgFilter["address.city"] = { $regex: new RegExp(options.city, "i") };
   } else if (pref.location) {
     if (pref.location.pincode) {
@@ -350,7 +352,7 @@ const getPostsByPreference = async (userId, options = {}) => {
 
   if (options.pgType) {
     postFilter.pgType = options.pgType;
-  } else if (pref.pgType) {
+  } else if (pref.pgType && !options.pgId) {
     postFilter.pgType = pref.pgType;
   }
 
