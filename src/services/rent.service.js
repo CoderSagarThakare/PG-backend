@@ -131,7 +131,7 @@ const recordPayment = async (data, recordedBy) => {
   ).populate("userId", "name email mobNo1")
    .populate("bedId", "bedNumber price")
    .populate("roomId", "roomNumber floor")
-   .populate("pgId", "name");
+   .populate("pgId", "name lateFee dueDayOfMonth");
 
   return rent;
 };
@@ -165,7 +165,7 @@ const getRentPayments = async ({ pgId, userId, rentMonth, status, paymentMode, p
       .populate("userId", "name email mobNo1")
       .populate("bedId", "bedNumber price")
       .populate("roomId", "roomNumber floor")
-      .populate("pgId", "name")
+      .populate("pgId", "name lateFee dueDayOfMonth")
       .populate("recordedBy", "name")
       .sort({ rentMonth: -1, createdAt: -1 })
       .skip(skip)
@@ -236,16 +236,30 @@ const updatePayment = async (rentId, updates, pgId) => {
   const rent = await RentPayment.findOne(query);
   if (!rent) throw new ApiError(httpStatus.NOT_FOUND, "Rent record not found");
 
-  const paid = updates.amountPaid ?? rent.amountPaid;
-  const baseDue = updates.amount ?? rent.amount;
-  const penalty = rent.penaltyAmount || 0;
+  const paid = updates.amountPaid !== undefined ? updates.amountPaid : rent.amountPaid;
+  const baseDue = updates.amount !== undefined ? updates.amount : rent.amount;
+  const penalty = updates.penaltyAmount !== undefined ? Number(updates.penaltyAmount) : (rent.penaltyAmount || 0);
   const totalDue = baseDue + penalty;
+
+  let isPenaltyApplied = rent.isPenaltyApplied;
+  if (updates.penaltyAmount !== undefined) {
+    isPenaltyApplied = Number(updates.penaltyAmount) > 0;
+  }
+  if (updates.isPenaltyApplied !== undefined) {
+    isPenaltyApplied = !!updates.isPenaltyApplied;
+  }
+
   let status = rent.status;
   if (paid >= totalDue) status = "paid";
   else if (paid > 0) status = "partial";
-  else status = rent.isPenaltyApplied ? "overdue" : "pending";
+  else status = isPenaltyApplied ? "overdue" : "pending";
 
-  Object.assign(rent, { ...updates, status });
+  const updatesWithStatus = { ...updates, status };
+  if (updates.penaltyAmount !== undefined && updates.isPenaltyApplied === undefined) {
+    updatesWithStatus.isPenaltyApplied = Number(updates.penaltyAmount) > 0;
+  }
+
+  Object.assign(rent, updatesWithStatus);
   if (paid > 0 && !rent.paidDate) rent.paidDate = new Date();
   await rent.save();
 
