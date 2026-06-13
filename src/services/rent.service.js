@@ -39,7 +39,7 @@ const checkAndApplyOverduePayments = async (pgIdOrIds) => {
 
   const unpaidRents = await RentPayment.find({
     pgId: { $in: pgIds },
-    status: { $in: ["pending", "partial"] },
+    status: { $in: ["pending", "partial", "overdue"] },
     isDeleted: false,
   }).populate("bedId");
 
@@ -87,7 +87,7 @@ const checkAndApplyOverduePayments = async (pgIdOrIds) => {
  * Create or upsert a rent payment record for a given tenant/bed/month.
  */
 const recordPayment = async (data, recordedBy) => {
-  const { bedId, userId, rentMonth, amount, amountPaid, paymentMode, paidDate, referenceNo, notes, activeDays, status: inputStatus } = data;
+  const { bedId, userId, rentMonth, amount, amountPaid, paymentMode, paidDate, referenceNo, notes, activeDays, status: inputStatus, penaltyAmount } = data;
 
   // Validate the bed belongs to this PG and is occupied by this user
   const bed = await Bed.findById(bedId).populate("roomId").populate("pgId");
@@ -125,6 +125,8 @@ const recordPayment = async (data, recordedBy) => {
         notes: notes || null,
         recordedBy,
         activeDays: activeDays || null,
+        penaltyAmount: penaltyAmount !== undefined ? Number(penaltyAmount || 0) : 0,
+        isPenaltyApplied: penaltyAmount !== undefined,
       },
     },
     { upsert: true, new: true }
@@ -201,7 +203,7 @@ const getMonthlySummary = async (pgId, rentMonth) => {
       $group: {
         _id: "$status",
         count: { $sum: 1 },
-        totalDue: { $sum: "$amount" },
+        totalDue: { $sum: { $add: ["$amount", { $ifNull: ["$penaltyAmount", 0] }] } },
         totalPaid: { $sum: "$amountPaid" },
       },
     },
@@ -211,7 +213,7 @@ const getMonthlySummary = async (pgId, rentMonth) => {
   stats.forEach(({ _id, count, totalDue, totalPaid }) => {
     summary[_id] = count;
     summary.totalDue += totalDue;
-    if (_id === "paid" || _id === "partial") {
+    if (_id === "paid" || _id === "partial" || _id === "overdue") {
       summary.totalCollected += totalPaid;
     }
     summary.tenantCount += count;
@@ -243,20 +245,28 @@ const updatePayment = async (rentId, updates, pgId) => {
 
   let isPenaltyApplied = rent.isPenaltyApplied;
   if (updates.penaltyAmount !== undefined) {
-    isPenaltyApplied = Number(updates.penaltyAmount) > 0;
+    isPenaltyApplied = true;
   }
   if (updates.isPenaltyApplied !== undefined) {
     isPenaltyApplied = !!updates.isPenaltyApplied;
   }
 
+  const pg = await PG.findById(rent.pgId);
+  const dueDay = pg?.dueDayOfMonth || 10;
+  const [rentYear, rentMonth] = rent.rentMonth.split("-").map(Number);
+  const dueDate = new Date(rentYear, rentMonth - 1, dueDay, 23, 59, 59, 999);
+  const isPastDue = new Date() > dueDate;
+
   let status = rent.status;
-  if (paid >= totalDue) status = "paid";
-  else if (paid > 0) status = "partial";
-  else status = isPenaltyApplied ? "overdue" : "pending";
+  if (paid >= totalDue) {
+    status = "paid";
+  } else {
+    status = isPastDue ? "overdue" : (paid > 0 ? "partial" : "pending");
+  }
 
   const updatesWithStatus = { ...updates, status };
   if (updates.penaltyAmount !== undefined && updates.isPenaltyApplied === undefined) {
-    updatesWithStatus.isPenaltyApplied = Number(updates.penaltyAmount) > 0;
+    updatesWithStatus.isPenaltyApplied = true;
   }
 
   Object.assign(rent, updatesWithStatus);
