@@ -62,6 +62,8 @@ const discoverPGs = catchAsync(async (req, res) => {
     city: req.query.city,
     pgType: req.query.pgType,
     facilities,
+    minRating: req.query.minRating,
+    onlyWithVacancy: req.query.onlyWithVacancy,
   };
   const options = {
     limit: parseInt(req.query.limit) || 9,

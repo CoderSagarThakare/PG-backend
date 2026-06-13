@@ -338,6 +338,21 @@ const getPostsByPreference = async (userId, options = {}) => {
     }
   }
 
+  if (options.facilities) {
+    const facArray = Array.isArray(options.facilities)
+      ? options.facilities
+      : typeof options.facilities === 'string'
+        ? options.facilities.split(',').map(f => f.trim()).filter(Boolean)
+        : [];
+    if (facArray.length > 0) {
+      pgFilter.facilities = { $all: facArray };
+    }
+  }
+
+  if (options.minRating) {
+    pgFilter.rating = { $gte: Number(options.minRating) };
+  }
+
   // find matching PG ids
   const pgDocs = await PG.find(pgFilter).select("_id facilities");
 
@@ -371,6 +386,10 @@ const getPostsByPreference = async (userId, options = {}) => {
     if (options.maxPrice) {
       postFilter.maxPrice = { $lte: Number(options.maxPrice) };
     }
+  }
+
+  if (options.onlyWithVacancy === 'true' || options.onlyWithVacancy === true) {
+    postFilter.vacancyCount = { $gt: 0 };
   }
 
   // initial fetch without scoring (just to get total count)

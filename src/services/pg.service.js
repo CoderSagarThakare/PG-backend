@@ -368,6 +368,12 @@ const discoverPGs = async (filter = {}, options = {}) => {
     if (filter.facilities && filter.facilities.length > 0) {
       query.facilities = { $all: filter.facilities };
     }
+    if (filter.minRating) {
+      query.rating = { $gte: Number(filter.minRating) };
+    }
+    if (filter.onlyWithVacancy === 'true' || filter.onlyWithVacancy === true) {
+      query.emptyBeds = { $gt: 0 };
+    }
 
     const pgs = await PG.find(query)
       .limit(limit)
