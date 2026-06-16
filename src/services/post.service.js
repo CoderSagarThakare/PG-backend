@@ -17,6 +17,29 @@ const extractS3Key = (urlOrKey) => {
   return urlOrKey;
 };
 
+const getDistanceKm = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Radius of the earth in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c; // Straight-line distance in km
+
+  // Dynamic scaling based on straight-line distance
+  let factor = 1.15;
+  if (d > 7) {
+    factor = 1.4;
+  } else if (d >= 3) {
+    factor = 1.25;
+  }
+
+  const road = d * factor;
+  return Number(road.toFixed(2));
+};
+
 /**
  * Create a Vacancy Post
  * @param {Object} postBody
@@ -315,6 +338,16 @@ const getPostsByPreference = async (userId, options = {}) => {
   const pgFilter = { isActive: true, isDeleted: false };
   if (options.pgId) {
     pgFilter._id = options.pgId;
+  } else if (options.latitude && options.longitude) {
+    pgFilter.location = {
+      $near: {
+        $geometry: { 
+          type: "Point", 
+          coordinates: [Number(options.longitude), Number(options.latitude)] 
+        },
+        $maxDistance: Number(options.radius) || 15000
+      }
+    };
   } else if (options.city) {
     pgFilter["address.city"] = { $regex: new RegExp(options.city, "i") };
   } else if (pref.location) {
@@ -397,10 +430,10 @@ const getPostsByPreference = async (userId, options = {}) => {
 
   // fetch actual posts, project only necessary fields for UI & scoring
   let posts = await Post.find(postFilter)
-    .select("title description vacancyCount occupancyType pgType minPrice maxPrice pgId createdAt images")
+    .select("title description vacancyCount occupancyType pgType minPrice maxPrice pgId createdAt images maleVacancyCount femaleVacancyCount")
     .populate({
       path: "pgId",
-      select: "name address checkInTime checkOutTime facilities rating",
+      select: "name address checkInTime checkOutTime facilities rating location",
       populate: { path: "facilities", select: "name" }
     })
     .limit(limit)
@@ -419,6 +452,33 @@ const getPostsByPreference = async (userId, options = {}) => {
   posts = posts
     .map((post) => {
       let score = 0;
+
+      // calculate and attach distance in km if user coordinates are provided
+      if (options.latitude && options.longitude && post.pgId?.location?.coordinates) {
+        const [lon2, lat2] = post.pgId.location.coordinates;
+        const dist = getDistanceKm(Number(options.latitude), Number(options.longitude), lat2, lon2);
+        post.distanceKm = dist;
+        if (dist <= 2) score += 55;
+        else if (dist <= 5) score += 35;
+        else if (dist <= 10) score += 15;
+      }
+      // fallback to user preference location coordinates
+      else if (
+        pref.location &&
+        pref.location.coordinates &&
+        Array.isArray(pref.location.coordinates) &&
+        pref.location.coordinates.length === 2 &&
+        post.pgId?.location?.coordinates
+      ) {
+        const [lon2, lat2] = post.pgId.location.coordinates;
+        const [lon1, lat1] = pref.location.coordinates;
+        const dist = getDistanceKm(lat1, lon1, lat2, lon2);
+        post.distanceKm = dist;
+        if (dist <= 2) score += 55;
+        else if (dist <= 5) score += 35;
+        else if (dist <= 10) score += 15;
+      }
+
       // pincode match
       if (
         pref.location &&

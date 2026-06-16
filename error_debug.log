@@ -1667,3 +1667,191 @@ Stack: Error: please authenticate
     at module.exports [as JwtVerifier] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
     at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
 
+[2026-06-13T23:23:10.327Z] PATCH /pg/6a131c78790a4727b6a84cfa
+Status: 400
+Error: "location" is not allowed
+Stack: Error: "location" is not allowed
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at Route.dispatch (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:114:3)
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:284:15
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+
+[2026-06-13T23:41:26.075Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545929&longitude=73.776536
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:41:27.162Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545929&longitude=73.776536
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:41:38.411Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545929&longitude=73.776536
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:41:39.508Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545929&longitude=73.776536
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:41:44.540Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545929&longitude=73.776536
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:41:45.622Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545929&longitude=73.776536
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:42:30.172Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545920&longitude=73.776534
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:42:31.251Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545920&longitude=73.776534
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:42:33.753Z] GET /pg/discover?city=bad&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545920&longitude=73.776534
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:42:34.843Z] GET /pg/discover?city=bad&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545920&longitude=73.776534
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:42:36.819Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545920&longitude=73.776534
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:42:37.894Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545920&longitude=73.776534
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:44:59.128Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.508900&longitude=73.762600
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:45:00.198Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.508900&longitude=73.762600
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:45:08.611Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545903&longitude=73.776513
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-13T23:45:09.876Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=18.545903&longitude=73.776513
+Status: 500
+Error: Failed to discover PGs
+Stack: Error: Failed to discover PGs
+    at Object.discoverPGs (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\pg.service.js:424:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\pg.controller.js:76:18
+
+[2026-06-16T17:18:17.768Z] GET /pg/discover?city=&pgType=&minRating=&onlyWithVacancy=false&page=1&limit=12&latitude=&longitude=
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+
+[2026-06-16T17:18:17.791Z] GET /pg/facilities
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+
+[2026-06-16T17:20:46.978Z] GET /profile
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+

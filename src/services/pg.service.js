@@ -16,6 +16,29 @@ const extractS3Key = (urlOrKey) => {
   return urlOrKey;
 };
 
+const getDistanceKm = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Radius of the earth in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c; // Straight-line distance in km
+
+  // Dynamic scaling based on straight-line distance
+  let factor = 1.15;
+  if (d > 7) {
+    factor = 1.4;
+  } else if (d >= 3) {
+    factor = 1.25;
+  }
+
+  const road = d * factor;
+  return Number(road.toFixed(2));
+};
+
 const checkExistingPG = async (ownerId, name) => {
   const existingPG = await PG.findOne({
     ownerId: ownerId,
@@ -99,7 +122,6 @@ const getPGsByOwner = async (staffId, options = {}, isAdmin = false) => {
     let pgs = await PG.find(query)
       .limit(limit)
       .skip(skip)
-      .select("name address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds managerId rating isActive images")
       .populate("managerId", "name")
       .lean();
 
@@ -374,26 +396,53 @@ const discoverPGs = async (filter = {}, options = {}) => {
     if (filter.onlyWithVacancy === 'true' || filter.onlyWithVacancy === true) {
       query.emptyBeds = { $gt: 0 };
     }
+    if (filter.latitude && filter.longitude) {
+      query.location = {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [Number(filter.longitude), Number(filter.latitude)]
+          },
+          $maxDistance: Number(filter.radius) || 15000
+        }
+      };
+    }
 
     const pgs = await PG.find(query)
       .limit(limit)
       .skip(skip)
-      .select("name address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds rating facilities images")
+      .select("name address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds rating facilities images location")
       .populate("facilities", "name")
       .lean();
 
-    // Resolve S3 image keys to signed GET URLs
+    // Resolve S3 image keys to signed GET URLs and calculate distances
     for (const pg of pgs) {
       if (pg.images && pg.images.length > 0) {
         pg.images = await Promise.all(pg.images.map(img => awsService.getFileUrl(img)));
       }
+      if (filter.latitude && filter.longitude && pg.location?.coordinates) {
+        const [lon2, lat2] = pg.location.coordinates;
+        pg.distanceKm = getDistanceKm(Number(filter.latitude), Number(filter.longitude), lat2, lon2);
+      }
     }
 
-    const total = await PG.countDocuments(query);
+    const countQuery = { ...query };
+    if (countQuery.location && countQuery.location.$near) {
+      const nearQuery = countQuery.location.$near;
+      const coordinates = nearQuery.$geometry.coordinates;
+      const maxDistance = nearQuery.$maxDistance || 15000;
+      countQuery.location = {
+        $geoWithin: {
+          $centerSphere: [coordinates, maxDistance / 6378100]
+        }
+      };
+    }
+    const total = await PG.countDocuments(countQuery);
 
     return { pgs, total, limit, page };
   } catch (error) {
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to discover PGs");
+    console.error("Error in discoverPGs:", error);
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, `Failed to discover PGs: ${error.message}`);
   }
 };
 

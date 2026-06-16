@@ -44,6 +44,10 @@ const createPG = {
         "array.min": "Please select at least one facility",
         "any.required": "Facilities are required",
       }),
+    location: Joi.object().keys({
+      type: Joi.string().valid("Point").default("Point"),
+      coordinates: Joi.array().items(Joi.number()).length(2).required(),
+    }).optional(),
     totalRooms: Joi.any(),
     totalBeds: Joi.any(),
     occupiedBeds: Joi.any(),
@@ -96,6 +100,10 @@ const updatePG = {
           "array.min":
             "Please select at least one facility if providing facilities",
         }),
+      location: Joi.object().keys({
+        type: Joi.string().valid("Point"),
+        coordinates: Joi.array().items(Joi.number()).length(2),
+      }).optional(),
       totalRooms: Joi.any(),
       totalBeds: Joi.any(),
       occupiedBeds: Joi.any(),
