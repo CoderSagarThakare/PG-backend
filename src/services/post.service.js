@@ -344,10 +344,12 @@ const getPostsByPreference = async (userId, options = {}) => {
         $geometry: { 
           type: "Point", 
           coordinates: [Number(options.longitude), Number(options.latitude)] 
-        },
-        $maxDistance: Number(options.radius) || 15000
+        }
       }
     };
+    if (options.radius) {
+      pgFilter.location.$near.$maxDistance = Number(options.radius);
+    }
   } else if (options.city) {
     pgFilter["address.city"] = { $regex: new RegExp(options.city, "i") };
   } else if (pref.location) {

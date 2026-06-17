@@ -402,10 +402,12 @@ const discoverPGs = async (filter = {}, options = {}) => {
           $geometry: {
             type: "Point",
             coordinates: [Number(filter.longitude), Number(filter.latitude)]
-          },
-          $maxDistance: Number(filter.radius) || 15000
+          }
         }
       };
+      if (filter.radius) {
+        query.location.$near.$maxDistance = Number(filter.radius);
+      }
     }
 
     const pgs = await PG.find(query)
@@ -430,12 +432,15 @@ const discoverPGs = async (filter = {}, options = {}) => {
     if (countQuery.location && countQuery.location.$near) {
       const nearQuery = countQuery.location.$near;
       const coordinates = nearQuery.$geometry.coordinates;
-      const maxDistance = nearQuery.$maxDistance || 15000;
-      countQuery.location = {
-        $geoWithin: {
-          $centerSphere: [coordinates, maxDistance / 6378100]
-        }
-      };
+      if (nearQuery.$maxDistance) {
+        countQuery.location = {
+          $geoWithin: {
+            $centerSphere: [coordinates, nearQuery.$maxDistance / 6378100]
+          }
+        };
+      } else {
+        delete countQuery.location;
+      }
     }
     const total = await PG.countDocuments(countQuery);
 
