@@ -1178,6 +1178,299 @@
         }
       }
     },
+    "/staff/profile": {
+      "get": {
+        "tags": ["Staff & Payroll"],
+        "summary": "Get authenticated staff member profile details (Owner/Manager/Employee/Admin)",
+        "responses": {
+          "200": { "description": "Staff profile details retrieved successfully" }
+        }
+      },
+      "patch": {
+        "tags": ["Staff & Payroll"],
+        "summary": "Update staff profile details (Owner/Manager/Employee/Admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "mobNo1": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Profile updated successfully" }
+        }
+      }
+    },
+    "/staff/managers": {
+      "get": {
+        "tags": ["Staff & Payroll"],
+        "summary": "List all active managers and owners (Owner/Manager only)",
+        "responses": {
+          "200": { "description": "List of managers and owners retrieved successfully" }
+        }
+      }
+    },
+    "/employees": {
+      "get": {
+        "tags": ["Staff & Payroll"],
+        "summary": "List all staff members associated with the owner's PGs",
+        "responses": {
+          "200": { "description": "List of staff members retrieved successfully" }
+        }
+      },
+      "post": {
+        "tags": ["Staff & Payroll"],
+        "summary": "Register a new staff member under owner's PGs (Owner/Manager only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "pgId", "role", "baseSalary"],
+                "properties": {
+                  "userId": { "type": "string", "description": "User Account ID" },
+                  "pgId": { "type": "string", "description": "PG ID" },
+                  "role": { "type": "string", "enum": ["manager", "employee"] },
+                  "baseSalary": { "type": "number" },
+                  "joiningDate": { "type": "string", "format": "date" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Staff member created successfully" }
+        }
+      }
+    },
+    "/employees/search-users": {
+      "get": {
+        "tags": ["Staff & Payroll"],
+        "summary": "Search system users who are not yet added as staff (Owner/Manager only)",
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Filtered search results" }
+        }
+      }
+    },
+    "/employees/{id}": {
+      "patch": {
+        "tags": ["Staff & Payroll"],
+        "summary": "Update staff salary, status, or notes (Owner/Manager only)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "baseSalary": { "type": "number" },
+                  "status": { "type": "string", "enum": ["active", "suspended", "terminated"] },
+                  "notes": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Staff member details updated successfully" }
+        }
+      },
+      "delete": {
+        "tags": ["Staff & Payroll"],
+        "summary": "Soft-delete / remove staff member registry (Owner/Manager only)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Staff member successfully removed" }
+        }
+      }
+    },
+    "/expenses": {
+      "get": {
+        "tags": ["Staff & Payroll"],
+        "summary": "List expense claims (Owner/Manager sees PG-wide; Employee sees own)",
+        "responses": {
+          "200": { "description": "List of expense claims retrieved successfully" }
+        }
+      },
+      "post": {
+        "tags": ["Staff & Payroll"],
+        "summary": "Submit a new expense reimbursement claim (Any active staff)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["pgId", "title", "amount", "category"],
+                "properties": {
+                  "pgId": { "type": "string" },
+                  "title": { "type": "string" },
+                  "amount": { "type": "number" },
+                  "category": { "type": "string" },
+                  "description": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Expense claim submitted successfully" }
+        }
+      }
+    },
+    "/expenses/{id}/process": {
+      "patch": {
+        "tags": ["Staff & Payroll"],
+        "summary": "Approve or reject a pending expense claim (Owner/Manager only)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["status"],
+                "properties": {
+                  "status": { "type": "string", "enum": ["approved", "rejected"] },
+                  "rejectionReason": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Expense processed successfully" }
+        }
+      }
+    },
+    "/expenses/{id}/pay": {
+      "patch": {
+        "tags": ["Staff & Payroll"],
+        "summary": "Mark approved expense as paid directly (reimbursed) (Owner/Manager only)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Expense marked as reimbursed" }
+        }
+      }
+    },
+    "/expenses/{id}": {
+      "delete": {
+        "tags": ["Staff & Payroll"],
+        "summary": "Delete a pending expense claim (Owner/Manager or Claim Submitter)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Expense claim deleted successfully" }
+        }
+      }
+    },
+    "/staff-payments": {
+      "get": {
+        "tags": ["Staff & Payroll"],
+        "summary": "List monthly payroll records (Accessible by employees/managers/owners)",
+        "responses": {
+          "200": { "description": "List of payroll records retrieved" }
+        }
+      }
+    },
+    "/staff-payments/generate": {
+      "post": {
+        "tags": ["Staff & Payroll"],
+        "summary": "Generate staff payroll records for a specific month (Owner/Manager only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["pgId", "month"],
+                "properties": {
+                  "pgId": { "type": "string" },
+                  "month": { "type": "string", "description": "Format YYYY-MM" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Payroll records generated successfully" }
+        }
+      }
+    },
+    "/staff-payments/{id}/pay": {
+      "patch": {
+        "tags": ["Staff & Payroll"],
+        "summary": "Mark staff payroll record as paid with transaction reference (Owner/Manager only)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["paymentMode"],
+                "properties": {
+                  "paymentMode": { "type": "string", "enum": ["cash", "upi", "bank_transfer"] },
+                  "txnRef": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Payroll record updated to Paid status" }
+        }
+      }
+    },
+    "/staff-payments/{id}": {
+      "patch": {
+        "tags": ["Staff & Payroll"],
+        "summary": "Update specific payroll details (salary, reimbursed expenses amount) (Owner/Manager only)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "salaryPaid": { "type": "number" },
+                  "expenseReimbursement": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Payroll details updated successfully" }
+        }
+      }
+    },
     "/health": {
       "get": {
         "tags": ["System"],
