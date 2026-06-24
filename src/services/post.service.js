@@ -510,7 +510,15 @@ const getPostsByPreference = async (userId, options = {}) => {
 
       return { post, score };
     })
-    .sort((a, b) => b.score - a.score || b.post.createdAt - a.post.createdAt)
+    .sort((a, b) => {
+      // If user supplied GPS coords, sort primarily by proximity/distance ascending
+      if (options.latitude && options.longitude) {
+        const distA = a.post.distanceKm !== undefined ? a.post.distanceKm : Infinity;
+        const distB = b.post.distanceKm !== undefined ? b.post.distanceKm : Infinity;
+        if (distA !== distB) return distA - distB;
+      }
+      return b.score - a.score || b.post.createdAt - a.post.createdAt;
+    })
     .map((p) => p.post);
 
   // Attach enquiry data for this user
