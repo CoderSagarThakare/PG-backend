@@ -24,6 +24,7 @@ const defaultRoutes = [
   { path: "/employees", route: require("./employee.route") }, // Staff member registry
   { path: "/expenses", route: require("./expense.route") }, // Expense claims
   { path: "/staff-payments", route: require("./staffPayment.route") }, // Monthly payroll
+  { path: "/review", route: require("./review.route") },
 ];
 
 defaultRoutes.map((route) => {

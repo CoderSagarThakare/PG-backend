@@ -126,7 +126,7 @@ const queryPosts = async (staffId, options = {}) => {
     }
 
     const posts = await Post.find(finalFilter)
-      .populate("pgId", "name address locationLink rating checkInTime checkOutTime")
+      .populate("pgId", "name address locationLink rating numReviews checkInTime checkOutTime")
       .sort(options.sortBy || "-createdAt")
       .limit(limit)
       .skip(skip)
@@ -158,7 +158,7 @@ const queryPosts = async (staffId, options = {}) => {
  */
 const getPostById = async (postId, staffId) => {
   const post = await Post.findOne({ _id: postId })
-    .populate("pgId", "name rating checkInTime checkOutTime")
+    .populate("pgId", "name rating numReviews checkInTime checkOutTime")
     .populate("ownerId", "name mobNo1 mobNo2 role email picture")
     .populate("managerId", "name mobNo1 mobNo2 role email picture")
     .populate("facilities")
@@ -435,7 +435,7 @@ const getPostsByPreference = async (userId, options = {}) => {
     .select("title description vacancyCount occupancyType pgType minPrice maxPrice pgId createdAt images maleVacancyCount femaleVacancyCount")
     .populate({
       path: "pgId",
-      select: "name address checkInTime checkOutTime facilities rating location",
+      select: "name address checkInTime checkOutTime facilities rating numReviews location",
       populate: { path: "facilities", select: "name" }
     })
     .limit(limit)

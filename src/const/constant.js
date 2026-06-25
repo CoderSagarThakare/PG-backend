@@ -19,6 +19,7 @@ const SCHEMA_NAME = {
   employee: "Employee",
   expense: "Expense",
   staffPayment: "StaffPayment",
+  review: "Review",
 };
 
 const GENDER_TYPES = {

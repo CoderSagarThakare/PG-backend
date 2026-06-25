@@ -85,6 +85,10 @@ const pgSchema = mongoose.Schema(
       default: 0,
       set: (v) => Math.round(v * 10) / 10,
     },
+    numReviews: {
+      type: Number,
+      default: 0,
+    },
     totalBeds: {
       type: Number,
       default: 0,

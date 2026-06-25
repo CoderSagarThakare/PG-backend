@@ -10,3 +10,4 @@ module.exports.enquiryController = require("./enquiry.controller");
 module.exports.employeeController = require("./employee.controller");
 module.exports.roomController = require("./room.controller");
 module.exports.avatarController = require("./avatar.controller");
+module.exports.reviewController = require("./review.controller");

@@ -413,7 +413,7 @@ const discoverPGs = async (filter = {}, options = {}) => {
     const pgs = await PG.find(query)
       .limit(limit)
       .skip(skip)
-      .select("name address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds rating facilities images location")
+      .select("name address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds rating numReviews facilities images location")
       .populate("facilities", "name")
       .lean();
 
