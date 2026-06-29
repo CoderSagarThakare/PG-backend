@@ -379,6 +379,7 @@ const discoverPGs = async (filter = {}, options = {}) => {
     if (filter.city) {
       query.$or = [
         { name: { $regex: filter.city, $options: 'i' } },
+        { pgDisplayId: { $regex: filter.city, $options: 'i' } },
         { 'address.city': { $regex: filter.city, $options: 'i' } },
         { 'address.state': { $regex: filter.city, $options: 'i' } },
         { 'address.landmark': { $regex: filter.city, $options: 'i' } }
@@ -413,7 +414,7 @@ const discoverPGs = async (filter = {}, options = {}) => {
     const pgs = await PG.find(query)
       .limit(limit)
       .skip(skip)
-      .select("name address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds rating numReviews facilities images location")
+      .select("name pgDisplayId address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds rating numReviews facilities images location")
       .populate("facilities", "name")
       .lean();
 

@@ -14,6 +14,11 @@ const pgSchema = mongoose.Schema(
       ref: SCHEMA_NAME.user,
       required: true,
     },
+    pgDisplayId: {
+      type: String,
+      unique: true,
+      index: true,
+    },
     name: {
       type: String,
       required: true,
@@ -156,6 +161,24 @@ const pgSchema = mongoose.Schema(
     timestamps: true,
   },
 );
+
+// Pre-validate hook to automatically generate unique PG display ID
+pgSchema.pre("validate", async function (next) {
+  if (this.isNew && !this.pgDisplayId) {
+    try {
+      const Counter = mongoose.model("Counter");
+      const counter = await Counter.findOneAndUpdate(
+        { _id: "pgDisplayId" },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+      );
+      this.pgDisplayId = `PG-${counter.seq}`;
+    } catch (err) {
+      return next(err);
+    }
+  }
+  next();
+});
 
 // Pre-save hook to ensure PG name consistency (Title Case and Trimming)
 pgSchema.pre("save", function (next) {

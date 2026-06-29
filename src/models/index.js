@@ -11,4 +11,6 @@ module.exports.Employee = require('./employee.model')
 module.exports.Expense = require('./expense.model')
 module.exports.StaffPayment = require('./staffPayment.model')
 module.exports.Review = require('./review.model')
+module.exports.Counter = require('./counter.model')
+
 
