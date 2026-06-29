@@ -35,6 +35,8 @@ const getUser = catchAsync(async (req, res) => {
       mobNo2: user.mobNo2 || null,
       address: user.address,
       isEmailVerified: user.isEmailVerified,
+      vehicleType: user.vehicleType || "none",
+      vehicleNumber: user.vehicleNumber || null,
       createdAt: user.createdAt,
     },
     statusCode: httpStatus.OK,

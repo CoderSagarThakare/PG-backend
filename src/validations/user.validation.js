@@ -1,6 +1,7 @@
 const Joi = require("joi");
 const { GENDER_TYPES } = require("../const/constant");
 const mobileRegex = /^[6-9]\d{9}$/;
+const vehicleNoPattern = /^(?:[a-zA-Z]{2}[0-9]{1,2}[a-zA-Z]{1,2}[0-9]{4}|[0-9]{2}BH[0-9]{4}[a-zA-Z]{2})$/;
 
 const updateUser = {
   body: Joi.object()
@@ -45,8 +46,21 @@ const updateUser = {
         .valid(...Object.values(GENDER_TYPES).filter(g => g !== 'unisex'))
         .allow("", null)
         .optional(),
+      vehicleType: Joi.string().valid("none", "bike", "car").optional(),
+      vehicleNumber: Joi.string()
+        .allow("", null)
+        .optional()
+        .when("vehicleType", {
+          is: Joi.string().valid("bike", "car"),
+          then: Joi.string().pattern(vehicleNoPattern).required().messages({
+            "string.pattern.base": "Please provide a valid Indian vehicle number plate without spaces or hyphens (e.g. MH12AB1234 or 22BH1234AA)",
+            "any.required": "Vehicle number is required when bike or car is selected",
+          }),
+          otherwise: Joi.string().empty("").allow(null).default(null),
+        }),
     })
     .min(1),
 };
 
 module.exports = { updateUser };
+

@@ -61,7 +61,7 @@ const createRoom = async (roomBody) => {
 const getRoomsByPg = async (pgId) => {
   const rooms = await Room.find({ pgId, isDeleted: false }).lean();
   const roomIds = rooms.map(r => r._id);
-  const beds = await Bed.find({ roomId: { $in: roomIds }, isDeleted: false }).populate('userId', 'name email mobNo1');
+  const beds = await Bed.find({ roomId: { $in: roomIds }, isDeleted: false }).populate('userId', 'name email mobNo1 vehicleType vehicleNumber');
 
   // Map beds to their rooms
   return rooms.map(room => ({
@@ -303,7 +303,7 @@ const deleteRoom = async (roomId) => {
 const getEligibleTenants = async (pgId) => {
   const [enquiries, pg] = await Promise.all([
     Enquiry.find({ pgId, status: 'dealDone', isDeleted: false })
-      .populate('userId', 'name email mobNo1 gender')
+      .populate('userId', 'name email mobNo1 gender vehicleType vehicleNumber')
       .lean(),
     PG.findById(pgId).select('pgType'),
   ]);
