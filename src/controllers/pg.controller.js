@@ -57,7 +57,6 @@ const discoverPGs = catchAsync(async (req, res) => {
       facilities = req.query.facilities.split(',');
     }
   }
-  console.log(req.query.latitude,req.query.longitude)
 
   const filter = {
     city: req.query.city,
