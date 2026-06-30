@@ -65,6 +65,9 @@ const createPG = async (pgBody) => {
     if (pgBody.images) {
       pgBody.images = pgBody.images.map(extractS3Key);
     }
+    if (pgBody.paymentQrKey) {
+      pgBody.paymentQrKey = extractS3Key(pgBody.paymentQrKey);
+    }
     const pg = await PG.create({ 
       ...pgBody, 
       totalRooms: 0,
@@ -130,6 +133,11 @@ const getPGsByOwner = async (staffId, options = {}, isAdmin = false) => {
       if (pg.images && pg.images.length > 0) {
         pg.images = await Promise.all(pg.images.map(img => awsService.getFileUrl(img)));
       }
+      if (pg.paymentQrKey) {
+        pg.paymentQrUrl = await awsService.getFileUrl(pg.paymentQrKey);
+      } else {
+        pg.paymentQrUrl = null;
+      }
     }
 
     // Ensure numeric fields are never null for UI stability
@@ -194,6 +202,11 @@ const getPGById = async (pgId, staffId, isAdmin = false) => {
     if (pg.images && pg.images.length > 0) {
       pg.images = await Promise.all(pg.images.map(img => awsService.getFileUrl(img)));
     }
+    if (pg.paymentQrKey) {
+      pg.paymentQrUrl = await awsService.getFileUrl(pg.paymentQrKey);
+    } else {
+      pg.paymentQrUrl = null;
+    }
     return pg;
   } catch (error) {
     console.log("error : ", error);
@@ -230,6 +243,13 @@ const updatePG = async (pgId, staffId, updateBody) => {
         for (const img of removedImages) {
           await awsService.deleteFile(img).catch(() => {});
         }
+      }
+    }
+
+    if (updateBody.hasOwnProperty('paymentQrKey')) {
+      updateBody.paymentQrKey = extractS3Key(updateBody.paymentQrKey);
+      if (oldPg.paymentQrKey && oldPg.paymentQrKey !== updateBody.paymentQrKey) {
+        await awsService.deleteFile(oldPg.paymentQrKey).catch(() => {});
       }
     }
 
@@ -414,7 +434,7 @@ const discoverPGs = async (filter = {}, options = {}) => {
     const pgs = await PG.find(query)
       .limit(limit)
       .skip(skip)
-      .select("name pgDisplayId address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds rating numReviews facilities images location")
+      .select("name pgDisplayId address.city address.state pgType totalRooms totalBeds emptyBeds occupiedBeds rating numReviews facilities images location upiId paymentQrKey")
       .populate("facilities", "name")
       .lean();
 
@@ -422,6 +442,11 @@ const discoverPGs = async (filter = {}, options = {}) => {
     for (const pg of pgs) {
       if (pg.images && pg.images.length > 0) {
         pg.images = await Promise.all(pg.images.map(img => awsService.getFileUrl(img)));
+      }
+      if (pg.paymentQrKey) {
+        pg.paymentQrUrl = await awsService.getFileUrl(pg.paymentQrKey);
+      } else {
+        pg.paymentQrUrl = null;
       }
       if (filter.latitude && filter.longitude && pg.location?.coordinates) {
         const [lon2, lat2] = pg.location.coordinates;

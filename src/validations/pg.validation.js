@@ -52,6 +52,10 @@ const createPG = {
     totalBeds: Joi.any(),
     occupiedBeds: Joi.any(),
     emptyBeds: Joi.any(),
+    upiId: Joi.string().pattern(/^[\w.-]+@[\w.-]+$/).allow("", null).optional().messages({
+      "string.pattern.base": "Please provide a valid UPI ID (e.g. name@bank or phone@upi)."
+    }),
+    paymentQrKey: Joi.string().allow("", null).optional(),
   }),
 };
 
@@ -108,6 +112,10 @@ const updatePG = {
       totalBeds: Joi.any(),
       occupiedBeds: Joi.any(),
       emptyBeds: Joi.any(),
+      upiId: Joi.string().pattern(/^[\w.-]+@[\w.-]+$/).allow("", null).optional().messages({
+        "string.pattern.base": "Please provide a valid UPI ID (e.g. name@bank or phone@upi)."
+      }),
+      paymentQrKey: Joi.string().allow("", null).optional(),
     })
     .min(1),
 };

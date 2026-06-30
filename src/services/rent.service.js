@@ -133,7 +133,7 @@ const recordPayment = async (data, recordedBy) => {
   ).populate("userId", "name email mobNo1")
    .populate("bedId", "bedNumber price")
    .populate("roomId", "roomNumber floor")
-   .populate("pgId", "name lateFee dueDayOfMonth");
+   .populate("pgId", "name lateFee dueDayOfMonth upiId paymentQrKey paymentQrUrl");
 
   return rent;
 };
@@ -167,7 +167,7 @@ const getRentPayments = async ({ pgId, userId, rentMonth, status, paymentMode, p
       .populate("userId", "name email mobNo1")
       .populate("bedId", "bedNumber price")
       .populate("roomId", "roomNumber floor")
-      .populate("pgId", "name lateFee dueDayOfMonth")
+      .populate("pgId", "name lateFee dueDayOfMonth upiId paymentQrKey")
       .populate("recordedBy", "name")
       .sort({ rentMonth: -1, createdAt: -1 })
       .skip(skip)
@@ -175,7 +175,21 @@ const getRentPayments = async ({ pgId, userId, rentMonth, status, paymentMode, p
     RentPayment.countDocuments(filter),
   ]);
 
-  return { records, total, page: Number(page), limit: Number(limit) };
+  const awsService = require("./aws.service");
+  const recordsWithUrls = [];
+  for (const rec of records) {
+    const recObj = rec.toObject();
+    if (recObj.pgId) {
+      if (recObj.pgId.paymentQrKey) {
+        recObj.pgId.paymentQrUrl = await awsService.getFileUrl(recObj.pgId.paymentQrKey);
+      } else {
+        recObj.pgId.paymentQrUrl = null;
+      }
+    }
+    recordsWithUrls.push(recObj);
+  }
+
+  return { records: recordsWithUrls, total, page: Number(page), limit: Number(limit) };
 };
 
 /**

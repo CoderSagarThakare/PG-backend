@@ -152,6 +152,16 @@ const pgSchema = mongoose.Schema(
         ref: SCHEMA_NAME.facilities,
       },
     ],
+    upiId: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    paymentQrKey: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

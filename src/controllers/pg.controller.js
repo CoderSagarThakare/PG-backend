@@ -99,6 +99,17 @@ const getPGImageUploadUrl = catchAsync(async (req, res) => {
   sendResponse(res, { data: { uploadUrl, key }, statusCode: httpStatus.OK });
 });
 
+const getPaymentQrUploadUrl = catchAsync(async (req, res) => {
+  const { fileName, fileType } = req.query;
+  if (!fileName || !fileType) {
+    return res.status(httpStatus.BAD_REQUEST).json({ message: "fileName and fileType are required" });
+  }
+
+  const { awsService } = require("../services");
+  const { uploadUrl, key } = await awsService.getPGPaymentQrUploadUrl(fileName, fileType);
+  sendResponse(res, { data: { uploadUrl, key }, statusCode: httpStatus.OK });
+});
+
 const deletePGImageFile = catchAsync(async (req, res) => {
   const { key } = req.body;
   if (!key) {
@@ -125,6 +136,7 @@ module.exports = {
   getPriceRange,
   getPgOccupancyStats,
   getPGImageUploadUrl,
+  getPaymentQrUploadUrl,
   deletePGImageFile,
 };
 

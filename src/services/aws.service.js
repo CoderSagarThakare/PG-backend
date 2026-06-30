@@ -306,6 +306,10 @@ const validateAadharImageOCR = async (key) => {
   }
 };
 
+const getPGPaymentQrUploadUrl = (fileName, fileType) => {
+  return generateUploadPresignedUrl(fileName, fileType, "public/pgs/payments");
+};
+
 module.exports = {
   generateUploadPresignedUrl,
   getFileUrl,
@@ -317,6 +321,7 @@ module.exports = {
   validateAadharImageOCR,
   getPGShowcaseUploadUrl,
   getPostShowcaseUploadUrl,
+  getPGPaymentQrUploadUrl,
 };
 
  

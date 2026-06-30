@@ -21,6 +21,9 @@ router.get("/discover", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.us
 // Presigned upload url route for PG images
 router.get("/upload-url", auth(ROLE_TYPES.owner, ROLE_TYPES.manager), pgController.getPGImageUploadUrl);
 
+// Presigned upload url route for PG payment QR code
+router.get("/payment-qr-upload-url", auth(ROLE_TYPES.owner, ROLE_TYPES.manager), pgController.getPaymentQrUploadUrl);
+
 // Delete uploaded PG image route
 router.delete("/file", auth(ROLE_TYPES.owner, ROLE_TYPES.manager), pgController.deletePGImageFile);
 
