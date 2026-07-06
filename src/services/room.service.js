@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Room, Bed, PG, Enquiry, Post, User } = require('../models');
+const { Room, Bed, PG, Enquiry, Post, User, Onboarding } = require('../models');
 const postService = require('./post.service');
 const ApiError = require('../utils/ApiError');
 
@@ -301,20 +301,19 @@ const deleteRoom = async (roomId) => {
  * @returns {Promise<Array>}
  */
 const getEligibleTenants = async (pgId) => {
-  const [enquiries, pg] = await Promise.all([
-    Enquiry.find({ pgId, status: 'dealDone', isDeleted: false })
+  const [onboardings, occupiedBeds, pg] = await Promise.all([
+    Onboarding.find({ pgId, status: 'completed', isDeleted: false })
       .populate('userId', 'name email mobNo1 gender vehicleType vehicleNumber')
       .lean(),
+    Bed.find({ pgId, status: 'occupied', isDeleted: false }).select('userId').lean(),
     PG.findById(pgId).select('pgType'),
   ]);
 
-  // Get all users who are already assigned to a bed in this PG
-  const occupiedBeds = await Bed.find({ pgId, status: 'occupied', isDeleted: false });
-  const occupiedUserIds = new Set(occupiedBeds.map(b => b.userId?.toString()));
+  const occupiedUserIds = new Set(occupiedBeds.map(b => b.userId?.toString()).filter(Boolean));
 
   // Extract unique users who don’t have a bed yet
-  const users = enquiries
-    .map(e => e.userId)
+  const users = onboardings
+    .map(o => o.userId)
     .filter(user => user && !occupiedUserIds.has(user._id.toString()));
 
   // Filter by gender compatibility with the PG type

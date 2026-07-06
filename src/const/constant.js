@@ -20,6 +20,8 @@ const SCHEMA_NAME = {
   expense: "Expense",
   staffPayment: "StaffPayment",
   review: "Review",
+  onboarding: "Onboarding",
+  bedAssignment: "BedAssignment",
 };
 
 const GENDER_TYPES = {

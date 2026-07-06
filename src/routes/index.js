@@ -25,6 +25,7 @@ const defaultRoutes = [
   { path: "/expenses", route: require("./expense.route") }, // Expense claims
   { path: "/staff-payments", route: require("./staffPayment.route") }, // Monthly payroll
   { path: "/review", route: require("./review.route") },
+  { path: "/onboarding", route: require("./onboarding.route") }, // Tenant onboarding lifecycle
 ];
 
 defaultRoutes.map((route) => {

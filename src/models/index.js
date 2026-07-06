@@ -12,5 +12,5 @@ module.exports.Expense = require('./expense.model')
 module.exports.StaffPayment = require('./staffPayment.model')
 module.exports.Review = require('./review.model')
 module.exports.Counter = require('./counter.model')
-
-
+module.exports.Onboarding = require('./onboarding.model')
+module.exports.BedAssignment = require('./bedAssignment.model')
