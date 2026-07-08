@@ -3411,3 +3411,397 @@ Stack: Error: /onboarding/tenant/history URL NOT FOUND
     at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
     at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
 
+[2026-07-06T19:57:38.066Z] GET /onboarding/tenant/history
+Status: 404
+Error: /onboarding/tenant/history URL NOT FOUND 
+Stack: Error: /onboarding/tenant/history URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-07-06T19:57:38.086Z] GET /onboarding/tenant/my-pg
+Status: 404
+Error: /onboarding/tenant/my-pg URL NOT FOUND 
+Stack: Error: /onboarding/tenant/my-pg URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-07-06T19:57:42.430Z] GET /onboarding/tenant/my-pg
+Status: 404
+Error: /onboarding/tenant/my-pg URL NOT FOUND 
+Stack: Error: /onboarding/tenant/my-pg URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-07-06T19:57:42.438Z] GET /onboarding/tenant/history
+Status: 404
+Error: /onboarding/tenant/history URL NOT FOUND 
+Stack: Error: /onboarding/tenant/history URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-07-06T19:57:43.469Z] GET /onboarding/tenant/my-pg
+Status: 404
+Error: /onboarding/tenant/my-pg URL NOT FOUND 
+Stack: Error: /onboarding/tenant/my-pg URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-07-06T19:57:43.475Z] GET /onboarding/tenant/history
+Status: 404
+Error: /onboarding/tenant/history URL NOT FOUND 
+Stack: Error: /onboarding/tenant/history URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-07-06T19:58:04.772Z] GET /onboarding/tenant/my-pg
+Status: 404
+Error: /onboarding/tenant/my-pg URL NOT FOUND 
+Stack: Error: /onboarding/tenant/my-pg URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-07-06T19:58:04.778Z] GET /onboarding/tenant/history
+Status: 404
+Error: /onboarding/tenant/history URL NOT FOUND 
+Stack: Error: /onboarding/tenant/history URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-07-06T19:58:05.791Z] GET /onboarding/tenant/my-pg
+Status: 404
+Error: /onboarding/tenant/my-pg URL NOT FOUND 
+Stack: Error: /onboarding/tenant/my-pg URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-07-06T19:58:05.799Z] GET /onboarding/tenant/history
+Status: 404
+Error: /onboarding/tenant/history URL NOT FOUND 
+Stack: Error: /onboarding/tenant/history URL NOT FOUND 
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\app.js:58:8
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:376:14)
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:265:14)
+
+[2026-07-06T20:24:24.570Z] GET /onboarding/6a4c0ebe47ae340aab025bc0
+Status: 404
+Error: Onboarding not found
+Stack: Error: Onboarding not found
+    at Object.getOnboarding (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\onboarding.service.js:312:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:38:22
+
+[2026-07-06T20:24:25.638Z] GET /onboarding/6a4c0ebe47ae340aab025bc0
+Status: 404
+Error: Onboarding not found
+Stack: Error: Onboarding not found
+    at Object.getOnboarding (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\onboarding.service.js:312:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:38:22
+
+[2026-07-07T18:58:48.119Z] POST /auth/login
+Status: 400
+Error: "email" must be a valid email
+Stack: Error: "email" must be a valid email
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at Route.dispatch (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:114:3)
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\index.js:47:12)
+
+[2026-07-07T19:37:49.999Z] POST /auth/login
+Status: 401
+Error: Incorrect email or password
+Stack: Error: Incorrect email or password
+    at Object.loginUserWithEmailAndPassword (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\auth.service.js:18:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\auth.controller.js:37:14
+
+[2026-07-07T19:37:55.248Z] POST /auth/login
+Status: 401
+Error: Incorrect email or password
+Stack: Error: Incorrect email or password
+    at Object.loginUserWithEmailAndPassword (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\auth.service.js:18:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\auth.controller.js:37:14
+
+[2026-07-07T19:38:18.808Z] POST /auth/login
+Status: 401
+Error: Incorrect email or password
+Stack: Error: Incorrect email or password
+    at Object.loginUserWithEmailAndPassword (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\auth.service.js:18:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\auth.controller.js:37:14
+
+[2026-07-07T20:03:03.022Z] GET /onboarding/6a4d58e85e07e0974ff46725
+Status: 404
+Error: Onboarding not found
+Stack: Error: Onboarding not found
+    at Object.getOnboarding (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\onboarding.service.js:312:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:38:22
+
+[2026-07-07T20:03:04.141Z] GET /onboarding/6a4d58e85e07e0974ff46725
+Status: 404
+Error: Onboarding not found
+Stack: Error: Onboarding not found
+    at Object.getOnboarding (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\onboarding.service.js:312:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:38:22
+
+[2026-07-07T20:09:18.280Z] PATCH /enquiry/6a076bb58a999688d34d523b
+Status: 400
+Error: Cannot mark as Deal Done: " Garwa biryani PG -Test Owner 9's Premium Stay 5" is a Female-only PG but Test User 5 is male. Only female tenants can be admitted here.
+Stack: Error: Cannot mark as Deal Done: " Garwa biryani PG -Test Owner 9's Premium Stay 5" is a Female-only PG but Test User 5 is male. Only female tenants can be admitted here.
+    at Object.updateEnquiryById (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\enquiry.service.js:221:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\enquiry.controller.js:60:19
+
+[2026-07-07T20:12:01.313Z] PATCH /enquiry/6a076bb58a999688d34d523b
+Status: 400
+Error: Test User 5 (male) cannot join a Female-only PG.
+Stack: Error: Test User 5 (male) cannot join a Female-only PG.
+    at Object.updateEnquiryById (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\enquiry.service.js:218:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\enquiry.controller.js:60:19
+
+[2026-07-07T20:14:03.080Z] PATCH /onboarding/6a4d5db2349cd845898b2c1c/step
+Status: 400
+Error: Phone number must be a valid 10-digit mobile number
+Stack: Error: Phone number must be a valid 10-digit mobile number
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:18:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-07-07T20:23:33.814Z] PATCH /onboarding/6a4d5db2349cd845898b2c1c/step
+Status: 400
+Error: Phone number must be a valid 10-digit mobile number
+Stack: Error: Phone number must be a valid 10-digit mobile number
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:18:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-07-07T20:41:08.355Z] GET /onboarding/6a4d5db2349cd845898b2c1c
+Status: 404
+Error: Onboarding not found
+Stack: Error: Onboarding not found
+    at Object.getOnboarding (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\onboarding.service.js:312:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:38:22
+
+[2026-07-07T20:41:09.457Z] GET /onboarding/6a4d5db2349cd845898b2c1c
+Status: 404
+Error: Onboarding not found
+Stack: Error: Onboarding not found
+    at Object.getOnboarding (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\onboarding.service.js:312:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:38:22
+
+[2026-07-07T20:43:06.292Z] PATCH /onboarding/6a4d64b3349cd845898b2c4f/step
+Status: 400
+Error: Phone number must be a valid 10-digit mobile number
+Stack: Error: Phone number must be a valid 10-digit mobile number
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:18:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-07-07T20:43:14.047Z] PATCH /onboarding/6a4d64b3349cd845898b2c4f/step
+Status: 400
+Error: Phone number must be a valid 10-digit mobile number
+Stack: Error: Phone number must be a valid 10-digit mobile number
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:18:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-07-07T21:15:13.882Z] PATCH /enquiry/6a4d6bd7349cd845898b2f15
+Status: 400
+Error: Test User 6 (male) cannot join a Female-only PG.
+Stack: Error: Test User 6 (male) cannot join a Female-only PG.
+    at Object.updateEnquiryById (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\enquiry.service.js:218:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\enquiry.controller.js:60:19
+
+[2026-07-07T21:15:23.304Z] PATCH /enquiry/6a4d6bd7349cd845898b2f15
+Status: 400
+Error: Test User 6 (male) cannot join a Female-only PG.
+Stack: Error: Test User 6 (male) cannot join a Female-only PG.
+    at Object.updateEnquiryById (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\enquiry.service.js:218:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\enquiry.controller.js:60:19
+
+[2026-07-07T21:55:16.364Z] PATCH /enquiry/6a4d75b723ade014e236c268
+Status: 400
+Error: User is already onboarded at another PG. Offboard them first.
+Stack: Error: User is already onboarded at another PG. Offboard them first.
+    at Object.updateEnquiryById (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\enquiry.service.js:193:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\enquiry.controller.js:60:19
+
+[2026-07-07T21:55:21.792Z] PATCH /enquiry/6a4d75b723ade014e236c268
+Status: 400
+Error: User is already onboarded at another PG. Offboard them first.
+Stack: Error: User is already onboarded at another PG. Offboard them first.
+    at Object.updateEnquiryById (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\enquiry.service.js:193:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\enquiry.controller.js:60:19
+
+[2026-07-07T21:55:22.775Z] PATCH /enquiry/6a4d75b723ade014e236c268
+Status: 400
+Error: User is already onboarded at another PG. Offboard them first.
+Stack: Error: User is already onboarded at another PG. Offboard them first.
+    at Object.updateEnquiryById (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\enquiry.service.js:193:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\enquiry.controller.js:60:19
+
+[2026-07-07T21:59:10.935Z] PATCH /enquiry/6a4d769a23ade014e236c469
+Status: 400
+Error: Test User 7 (male) cannot join a Female-only PG.
+Stack: Error: Test User 7 (male) cannot join a Female-only PG.
+    at Object.updateEnquiryById (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\enquiry.service.js:218:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\enquiry.controller.js:60:19
+
+[2026-07-08T07:11:50.753Z] GET /profile
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:31:9
+    at strategy.error (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:361:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:111:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:24:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-07-08T07:11:50.933Z] GET /profile
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:31:9
+    at strategy.error (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:361:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:111:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:24:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-07-08T07:11:51.727Z] GET /pg
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:31:9
+    at strategy.error (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:361:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:111:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:24:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-07-08T07:11:51.754Z] GET /onboarding/tenant/my-pg
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:31:9
+    at strategy.error (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:361:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:111:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:24:5)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at runNextTicks (node:internal/process/task_queues:69:3)
+    at listOnTimeout (node:internal/timers:567:9)
+    at process.processTimers (node:internal/timers:541:7)
+
+[2026-07-08T07:11:51.759Z] GET /onboarding/tenant/history
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:31:9
+    at strategy.error (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport\lib\middleware\authenticate.js:361:18)
+    at verified (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:111:41)
+    at JwtStrategy.jwtVerify [as _verify] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\config\passport.js:24:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+

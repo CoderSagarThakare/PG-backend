@@ -13,7 +13,7 @@ const defaultRoutes = [
   { path: "/user", route: userRoute }, // base path for user routes
   { path: "/owner", route: ownerRoute }, // base path for owner routes
   { path: "/manager", route: managerRoute },
-  { path: "/post", route: postRoute }, // base path for post routes
+  { path: "/post", route: postRoute }, // base path for post routes 
   { path: "/enquiry", route: enquiryRoutes }, // base path for enquiry routes
   { path: "/pg", route: require("./pg.route") }, // base path for generic PG routes
   { path: "/room", route: require("./room.route") }, // base path for room routes

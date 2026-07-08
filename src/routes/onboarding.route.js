@@ -28,21 +28,21 @@ const {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * GET /onboarding/my-pg
+ * GET /onboarding/tenant/my-pg
  * Tenant reads their current PG, bed, and onboarding summary.
  */
 router.get(
-  "/my-pg",
+  "/tenant/my-pg",
   auth("user"),
   onboardingController.getMyPGInfo
 );
 
 /**
- * GET /onboarding/my-history
+ * GET /onboarding/tenant/history
  * Tenant reads their full bed-assignment history across all PGs.
  */
 router.get(
-  "/my-history",
+  "/tenant/history",
   auth("user"),
   onboardingController.getBedHistory
 );

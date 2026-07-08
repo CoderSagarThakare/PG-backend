@@ -91,12 +91,12 @@ const deleteRoom = catchAsync(async (req, res) => {
 
 const getEligibleTenants = catchAsync(async (req, res) => {
   const { pgId } = req.params;
-  const users = await roomService.getEligibleTenants(pgId);
+  const { users, genderMismatchCount } = await roomService.getEligibleTenants(pgId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Eligible tenants fetched successfully',
-    data: users
+    data: { users, genderMismatchCount }
   });
 });
 

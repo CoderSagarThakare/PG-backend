@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Room, Bed, PG, Enquiry, Post, User, Onboarding } = require('../models');
+const { Room, Bed, PG, Enquiry, Post, User, Onboarding, BedAssignment } = require('../models');
 const postService = require('./post.service');
 const ApiError = require('../utils/ApiError');
 
@@ -19,6 +19,9 @@ const updatePGBedStats = async (pgId) => {
     { _id: pgId },
     { $set: { totalRooms, totalBeds, occupiedBeds, emptyBeds } }
   );
+
+  // Automatically keep active vacancy post count in sync with emptyBeds
+  await postService.syncPostVacancy(pgId);
 };
 
 /**
@@ -147,6 +150,30 @@ const assignTenant = async (bedId, userId, joiningDate) => {
   // Sync vacancy post count (non-critical — errors are swallowed inside syncPostVacancy)
   await postService.syncPostVacancy(bed.pgId, { userGender: user.gender, delta: -1 });
 
+  // ── Create BedAssignment audit record and finalize Onboarding ─────────────
+  const onboarding = await Onboarding.findOne({
+    userId,
+    pgId: bed.pgId,
+    status: { $ne: 'removed' },
+    isDeleted: false
+  });
+
+  await BedAssignment.create({
+    userId,
+    pgId: bed.pgId,
+    bedId: bed._id,
+    roomId: bed.roomId,
+    onboardingId: onboarding ? onboarding._id : null,
+    startDate: joiningDate ? new Date(joiningDate) : new Date(),
+    shiftReason: 'initial_onboarding',
+  });
+
+  if (onboarding && onboarding.status !== 'completed') {
+    onboarding.status = 'completed';
+    onboarding.completedAt = new Date();
+    await onboarding.save();
+  }
+
   return bed;
 };
 
@@ -166,6 +193,14 @@ const unassignTenant = async (bedId) => {
   const prevUser = bed.userId
     ? await User.findById(bed.userId).select('gender')
     : null;
+
+  // Close the BedAssignment record
+  if (bed.userId) {
+    await BedAssignment.findOneAndUpdate(
+      { userId: bed.userId, pgId: bed.pgId, endDate: null },
+      { endDate: new Date(), shiftReason: 'offboarding' }
+    );
+  }
 
   bed.userId    = null;
   bed.status    = 'available';
@@ -311,20 +346,24 @@ const getEligibleTenants = async (pgId) => {
 
   const occupiedUserIds = new Set(occupiedBeds.map(b => b.userId?.toString()).filter(Boolean));
 
-  // Extract unique users who don’t have a bed yet
-  const users = onboardings
+  // Users with completed onboarding who don't yet have a bed in this PG
+  const unassigned = onboardings
     .map(o => o.userId)
     .filter(user => user && !occupiedUserIds.has(user._id.toString()));
 
-  // Filter by gender compatibility with the PG type
-  return users.filter(user => {
-    if (!user.gender) return false; // no gender = not eligible (must set profile first)
+  // Separate gender-compatible and mismatched users
+  const isGenderCompatible = (user) => {
+    if (!user.gender) return false;
     if (pg.pgType === 'male')     return user.gender === 'male';
     if (pg.pgType === 'female')   return user.gender === 'female';
     if (pg.pgType === 'unisex')   return ['male', 'female'].includes(user.gender);
-    if (pg.pgType === 'coLiving') return true; // any gender
-    return true;
-  });
+    return true; // coLiving or unknown: allow all
+  };
+
+  const eligible = unassigned.filter(isGenderCompatible);
+  const genderMismatchCount = unassigned.filter(u => !isGenderCompatible(u)).length;
+
+  return { users: eligible, genderMismatchCount };
 };
 
 module.exports = {

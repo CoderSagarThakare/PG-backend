@@ -303,7 +303,7 @@ const getOnboarding = async (onboardingId, requestingUser) => {
     )
     .populate(
       "pgId",
-      "name address pgType ownerId managerId rulesDocument dueDayOfMonth"
+      "name address pgType ownerId managerId dueDayOfMonth"
     )
     .populate("enquiryId")
     .lean();
@@ -338,10 +338,6 @@ const getOnboarding = async (onboardingId, requestingUser) => {
     );
   }
 
-  // Attach presigned URL for PDF rules if present
-  if (pg?.rulesDocument?.s3Key) {
-    pg.rulesDocument.url = await awsService.getFileUrl(pg.rulesDocument.s3Key);
-  }
 
   // Attach presigned URL for Aadhaar image if present
   if (onboarding.userId?.aadharFileKey) {
@@ -551,7 +547,7 @@ const offboardTenant = async (onboardingId, offboardData, staffId) => {
  * @returns {Promise<{ assignment: Object, onboarding: Object, pgInfo: Object } | null>}
  */
 const getMyPGInfo = async (userId) => {
-  // Find active bed assignment (endDate null = currently occupied)
+  // 1. Find active bed assignment (endDate null = currently occupied)
   const assignment = await BedAssignment.findOne({
     userId,
     endDate: null,
@@ -559,27 +555,46 @@ const getMyPGInfo = async (userId) => {
   })
     .populate(
       "pgId",
-      "name address pgType upiId paymentQrKey rulesDocument dueDayOfMonth"
+      "name address pgType upiId paymentQrKey dueDayOfMonth"
     )
     .populate("bedId", "bedNumber price")
     .populate("roomId", "roomNumber floor")
     .lean();
 
-  if (!assignment) return null;
+  if (assignment) {
+    const pgInfo = assignment.pgId;
+    if (pgInfo?.paymentQrKey) {
+      pgInfo.paymentQrUrl = await awsService.getFileUrl(pgInfo.paymentQrKey);
+    }
+    const onboarding = await Onboarding.findOne({
+      userId,
+      pgId: pgInfo._id,
+      status: { $ne: "removed" },
+      isDeleted: false,
+    }).lean();
+    return { assignment, onboarding, pgInfo };
+  }
 
-  const pgInfo = assignment.pgId;
+  // 2. Fall back to completed onboarding if no active bed assignment exists
+  const onboarding = await Onboarding.findOne({
+    userId,
+    status: { $ne: "removed" },
+    isDeleted: false,
+  })
+    .populate(
+      "pgId",
+      "name address pgType upiId paymentQrKey dueDayOfMonth"
+    )
+    .lean();
 
-  // Generate signed URL for payment QR code if present
+  if (!onboarding) return null;
+
+  const pgInfo = onboarding.pgId;
   if (pgInfo?.paymentQrKey) {
     pgInfo.paymentQrUrl = await awsService.getFileUrl(pgInfo.paymentQrKey);
   }
 
-  // Fetch associated onboarding record
-  const onboarding = await Onboarding.findOne({
-    _id: assignment.onboardingId,
-  }).lean();
-
-  return { assignment, onboarding, pgInfo };
+  return { assignment: null, onboarding, pgInfo };
 };
 
 /**

@@ -276,42 +276,45 @@ const deletePostById = async (postId, staffId) => {
 };
 
 /**
- * Sync vacancy counts on a PG's active post after a bed assign / unassign.
- * Called by room.service — fails silently if no post exists for the PG.
+ * Sync vacancy counts on a PG's active post based on actual empty beds in inventory.
+ * Called by room.service's updatePGBedStats — fails silently if no post exists for the PG.
  *
  * @param {ObjectId|string} pgId
- * @param {Object}          opts
- * @param {string}          opts.userGender  - 'male' | 'female' | 'transgender' | 'preferNotToSay'
- * @param {number}          opts.delta       - -1 (assign) or +1 (unassign)
+ * @param {Object}          [opts]           - (optional, for backwards compatibility)
  */
-const syncPostVacancy = async (pgId, { userGender, delta }) => {
+const syncPostVacancy = async (pgId, opts = {}) => {
   try {
     const post = await Post.findOne({ pgId, isDeleted: false });
     if (!post) return; // No vacancy post for this PG — silently skip
 
+    const { Bed } = require('../models');
+    const emptyBeds = await Bed.countDocuments({ pgId, status: 'available', isDeleted: false });
+
     if (post.pgType === 'unisex') {
-      // For unisex track male and female separately
-      if (userGender === 'male') {
-        post.maleVacancyCount = Math.max(0, (post.maleVacancyCount || 0) + delta);
-      } else if (userGender === 'female') {
-        post.femaleVacancyCount = Math.max(0, (post.femaleVacancyCount || 0) + delta);
+      // In unisex PGs, we track male and female vacancy counts.
+      // If the sum exceeds total empty beds, adjust/cap them.
+      const currentMale = post.maleVacancyCount || 0;
+      const currentFemale = post.femaleVacancyCount || 0;
+      const totalRequested = currentMale + currentFemale;
+
+      if (totalRequested > emptyBeds) {
+        post.maleVacancyCount = Math.min(currentMale, emptyBeds);
+        post.femaleVacancyCount = Math.max(0, emptyBeds - post.maleVacancyCount);
       }
-      // Recompute total
       post.vacancyCount = (post.maleVacancyCount || 0) + (post.femaleVacancyCount || 0);
     } else {
-      // male / female / coLiving — single counter
-      post.vacancyCount = Math.max(0, post.vacancyCount + delta);
+      // male / female / coLiving — vacancy is exactly the number of empty beds
+      post.vacancyCount = emptyBeds;
     }
 
     // Auto-deactivate when all vacancies filled
     if (post.vacancyCount === 0) {
       post.isActive = false;
     }
-    // NOTE: never auto-reactivate — owner must manually turn it back on
 
     await post.save();
   } catch (err) {
-    // Non-critical — log but do not block the bed assignment flow
+    // Non-critical — log but do not block the flow
     console.error('[syncPostVacancy] Error syncing post vacancy for pgId', pgId, err.message);
   }
 };

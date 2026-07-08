@@ -162,18 +162,6 @@ const pgSchema = mongoose.Schema(
       trim: true,
       default: null,
     },
-    /**
-     * PG house rules document.
-     * Can be either a PDF (stored in S3) or a list of bullet points.
-     * Version is incremented each time the rules are updated.
-     */
-    rulesDocument: {
-      type: { type: String, enum: ["pdf", "bullets"], default: null },
-      s3Key: { type: String, default: null },
-      bulletPoints: [{ type: String }],
-      version: { type: Number, default: 1 },
-      updatedAt: { type: Date },
-    },
     isDeleted: {
       type: Boolean,
       default: false,

@@ -1,4 +1,4 @@
-const { Enquiry, PG, Post, User } = require("../models");
+const { Enquiry, PG, Post, User, Onboarding } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 
@@ -176,7 +176,52 @@ const updateEnquiryById = async (enquiryId, updateBody, staffId) => {
     throw new ApiError(httpStatus.NOT_FOUND, "Enquiry not found");
   }
 
-  // No need for additional access check since getEnquiryById already filters by access
+  // ── Deal Done gate (runs both checks in parallel for efficiency) ────────────
+  if (updateBody.status === "dealDone") {
+    const [activeOnboarding, user, pg] = await Promise.all([
+      Onboarding.findOne({
+        userId: enquiry.userId,
+        status: { $ne: "removed" },
+        isDeleted: false,
+      }).select("_id pgId").lean(),
+      User.findById(enquiry.userId).select("gender name").lean(),
+      PG.findById(enquiry.pgId).select("pgType name").lean(),
+    ]);
+
+    // 1. Block if already onboarded elsewhere
+    if (activeOnboarding) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "User is already onboarded at another PG. Offboard them first."
+      );
+    }
+
+    // 2. Block if user gender is incompatible with the PG type
+    if (user && pg) {
+      const gender = user.gender;
+      const pgType = pg.pgType;
+
+      const pgTypeLabel = { male: "Male-only", female: "Female-only", unisex: "Unisex" };
+      const isIncompatible =
+        (pgType === "male"   && gender !== "male")   ||
+        (pgType === "female" && gender !== "female") ||
+        (pgType === "unisex" && !["male", "female"].includes(gender));
+
+      if (!gender) {
+        throw new ApiError(
+          httpStatus.BAD_REQUEST,
+          `${user.name} has no gender set. Ask them to update their profile first.`
+        );
+      }
+
+      if (isIncompatible) {
+        throw new ApiError(
+          httpStatus.BAD_REQUEST,
+          `${user.name} (${gender}) cannot join a ${pgTypeLabel[pgType] ?? pgType} PG.`
+        );
+      }
+    }
+  }
 
   updateBody.updatedBy = staffId;
 
