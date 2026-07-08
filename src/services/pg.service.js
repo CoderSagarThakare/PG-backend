@@ -1,4 +1,4 @@
-const { PG, Bed, Room, Employee } = require("../models");
+const { PG, Bed, Room, Employee, Post, Onboarding, BedAssignment } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 const awsService = require("./aws.service");
@@ -43,6 +43,7 @@ const checkExistingPG = async (ownerId, name) => {
   const existingPG = await PG.findOne({
     ownerId: ownerId,
     name: name,
+    isDeleted: false,
   });
 
   if (existingPG) {
@@ -177,8 +178,20 @@ const getPGById = async (pgId, staffId, isAdmin = false) => {
     // OR if the user is the specific owner/manager of the property.
     if (!isAdmin) {
       query.isDeleted = false;
-      if (staffId && (staffId.role === 'owner' || staffId.role === 'manager')) {
-        query.$or = [{ ownerId: staffId.id || staffId }, { managerId: staffId.id || staffId }];
+
+      let userObj = staffId;
+      if (staffId) {
+        const staffStr = staffId.id || (typeof staffId === 'object' && staffId._id ? staffId._id.toString() : staffId.toString());
+        if (!staffId.role) {
+          const { User } = require("../models");
+          userObj = await User.findById(staffStr).select("role").lean();
+        }
+      }
+
+      const isOwnerOrManager = userObj && (userObj.role === 'owner' || userObj.role === 'manager');
+      if (isOwnerOrManager) {
+        const staffUserId = userObj._id || userObj.id || staffId;
+        query.$or = [{ ownerId: staffUserId }, { managerId: staffUserId }];
       } else {
         query.isActive = true;
       }
@@ -329,12 +342,35 @@ const updatePG = async (pgId, staffId, updateBody) => {
  */
 const deletePG = async (pgId, staffId) => {
   try {
-    const pg = await PG.findOne({ _id: pgId, $or: [{ ownerId: staffId }, { managerId: staffId }] });
+    const pg = await PG.findOne({ _id: pgId, $or: [{ ownerId: staffId }, { managerId: staffId }], isDeleted: false });
     if (!pg) {
       throw new ApiError(httpStatus.NOT_FOUND, "PG not found");
     }
+
+    // 1. Soft-delete the PG itself
     await PG.updateOne({ _id: pgId }, { isDeleted: true });
+
+    // 2. Soft-delete all Rooms and Beds in this PG
+    await Room.updateMany({ pgId }, { isDeleted: true });
+    await Bed.updateMany({ pgId }, { isDeleted: true });
+
+    // 3. Soft-delete and deactivate all Vacancy Posts in this PG
+    await Post.updateMany({ pgId }, { isDeleted: true, isActive: false });
+
+    // 4. Soft-delete/close all active BedAssignments in this PG
+    await BedAssignment.updateMany(
+      { pgId, endDate: null, isDeleted: false },
+      { $set: { endDate: new Date(), shiftReason: 'pg_deletion' } }
+    );
+
+    // 5. Soft-delete all active/pending Onboarding records in this PG
+    await Onboarding.updateMany(
+      { pgId, status: { $nin: ['completed', 'removed'] }, isDeleted: false },
+      { $set: { status: 'removed', isDeleted: true } }
+    );
   } catch (error) {
+    console.error("Error inside deletePG:", error);
+    if (error instanceof ApiError) throw error;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to delete PG");
   }
 };

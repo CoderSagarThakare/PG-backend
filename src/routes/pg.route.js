@@ -28,7 +28,7 @@ router.get("/payment-qr-upload-url", auth(ROLE_TYPES.owner, ROLE_TYPES.manager),
 router.delete("/file", auth(ROLE_TYPES.owner, ROLE_TYPES.manager), pgController.deletePGImageFile);
 
 // Publicly accessible individual PG details
-router.get("/:pgId", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user, ROLE_TYPES.employee), pgController.getPG);
+router.get("/:pgId", auth(ROLE_TYPES.owner, ROLE_TYPES.manager, ROLE_TYPES.user, ROLE_TYPES.employee), validate(pgValidation.getPG), pgController.getPG);
 
 // Apply auth middleware to all other PG management routes (owner and manager allowed)
 router.use(auth(ROLE_TYPES.owner, ROLE_TYPES.manager));
@@ -47,9 +47,6 @@ router.get("/:pgId/price-range", validate(pgValidation.getPG), pgController.getP
 
 // Get occupancy stats for PG vacancy form
 router.get("/:pgId/occupancy-stats", validate(pgValidation.getPG), pgController.getPgOccupancyStats);
-
-// Get PG Details
-router.get("/:pgId", validate(pgValidation.getPG), pgController.getPG);
 
 // Get all PGs of owner
 router.get("/", validate(pgValidation.listPGs), pgController.getPGs);
