@@ -79,10 +79,14 @@ const updatePost = catchAsync(async (req, res) => {
   if (pg) {
     // Determine the requested total from the update body (fall back to current post values)
     const isUnisex = (req.body.pgType || existingPost.pgType) === 'unisex';
-    const requestedTotal = isUnisex
-      ? (Number(req.body.maleVacancyCount)   ?? existingPost.maleVacancyCount   ?? 0)
-        + (Number(req.body.femaleVacancyCount) ?? existingPost.femaleVacancyCount ?? 0)
-      : Number(req.body.vacancyCount) ?? existingPost.vacancyCount ?? 0;
+    
+    const getUpdateValue = (val, fallback) => (val !== undefined && val !== null ? Number(val) : fallback);
+
+    const maleVal = getUpdateValue(req.body.maleVacancyCount, existingPost.maleVacancyCount);
+    const femaleVal = getUpdateValue(req.body.femaleVacancyCount, existingPost.femaleVacancyCount);
+    const vacancyVal = getUpdateValue(req.body.vacancyCount, existingPost.vacancyCount);
+
+    const requestedTotal = isUnisex ? ((maleVal || 0) + (femaleVal || 0)) : (vacancyVal || 0);
 
     if (requestedTotal > pg.emptyBeds) {
       throw new ApiError(
@@ -108,7 +112,8 @@ const getPostsByPreference = catchAsync(async (req, res) => {
     page: req.query.page || 1,
   };
 
-  const result = await postService.getPostsByPreference(req.user._id, options);
+  const userId = req.user ? (req.user._id || req.user.id) : null;
+  const result = await postService.getPostsByPreference(userId, options);
   sendResponse(res, { data: result, statusCode: httpStatus.OK });
 });
 

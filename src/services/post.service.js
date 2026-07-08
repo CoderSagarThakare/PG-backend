@@ -122,6 +122,10 @@ const queryPosts = async (staffId, options = {}) => {
 
     // If a specific pgId was requested in options, narrow it down
     if (options.pgId) {
+      const isManaged = pgIds.some(id => String(id) === String(options.pgId));
+      if (!isManaged) {
+        throw new ApiError(httpStatus.FORBIDDEN, "Access Denied: You do not manage this PG.");
+      }
       finalFilter.pgId = options.pgId;
     }
 
@@ -157,8 +161,8 @@ const queryPosts = async (staffId, options = {}) => {
  * @returns {Promise<Post>}
  */
 const getPostById = async (postId, staffId) => {
-  const post = await Post.findOne({ _id: postId })
-    .populate("pgId", "name pgDisplayId rating numReviews checkInTime checkOutTime")
+  const post = await Post.findOne({ _id: postId, isDeleted: false })
+    .populate("pgId", "name pgDisplayId rating numReviews checkInTime checkOutTime ownerId managerId")
     .populate("ownerId", "name mobNo1 mobNo2 role email picture")
     .populate("managerId", "name mobNo1 mobNo2 role email picture")
     .populate("facilities")
@@ -169,6 +173,18 @@ const getPostById = async (postId, staffId) => {
       httpStatus.NOT_FOUND,
       "Post not found or has been deleted",
     );
+  }
+
+  if (staffId) {
+    const isOwner = post.pgId.ownerId.toString() === staffId.toString();
+    const isManager = post.pgId.managerId && post.pgId.managerId.toString() === staffId.toString();
+
+    if (!isOwner && !isManager) {
+      throw new ApiError(
+        httpStatus.FORBIDDEN,
+        "Access Denied: You are not authorized to view this post.",
+      );
+    }
   }
 
   // Resolve S3 image keys to signed GET URLs
