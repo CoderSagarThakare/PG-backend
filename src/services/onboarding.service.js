@@ -31,6 +31,7 @@ const {
   PG,
   Enquiry,
   User,
+  RentPayment,
 } = require("../models");
 const awsService = require("./aws.service");
 const roomService = require("./room.service");
@@ -90,7 +91,7 @@ const fetchOnboardingAndPG = async (onboardingId) => {
  */
 const initiateOnboarding = async (enquiryId, processedBy) => {
   // Validate enquiry
-  const enquiry = await Enquiry.findById(enquiryId);
+  const enquiry = await Enquiry.findById(enquiryId).populate("userId");
   if (!enquiry) {
     throw new ApiError(httpStatus.NOT_FOUND, "Enquiry not found");
   }
@@ -99,6 +100,26 @@ const initiateOnboarding = async (enquiryId, processedBy) => {
       httpStatus.BAD_REQUEST,
       "Onboarding can only be initiated for enquiries with status 'dealDone'"
     );
+  }
+
+  // Validate tenant profile is complete (Option A)
+  const user = enquiry.userId;
+  if (user) {
+    const missing = [];
+    if (!user.mobNo1) missing.push("mobile number");
+    if (!user.gender) missing.push("gender");
+    if (!user.aadharNumber) missing.push("Aadhaar number");
+    if (!user.aadharFileKey) missing.push("Aadhaar document copy");
+    if (!user.address?.pincode || !user.address?.city || !user.address?.state) {
+      missing.push("permanent address");
+    }
+
+    if (missing.length > 0) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        `Cannot initiate onboarding: Tenant's profile is incomplete. Missing: ${missing.join(", ")}.`
+      );
+    }
   }
 
   // Guard against duplicate active onboarding for the same enquiry or user/PG — return existing to allow resuming
@@ -519,6 +540,20 @@ const offboardTenant = async (onboardingId, offboardData, staffId) => {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
       "Tenant can only be offboarded from an 'onboarding_completed' stay"
+    );
+  }
+
+  // Verify that the tenant has paid all months of rent (no unpaid records)
+  const unpaidRent = await RentPayment.findOne({
+    userId: onboarding.userId,
+    status: { $in: ["pending", "under_review", "partial", "overdue"] },
+    isDeleted: false,
+  });
+
+  if (unpaidRent) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      `Cannot offboard tenant: There are unpaid or pending rent records for this tenant (Month: ${unpaidRent.rentMonth}, Status: ${unpaidRent.status}). Please clear all outstanding rent first.`
     );
   }
 

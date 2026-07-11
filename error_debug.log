@@ -3953,3 +3953,67 @@ Stack: Error: User is already onboarded at another PG. Offboard them first.
     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
     at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\enquiry.controller.js:60:19
 
+[2026-07-11T17:41:20.091Z] PATCH /enquiry/6a522a004a78ef5ed5b32f20
+Status: 400
+Error: Cannot mark as Deal Done: Tenant's profile is incomplete. Missing: Aadhaar number, Aadhaar document copy, permanent address.
+Stack: Error: Cannot mark as Deal Done: Tenant's profile is incomplete. Missing: Aadhaar number, Aadhaar document copy, permanent address.
+    at Object.updateEnquiryById (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\enquiry.service.js:243:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\enquiry.controller.js:60:19
+
+[2026-07-11T18:34:54.025Z] POST /onboarding/initiate
+Status: 400
+Error: Cannot initiate onboarding: Tenant's profile is incomplete. Missing: Aadhaar number, Aadhaar document copy, permanent address.
+Stack: Error: Cannot initiate onboarding: Tenant's profile is incomplete. Missing: Aadhaar number, Aadhaar document copy, permanent address.
+    at Object.initiateOnboarding (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\onboarding.service.js:117:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:22:22
+
+[2026-07-11T18:35:01.999Z] POST /onboarding/initiate
+Status: 400
+Error: Cannot initiate onboarding: Tenant's profile is incomplete. Missing: Aadhaar number, Aadhaar document copy, permanent address.
+Stack: Error: Cannot initiate onboarding: Tenant's profile is incomplete. Missing: Aadhaar number, Aadhaar document copy, permanent address.
+    at Object.initiateOnboarding (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\onboarding.service.js:117:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:22:22
+
+[2026-07-11T18:38:11.055Z] POST /onboarding/initiate
+Status: 400
+Error: Cannot initiate onboarding: Tenant's profile is incomplete. Missing: Aadhaar number, Aadhaar document copy, permanent address.
+Stack: Error: Cannot initiate onboarding: Tenant's profile is incomplete. Missing: Aadhaar number, Aadhaar document copy, permanent address.
+    at Object.initiateOnboarding (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\onboarding.service.js:117:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:22:22
+
+[2026-07-11T19:20:56.046Z] POST /onboarding/offboard
+Status: 400
+Error: Cannot offboard tenant: There are unpaid or pending rent records for this tenant (Month: 2026-07, Status: pending). Please clear all outstanding rent first.
+Stack: Error: Cannot offboard tenant: There are unpaid or pending rent records for this tenant (Month: 2026-07, Status: pending). Please clear all outstanding rent first.
+    at Object.offboardTenant (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\onboarding.service.js:554:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:127:22
+
+[2026-07-11T19:27:11.985Z] POST /onboarding/offboard
+Status: 400
+Error: Cannot offboard tenant: There are unpaid or pending rent records for this tenant (Month: 2026-07, Status: pending). Please clear all outstanding rent first.
+Stack: Error: Cannot offboard tenant: There are unpaid or pending rent records for this tenant (Month: 2026-07, Status: pending). Please clear all outstanding rent first.
+    at Object.offboardTenant (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\onboarding.service.js:554:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:127:22
+
+[2026-07-11T19:37:24.165Z] POST /onboarding/offboard
+Status: 400
+Error: Cannot offboard tenant: There are unpaid or pending rent records for this tenant (Month: 2026-07, Status: pending). Please clear all outstanding rent first.
+Stack: Error: Cannot offboard tenant: There are unpaid or pending rent records for this tenant (Month: 2026-07, Status: pending). Please clear all outstanding rent first.
+    at Object.offboardTenant (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\onboarding.service.js:554:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:127:22
+
+[2026-07-11T19:37:24.422Z] POST /onboarding/offboard
+Status: 400
+Error: Cannot offboard tenant: There are unpaid or pending rent records for this tenant (Month: 2026-07, Status: pending). Please clear all outstanding rent first.
+Stack: Error: Cannot offboard tenant: There are unpaid or pending rent records for this tenant (Month: 2026-07, Status: pending). Please clear all outstanding rent first.
+    at Object.offboardTenant (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\onboarding.service.js:554:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:127:22
+

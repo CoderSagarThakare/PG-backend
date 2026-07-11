@@ -216,7 +216,7 @@ const updateEnquiryById = async (enquiryId, updateBody, staffId) => {
         status: { $nin: ["removed", "cancelled"] },
         isDeleted: false,
       }).select("_id pgId").lean(),
-      User.findById(enquiry.userId).select("gender name").lean(),
+      User.findById(enquiry.userId).select("gender name mobNo1 aadharNumber aadharFileKey address").lean(),
       PG.findById(enquiry.pgId).select("pgType name").lean(),
     ]);
 
