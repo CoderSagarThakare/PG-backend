@@ -39,11 +39,13 @@ const onboardingSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: [
-        "initiated",        // Step 0: record created
-        "docs_reviewed",    // Step 1: documents reviewed
-        "deposit_confirmed",// Step 2: security deposit received
-        "completed",        // Step 3: bed assigned, tenant moved in
-        "removed",          // Offboarded
+        "initiated",            // Step 0: record created
+        "docs_reviewed",        // Step 1: documents reviewed
+        "deposit_confirmed",    // Step 2: security deposit received
+        "onboarding_completed", // Step 3: bed assigned, tenant moved in (renamed from 'completed')
+        "settlement_pending",   // Step 4: offboarding initiated, awaiting tenant confirmation
+        "removed",              // Step 5: tenant confirmed receipt, stay closed
+        "cancelled",            // Step 6: onboarding reset/canceled before completion
       ],
       default: "initiated",
     },
@@ -79,9 +81,12 @@ const onboardingSchema = new mongoose.Schema(
     /** Agreed joining date */
     joiningDate: { type: Date },
 
-    // ── Offboarding details (populated when status → 'removed') ──────────
+    // ── Offboarding details (populated when status → 'settlement_pending' / 'removed') ──
     offboarding: {
-      vacatingDate: { type: Date },
+      /** The date the tenant physically exits / vacates (renamed from vacatingDate) */
+      exitDate: { type: Date },
+      /** Reason given by owner for offboarding */
+      reason: { type: String, trim: true },
       /** Monetary deductions from security deposit (damage, dues, etc.) */
       deductions: { type: Number, default: 0 },
       deductionNotes: { type: String },
@@ -89,6 +94,7 @@ const onboardingSchema = new mongoose.Schema(
       /** refundAmount = securityDepositAmount - deductions - pendingRent (≥0) */
       refundAmount: { type: Number, default: 0 },
       settlementReference: { type: String },
+      /** Set when tenant confirms they received the refund (status → 'removed') */
       settlementConfirmedAt: { type: Date },
       processedBy: { type: ObjectId, ref: SCHEMA_NAME.user },
     },
@@ -109,14 +115,14 @@ const onboardingSchema = new mongoose.Schema(
 // Fast lookup by enquiry + soft-delete filter
 onboardingSchema.index({ enquiryId: 1, isDeleted: 1 });
 
-// Strictly guarantee only one active (non-completed, non-removed) onboarding exists per enquiry
+// Strictly guarantee only one active (non-completed, non-removed, non-cancelled) onboarding exists per enquiry
 onboardingSchema.index(
   { enquiryId: 1 },
   {
     unique: true,
     partialFilterExpression: {
       isDeleted: false,
-      status: { $nin: ["completed", "removed"] }
+      status: { $nin: ["onboarding_completed", "settlement_pending", "removed", "cancelled"] }
     }
   }
 );

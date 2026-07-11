@@ -154,7 +154,7 @@ const assignTenant = async (bedId, userId, joiningDate) => {
   const onboarding = await Onboarding.findOne({
     userId,
     pgId: bed.pgId,
-    status: { $ne: 'removed' },
+    status: { $nin: ['removed', 'cancelled'] },
     isDeleted: false
   });
 
@@ -168,8 +168,8 @@ const assignTenant = async (bedId, userId, joiningDate) => {
     shiftReason: 'initial_onboarding',
   });
 
-  if (onboarding && onboarding.status !== 'completed') {
-    onboarding.status = 'completed';
+  if (onboarding && onboarding.status !== 'onboarding_completed') {
+    onboarding.status = 'onboarding_completed';
     onboarding.completedAt = new Date();
     await onboarding.save();
   }
@@ -337,7 +337,7 @@ const deleteRoom = async (roomId) => {
  */
 const getEligibleTenants = async (pgId) => {
   const [onboardings, occupiedBeds, pg] = await Promise.all([
-    Onboarding.find({ pgId, status: 'completed', isDeleted: false })
+    Onboarding.find({ pgId, status: 'onboarding_completed', isDeleted: false })
       .populate('userId', 'name email mobNo1 gender vehicleType vehicleNumber')
       .lean(),
     Bed.find({ pgId, status: 'occupied', isDeleted: false }).select('userId').lean(),

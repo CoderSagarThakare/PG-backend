@@ -14,11 +14,13 @@
  *   7. getOnboarding        — full detail view with rich population
  *   8. listOnboardings      — paginated PG-level list
  *   9. shiftBed             — move an active tenant to a different bed
- *  10. offboardTenant       — vacate tenant, settle deposit, close assignment
- *  11. getPGRulesUploadUrl  — presigned S3 PUT URL for rules PDF
- *  12. updatePGRules        — save rules metadata on the PG document
- *  13. getMyPGInfo          — tenant reads their own PG/bed/onboarding info
- *  14. getBedHistory        — full bed history for a tenant
+ *  10. offboardTenant       — owner initiates: sets settlement_pending, vacates bed, captures breakdown
+ *  11. confirmSettlement    — tenant confirms receipt; status → removed
+ *  12. queryTenants         — central tenant directory listing for owners
+ *  13. getPGRulesUploadUrl  — presigned S3 PUT URL for rules PDF
+ *  14. updatePGRules        — save rules metadata on the PG document
+ *  15. getMyPGInfo          — tenant reads their own PG/bed/onboarding info
+ *  16. getBedHistory        — full bed history for a tenant
  */
 
 const httpStatus = require("http-status");
@@ -105,7 +107,7 @@ const initiateOnboarding = async (enquiryId, processedBy) => {
       { enquiryId },
       { userId: enquiry.userId, pgId: enquiry.pgId }
     ],
-    status: { $ne: "removed" },
+    status: { $nin: ["removed", "cancelled"] },
   });
   if (existing) {
     return existing;
@@ -203,9 +205,9 @@ const updateOnboardingStep = async (onboardingId, staffId, stepData) => {
     onboarding.status = "deposit_confirmed";
   }
 
-  // completed: once joiningDate is set, the onboarding wizard is complete
+  // onboarding_completed: once joiningDate is set, the onboarding wizard is complete
   if (onboarding.joiningDate) {
-    onboarding.status = "completed";
+    onboarding.status = "onboarding_completed";
     if (!onboarding.completedAt) {
       onboarding.completedAt = new Date();
     }
@@ -236,11 +238,11 @@ const assignBed = async (onboardingId, bedId, staffId) => {
   const { onboarding, pg } = await fetchOnboardingAndPG(onboardingId);
   assertStaffAccessToPG(pg, staffId);
 
-  // ── Hard gates ────────────────────────────────────────────────────────────
-  if (onboarding.status !== "completed") {
+  // ── Hard gates ───────────────────────────────────────────────────────────────
+  if (onboarding.status !== "onboarding_completed") {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      "Bed can only be assigned to fully onboarded tenants (status: completed)"
+      "Bed can only be assigned to fully onboarded tenants (status: onboarding_completed)"
     );
   }
 
@@ -269,8 +271,8 @@ const assignBed = async (onboardingId, bedId, staffId) => {
     shiftReason: "initial_onboarding",
   });
 
-  // ── Finalize onboarding ───────────────────────────────────────────────────
-  onboarding.status = "completed";
+  // ── Finalize onboarding ───────────────────────────────────────────────────────────
+  onboarding.status = "onboarding_completed";
   onboarding.completedAt = new Date();
 
   // Copy bed price as agreed rent, and copy dueDay from PG
@@ -339,6 +341,18 @@ const getOnboarding = async (onboardingId, requestingUser) => {
   }
 
 
+  // Attach active bed if stay is completed/active
+  const activeBed = await Bed.findOne({
+    pgId: onboarding.pgId?._id || onboarding.pgId,
+    userId: onboarding.userId?._id || onboarding.userId,
+    status: "occupied",
+    isDeleted: false,
+  }).populate("roomId").lean();
+
+  if (activeBed) {
+    onboarding.currentBedId = activeBed;
+  }
+
   // Attach presigned URL for Aadhaar image if present
   if (onboarding.userId?.aadharFileKey) {
     onboarding.userId.aadharFileUrl = await awsService.getFileUrl(onboarding.userId.aadharFileKey);
@@ -369,7 +383,7 @@ const listOnboardings = async (pgId, filters, staffId) => {
 
   const { status, page = 1, limit = 10 } = filters;
   const query = { pgId };
-  if (status) query.status = status;
+  if (status && status !== "all") query.status = status;
 
   const skip = (page - 1) * limit;
 
@@ -382,6 +396,28 @@ const listOnboardings = async (pgId, filters, staffId) => {
       .lean(),
     Onboarding.countDocuments(query),
   ]);
+
+  const userIds = results.map(o => o.userId?._id || o.userId).filter(Boolean);
+  const activeBeds = await Bed.find({
+    pgId,
+    userId: { $in: userIds },
+    status: "occupied",
+    isDeleted: false,
+  }).populate("roomId").lean();
+
+  const bedMap = new Map();
+  for (const bed of activeBeds) {
+    if (bed.userId) {
+      bedMap.set(bed.userId.toString(), bed);
+    }
+  }
+
+  for (const o of results) {
+    const uId = o.userId?._id || o.userId;
+    if (uId && bedMap.has(uId.toString())) {
+      o.currentBedId = bedMap.get(uId.toString());
+    }
+  }
 
   return { results, page: Number(page), limit: Number(limit), totalResults };
 };
@@ -463,14 +499,15 @@ const shiftBed = async (
 };
 
 /**
- * 10. Offboard a tenant — settle accounts and vacate their bed.
+ * 10. Offboard a tenant — owner-initiated step.
  *
- * Calculates: refundAmount = securityDepositAmount - deductions - pendingRent (≥ 0)
- * Sets onboarding status → 'removed'
- * Closes BedAssignment + calls roomService.unassignTenant
+ * Sets status to 'settlement_pending' and immediately:
+ *  - closes the BedAssignment (endDate = exitDate)
+ *  - vacates the bed via roomService.unassignTenant
+ * Does NOT yet set settlementConfirmedAt (that happens in confirmSettlement).
  *
  * @param {string} onboardingId
- * @param {Object} offboardData  - { vacatingDate, deductions, deductionNotes, pendingRent, settlementReference }
+ * @param {Object} offboardData  - { exitDate, reason, deductions, deductionNotes, pendingRent, settlementReference }
  * @param {string} staffId
  * @returns {Promise<Onboarding>}
  */
@@ -478,15 +515,16 @@ const offboardTenant = async (onboardingId, offboardData, staffId) => {
   const { onboarding, pg } = await fetchOnboardingAndPG(onboardingId);
   assertStaffAccessToPG(pg, staffId);
 
-  if (onboarding.status !== "completed") {
+  if (onboarding.status !== "onboarding_completed") {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      "Tenant can only be offboarded from a 'completed' onboarding"
+      "Tenant can only be offboarded from an 'onboarding_completed' stay"
     );
   }
 
   const {
-    vacatingDate,
+    exitDate,
+    reason,
     deductions = 0,
     deductionNotes,
     pendingRent = 0,
@@ -497,28 +535,29 @@ const offboardTenant = async (onboardingId, offboardData, staffId) => {
     onboarding.financialTerms?.securityDepositAmount ?? 0;
   const refundAmount = Math.max(
     0,
-    securityDeposit - deductions - pendingRent
+    securityDeposit - Number(deductions) - Number(pendingRent)
   );
 
-  // Populate offboarding subdocument
+  // Populate offboarding subdocument (settlement not yet confirmed)
   onboarding.offboarding = {
-    vacatingDate,
-    deductions,
+    exitDate,
+    reason,
+    deductions: Number(deductions),
     deductionNotes,
-    pendingRent,
+    pendingRent: Number(pendingRent),
     refundAmount,
     settlementReference,
-    settlementConfirmedAt: new Date(),
+    settlementConfirmedAt: null,
     processedBy: staffId,
   };
-  onboarding.status = "removed";
+  onboarding.status = "settlement_pending";
 
   await onboarding.save();
 
-  // Close the BedAssignment record
+  // Close the BedAssignment record immediately
   await BedAssignment.findOneAndUpdate(
     { userId: onboarding.userId, pgId: onboarding.pgId, endDate: null },
-    { endDate: vacatingDate, shiftReason: "offboarding" }
+    { endDate: exitDate || new Date(), shiftReason: "offboarding" }
   );
 
   // Vacate the bed in the Bed collection
@@ -533,6 +572,141 @@ const offboardTenant = async (onboardingId, offboardData, staffId) => {
   }
 
   return onboarding;
+};
+
+/**
+ * 11. Confirm settlement — tenant-initiated final step.
+ *
+ * The tenant confirms they received the refund from the owner.
+ * Sets settlementConfirmedAt and moves status to 'removed'.
+ *
+ * @param {string} onboardingId
+ * @param {string} userId  - must match onboarding.userId
+ * @returns {Promise<Onboarding>}
+ */
+const confirmSettlement = async (onboardingId, userId) => {
+  const onboarding = await Onboarding.findById(onboardingId);
+  if (!onboarding) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Onboarding record not found");
+  }
+
+  // Ensure only the correct tenant can confirm
+  if (onboarding.userId.toString() !== userId.toString()) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "Access denied: you are not the tenant for this onboarding"
+    );
+  }
+
+  if (onboarding.status !== "settlement_pending") {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Settlement can only be confirmed when status is 'settlement_pending'"
+    );
+  }
+
+  onboarding.offboarding.settlementConfirmedAt = new Date();
+  onboarding.status = "removed";
+
+  await onboarding.save();
+  return onboarding;
+};
+
+/**
+ * 12. Query Tenants — central tenant directory for owners/managers.
+ *
+ * Returns paginated list of onboardings across all PGs managed by staffId,
+ * with optional search and status filters.
+ *
+ * @param {Object} filters  - { search, pgId, status, page, limit }
+ * @param {string} staffId
+ * @returns {Promise<{ results: Array, page: number, limit: number, totalResults: number }>}
+ */
+const queryTenants = async (filters, staffId) => {
+  // Find all PGs this staff member manages
+  const managedPGs = await PG.find({
+    $or: [{ ownerId: staffId }, { managerId: staffId }],
+    isDeleted: false,
+  }).select("_id name");
+
+  if (!managedPGs.length) {
+    return { results: [], page: 1, limit: 10, totalResults: 0 };
+  }
+
+  const managedPGIds = managedPGs.map((p) => p._id);
+
+  const { search, pgId, status, page = 1, limit = 20 } = filters;
+
+  // Build query
+  const query = { pgId: { $in: managedPGIds } };
+
+  // Filter by specific PG if provided (must be in managed list)
+  if (pgId) {
+    if (!managedPGIds.some((id) => id.toString() === pgId)) {
+      throw new ApiError(httpStatus.FORBIDDEN, "Access denied to this PG");
+    }
+    query.pgId = pgId;
+  }
+
+  // Status filter — default to active tenants only
+  if (status && status !== "all") {
+    query.status = status;
+  } else if (!status) {
+    query.status = "onboarding_completed";
+  }
+
+  const skip = (Number(page) - 1) * Number(limit);
+
+  let queryBuilder = Onboarding.find(query)
+    .populate("userId", "name email mobNo1 mobNo2 gender picture profileImageKey")
+    .populate("pgId", "name address")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(Number(limit));
+
+  let [results, totalResults] = await Promise.all([
+    queryBuilder.lean(),
+    Onboarding.countDocuments(query),
+  ]);
+
+  const userIds = results.map(o => o.userId?._id || o.userId).filter(Boolean);
+  const activeBeds = await Bed.find({
+    pgId: { $in: managedPGIds },
+    userId: { $in: userIds },
+    status: "occupied",
+    isDeleted: false,
+  }).populate("roomId").lean();
+
+  const bedMap = new Map();
+  for (const bed of activeBeds) {
+    if (bed.userId && bed.pgId) {
+      bedMap.set(`${bed.userId.toString()}_${bed.pgId.toString()}`, bed);
+    }
+  }
+
+  for (const o of results) {
+    const uId = o.userId?._id || o.userId;
+    const pId = o.pgId?._id || o.pgId;
+    if (uId && pId) {
+      const key = `${uId.toString()}_${pId.toString()}`;
+      if (bedMap.has(key)) {
+        o.currentBedId = bedMap.get(key);
+      }
+    }
+  }
+
+  // Apply in-memory search on name / phone if provided
+  if (search) {
+    const term = search.toLowerCase();
+    results = results.filter(
+      (o) =>
+        o.userId?.name?.toLowerCase().includes(term) ||
+        o.userId?.mobNo1?.includes(term) ||
+        o.userId?.email?.toLowerCase().includes(term)
+    );
+  }
+
+  return { results, page: Number(page), limit: Number(limit), totalResults };
 };
 
 
@@ -569,7 +743,7 @@ const getMyPGInfo = async (userId) => {
     const onboarding = await Onboarding.findOne({
       userId,
       pgId: pgInfo._id,
-      status: { $ne: "removed" },
+      status: { $nin: ["removed", "cancelled"] },
       isDeleted: false,
     }).lean();
     return { assignment, onboarding, pgInfo };
@@ -578,7 +752,7 @@ const getMyPGInfo = async (userId) => {
   // 2. Fall back to completed onboarding if no active bed assignment exists
   const onboarding = await Onboarding.findOne({
     userId,
-    status: { $ne: "removed" },
+    status: { $nin: ["removed", "cancelled"] },
     isDeleted: false,
   })
     .populate(
@@ -624,6 +798,8 @@ module.exports = {
   listOnboardings,
   shiftBed,
   offboardTenant,
+  confirmSettlement,
+  queryTenants,
   getMyPGInfo,
   getBedHistory,
 };

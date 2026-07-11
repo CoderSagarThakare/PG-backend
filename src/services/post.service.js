@@ -426,7 +426,7 @@ const getPostsByPreference = async (userId, options = {}) => {
   }
 
   if (options.occupancyType) {
-    postFilter.occupancyType = options.occupancyType;
+    postFilter.occupancyTypes = options.occupancyType;
   }
 
   if (options.title) {
@@ -451,7 +451,7 @@ const getPostsByPreference = async (userId, options = {}) => {
 
   // fetch actual posts, project only necessary fields for UI & scoring
   let posts = await Post.find(postFilter)
-    .select("title description vacancyCount occupancyType pgType minPrice maxPrice pgId createdAt images maleVacancyCount femaleVacancyCount")
+    .select("title description vacancyCount occupancyTypes pgType minPrice maxPrice pgId createdAt images maleVacancyCount femaleVacancyCount")
     .populate({
       path: "pgId",
       select: "name pgDisplayId address checkInTime checkOutTime facilities rating numReviews location",

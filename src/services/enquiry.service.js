@@ -176,12 +176,44 @@ const updateEnquiryById = async (enquiryId, updateBody, staffId) => {
     throw new ApiError(httpStatus.NOT_FOUND, "Enquiry not found");
   }
 
+  const oldStatus = enquiry.status;
+  const newStatus = updateBody.status;
+
+  // If status changes away from dealDone, clean up pending onboarding record
+  if (oldStatus === "dealDone" && newStatus && newStatus !== "dealDone") {
+    const activeStay = await Onboarding.findOne({
+      enquiryId: enquiry._id,
+      status: { $in: ["onboarding_completed", "settlement_pending"] },
+      isDeleted: false,
+    });
+
+    if (activeStay) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Cannot change enquiry status: Tenant onboarding is already completed. Please offboard the tenant first."
+      );
+    }
+
+    // Safe to soft-delete pending onboarding
+    const pendingOnboarding = await Onboarding.findOne({
+      enquiryId: enquiry._id,
+      status: { $in: ["initiated", "docs_reviewed", "deposit_confirmed"] },
+      isDeleted: false,
+    });
+
+    if (pendingOnboarding) {
+      pendingOnboarding.isDeleted = true;
+      pendingOnboarding.status = "cancelled";
+      await pendingOnboarding.save();
+    }
+  }
+
   // ── Deal Done gate (runs both checks in parallel for efficiency) ────────────
-  if (updateBody.status === "dealDone") {
+  if (newStatus === "dealDone") {
     const [activeOnboarding, user, pg] = await Promise.all([
       Onboarding.findOne({
         userId: enquiry.userId,
-        status: { $ne: "removed" },
+        status: { $nin: ["removed", "cancelled"] },
         isDeleted: false,
       }).select("_id pgId").lean(),
       User.findById(enquiry.userId).select("gender name").lean(),

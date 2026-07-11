@@ -3,7 +3,7 @@
  *
  * IMPORTANT — Route ordering:
  *   Static/specific paths MUST be declared before parameterised ones.
- *   e.g. /my-pg, /my-history, /shift-bed, /offboard, /pg/:pgId/...
+ *   e.g. /my-pg, /my-history, /shift-bed, /offboard, /pg/:pgId/..., /tenants
  *   must all come before /:id and /:id/... to avoid Express treating
  *   "my-pg" or "shift-bed" as an :id value.
  */
@@ -20,6 +20,8 @@ const {
   assignBed,
   shiftBed,
   offboardTenant,
+  confirmSettlement,
+  queryTenants,
   getOnboardings,
 } = require("../validations/onboarding.validation");
 
@@ -45,6 +47,17 @@ router.get(
   "/tenant/history",
   auth("user"),
   onboardingController.getBedHistory
+);
+
+/**
+ * POST /onboarding/confirm-settlement
+ * Tenant confirms they received the settlement refund → status moves to 'removed'.
+ */
+router.post(
+  "/confirm-settlement",
+  auth("user"),
+  validate(confirmSettlement),
+  onboardingController.confirmSettlement
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -75,7 +88,8 @@ router.post(
 
 /**
  * POST /onboarding/offboard
- * Offboard a tenant — settle deposit and vacate their bed.
+ * Owner initiates offboarding — captures settlement details and frees bed.
+ * Status moves to 'settlement_pending'. Tenant must then confirm.
  */
 router.post(
   "/offboard",
@@ -84,11 +98,20 @@ router.post(
   onboardingController.offboardTenant
 );
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 3. PG-level rules routes (static sub-paths — must come BEFORE /:id)
-// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * GET /onboarding/tenants
+ * Central tenant directory — list all tenants across managed PGs.
+ */
+router.get(
+  "/tenants",
+  auth("owner", "manager"),
+  validate(queryTenants),
+  onboardingController.listTenants
+);
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// 3. PG-level routes (static sub-paths — must come BEFORE /:id)
+// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * GET /onboarding/pg/:pgId
@@ -125,8 +148,6 @@ router.patch(
   validate(updateStep),
   onboardingController.updateStep
 );
-
-
 
 /**
  * POST /onboarding/:id/assign-bed

@@ -81,8 +81,6 @@ const updateStep = catchAsync(async (req, res) => {
   });
 });
 
-
-
 /**
  * POST /onboarding/:id/assign-bed
  * Final gated step — assigns a bed to the tenant.
@@ -121,7 +119,8 @@ const shiftBed = catchAsync(async (req, res) => {
 
 /**
  * POST /onboarding/offboard
- * Offboard a tenant — settle deposit and vacate their bed.
+ * Owner initiates offboarding: captures settlement details, frees bed,
+ * sets status = 'settlement_pending' for tenant confirmation.
  */
 const offboardTenant = catchAsync(async (req, res) => {
   const { onboardingId, ...offboardData } = req.body;
@@ -131,8 +130,30 @@ const offboardTenant = catchAsync(async (req, res) => {
     req.user._id
   );
   return sendResponse(res, {
-    message: "Tenant offboarded successfully",
+    message: "Offboarding initiated. Awaiting tenant confirmation.",
     data: onboarding,
+  });
+});
+
+/**
+ * GET /onboarding/tenants
+ * Central tenant directory — returns paginated tenants across all managed PGs.
+ * Accessible by owner/manager only.
+ */
+const listTenants = catchAsync(async (req, res) => {
+  const result = await onboardingService.queryTenants(
+    {
+      search: req.query.search,
+      pgId: req.query.pgId,
+      status: req.query.status,
+      page: req.query.page,
+      limit: req.query.limit,
+    },
+    req.user._id
+  );
+  return sendResponse(res, {
+    message: "Tenants fetched successfully",
+    data: result,
   });
 });
 
@@ -141,7 +162,7 @@ const offboardTenant = catchAsync(async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * GET /onboarding/my-pg
+ * GET /onboarding/tenant/my-pg
  * Tenant reads their current PG, bed, and onboarding info.
  */
 const getMyPGInfo = catchAsync(async (req, res) => {
@@ -153,7 +174,7 @@ const getMyPGInfo = catchAsync(async (req, res) => {
 });
 
 /**
- * GET /onboarding/my-history
+ * GET /onboarding/tenant/history
  * Tenant views their complete bed-assignment history across all PGs.
  */
 const getBedHistory = catchAsync(async (req, res) => {
@@ -161,6 +182,21 @@ const getBedHistory = catchAsync(async (req, res) => {
   return sendResponse(res, {
     message: "Bed history fetched successfully",
     data: history,
+  });
+});
+
+/**
+ * POST /onboarding/confirm-settlement
+ * Tenant confirms they received the refund — moves status to 'removed'.
+ */
+const confirmSettlement = catchAsync(async (req, res) => {
+  const onboarding = await onboardingService.confirmSettlement(
+    req.body.onboardingId,
+    req.user._id
+  );
+  return sendResponse(res, {
+    message: "Settlement confirmed. Your offboarding is now complete.",
+    data: onboarding,
   });
 });
 
@@ -172,6 +208,8 @@ module.exports = {
   assignBed,
   shiftBed,
   offboardTenant,
+  listTenants,
   getMyPGInfo,
   getBedHistory,
+  confirmSettlement,
 };

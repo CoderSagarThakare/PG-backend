@@ -365,7 +365,7 @@ const deletePG = async (pgId, staffId) => {
 
     // 5. Soft-delete all active/pending Onboarding records in this PG
     await Onboarding.updateMany(
-      { pgId, status: { $nin: ['completed', 'removed'] }, isDeleted: false },
+      { pgId, status: { $nin: ['onboarding_completed', 'settlement_pending', 'removed'] }, isDeleted: false },
       { $set: { status: 'removed', isDeleted: true } }
     );
   } catch (error) {

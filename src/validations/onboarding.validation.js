@@ -67,8 +67,6 @@ const confirmDeposit = {
   }),
 };
 
-
-
 /**
  * POST /onboarding/:id/assign-bed
  */
@@ -93,15 +91,49 @@ const shiftBed = {
 
 /**
  * POST /onboarding/offboard
+ * Owner initiates offboarding — captures settlement breakdown.
  */
 const offboardTenant = {
   body: Joi.object().keys({
     onboardingId: objectIdField.required(),
-    vacatingDate: Joi.date().required(),
+    exitDate: Joi.date().required(),
+    reason: Joi.string().trim().required(),
     deductions: Joi.number().min(0).default(0),
-    deductionNotes: Joi.string().trim(),
+    deductionNotes: Joi.string().trim().allow("", null),
     pendingRent: Joi.number().min(0).default(0),
-    settlementReference: Joi.string().trim(),
+    settlementReference: Joi.string().trim().allow("", null),
+  }),
+};
+
+/**
+ * POST /onboarding/confirm-settlement
+ * Tenant confirms they received their refund.
+ */
+const confirmSettlement = {
+  body: Joi.object().keys({
+    onboardingId: objectIdField.required(),
+  }),
+};
+
+/**
+ * GET /onboarding/tenants
+ * Query tenants across managed PGs with optional search and status filter.
+ */
+const queryTenants = {
+  query: Joi.object().keys({
+    search: Joi.string().trim().allow("", null),
+    pgId: objectIdField,
+    status: Joi.string().valid(
+      "initiated",
+      "docs_reviewed",
+      "deposit_confirmed",
+      "onboarding_completed",
+      "settlement_pending",
+      "removed",
+      "all"
+    ),
+    page: Joi.number().integer().min(1),
+    limit: Joi.number().integer().min(1).max(100),
   }),
 };
 
@@ -116,8 +148,10 @@ const getOnboardings = {
       "initiated",
       "docs_reviewed",
       "deposit_confirmed",
-      "completed",
-      "removed"
+      "onboarding_completed",
+      "settlement_pending",
+      "removed",
+      "all"
     ),
     page: Joi.number().integer().min(1),
     limit: Joi.number().integer().min(1).max(100),
@@ -131,5 +165,7 @@ module.exports = {
   assignBed,
   shiftBed,
   offboardTenant,
+  confirmSettlement,
+  queryTenants,
   getOnboardings,
 };
