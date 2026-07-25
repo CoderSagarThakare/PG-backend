@@ -11,6 +11,7 @@ const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const { ROLE_TYPES } = require("../const/constant");
 const sendResponse = require("../utils/sendResponse");
+const { Token } = require("../models");
 
 const register = catchAsync(async (req, res) => {
   const validRoles = [
@@ -36,7 +37,7 @@ const login = catchAsync(async (req, res) => {
 
   let user = await authService.loginUserWithEmailAndPassword(email, password);
 
-  const token = await tokenService.generateAuthTokens(user);
+  const tokens = await tokenService.generateAuthTokens(user);
 
   // Generate a fresh presigned picture URL if the user has a custom avatar
   let picture = user.picture;
@@ -48,7 +49,8 @@ const login = catchAsync(async (req, res) => {
     success: true, 
     message: "Login successful", 
     data: { 
-      token: token.token,
+      token: tokens.access.token,
+      refreshToken: tokens.refresh.token,
       user: {
         id: user._id,
         name: user.name,
@@ -59,6 +61,7 @@ const login = catchAsync(async (req, res) => {
         mobNo1: user.mobNo1,
         mobNo2: user.mobNo2 || null,
         address: user.address,
+        isEmailVerified: user.isEmailVerified || false,
       }
     } 
   });
@@ -72,17 +75,58 @@ const socialLogin = catchAsync(async (req, res) => {
     case "google":
       user = await authService.loginWithGoogle(idToken);
       break;
-    // case "facebook":
-    // user = await authService.loginWithFacebook(idToken);
-    // break;
     default:
       throw new ApiError(
         httpStatus.UNPROCESSABLE_ENTITY,
         `Provider ${req.body.provider} is not supported`,
       );
   }
-  const { token, expires } = await tokenService.generateAuthTokens(user);
-  sendResponse(res, { data: { user, token, expires } });
+  const tokens = await tokenService.generateAuthTokens(user);
+  sendResponse(res, { data: { user, token: tokens.access.token, refreshToken: tokens.refresh.token, expires: tokens.access.expires } });
+});
+
+const refreshTokens = catchAsync(async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Refresh token is required");
+  }
+
+  // 1. Verify & look up the refresh token in DB
+  const refreshTokenDoc = await tokenService.verifyRefreshToken(refreshToken);
+
+  // 2. Look up the user
+  const user = await userService.getUserById(refreshTokenDoc.user);
+  if (!user) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "User not found");
+  }
+
+  // 3. Delete the old refresh token (rotation: single-use)
+  await refreshTokenDoc.deleteOne();
+
+  // 4. Generate new access + refresh tokens
+  const tokens = await tokenService.generateAuthTokens(user);
+
+  sendResponse(res, {
+    data: {
+      token: tokens.access.token,
+      refreshToken: tokens.refresh.token,
+    },
+  });
+});
+
+const logoutUser = catchAsync(async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Refresh token is required");
+  }
+
+  // Remove the refresh token from DB (revoke it)
+  const tokenDoc = await Token.findOneAndDelete({ token: refreshToken, type: 'refresh' });
+  if (!tokenDoc) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Refresh token not found");
+  }
+
+  sendResponse(res, { success: true, message: "Logged out successfully" });
 });
 
 const forgotPassword = catchAsync(async (req, res) => {
@@ -132,6 +176,8 @@ module.exports = {
   register,
   login,
   socialLogin,
+  refreshTokens,
+  logoutUser,
   forgotPassword,
   resetPassword,
   sendVerificationEmail,

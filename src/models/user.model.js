@@ -19,7 +19,6 @@ const userSchema = mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
       lowercase: true,
       validate(value) {
@@ -150,6 +149,10 @@ const userSchema = mongoose.Schema(
 );
 
 userSchema.plugin(private);
+
+// Partial unique index: only enforce email uniqueness for active (non-deleted) users.
+// Soft-deleted users (isDeleted: true) won't block new registrations with the same email.
+userSchema.index({ email: 1 }, { unique: true, partialFilterExpression: { isDeleted: false } });
 
 /**
  *
