@@ -73,9 +73,10 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
     throw new ApiError(httpStatus.BAD_REQUEST, "User Not Found");
   }
 
-  await userService.updateUserById(user.id, {
-    password: newPassword,
-  });
+  // Use .save() instead of updateUserById so the pre-save bcrypt hook runs.
+  // findByIdAndUpdate ($set) bypasses Mongoose middleware → password was stored as plaintext.
+  user.password = newPassword;
+  await user.save();
 };
 
 const verifyEmail = async (verifyEmailToken) => {

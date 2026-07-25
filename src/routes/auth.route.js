@@ -5,8 +5,26 @@ const auth = require("../middlewares/auth");
 const captcha = require("../middlewares/captcha");
 const validate = require("../middlewares/validate");
 const { authValidation } = require("../validations");
+const rateLimit = require("express-rate-limit");
 
 const router = require("express").Router();
+
+// ── Rate limiters ──────────────────────────────────────────────────────────────
+const authLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 10, // 10 attempts per window
+  message: { message: "Too many attempts, please try again after 10 minutes" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const strictLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 5, // 5 attempts per window
+  message: { message: "Too many attempts, please try again after 10 minutes" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 router.get("/", (req, res) => {
   res.send("hiii in auth /");
@@ -14,33 +32,31 @@ router.get("/", (req, res) => {
 
 router.post(
   "/register",
-  // [captcha.verify, validate(authValidation.register)],
-  [validate(authValidation.register)],
+  [authLimiter, validate(authValidation.register)],
   authController.register,
 );
 
 router.post(
   "/login",
-  // [captcha.verify, validate(authValidation.login)],
-  [validate(authValidation.login)],
+  [authLimiter, validate(authValidation.login)],
   authController.login,
 );
 
 router.post(
   "/login/:provider",
-  [captcha.verify, validate(authValidation.socialLogin)],
+  [authLimiter, captcha.verify, validate(authValidation.socialLogin)],
   authController.socialLogin,
 );
 
 router.post(
   "/forgot-password",
-  [captcha.verify, validate(authValidation.forgotPassword)],
+  [strictLimiter, validate(authValidation.forgotPassword)],
   authController.forgotPassword,
 );
 
 router.post(
   "/reset-password",
-  validate(authValidation.resetPassword),
+  [strictLimiter, validate(authValidation.resetPassword)],
   authController.resetPassword,
 );
 
@@ -65,10 +81,23 @@ router.get(
 router.post(
   "/verify-otp",
   [
+    strictLimiter,
     validate(authValidation.verifyOTP),
     auth(ROLE_TYPES.user, ROLE_TYPES.owner, ROLE_TYPES.admin),
   ],
   authController.verifyOTP,
+);
+
+// ── Refresh Token Rotation ─────────────────────────────────────────────────────
+router.post(
+  "/refresh-tokens",
+  authController.refreshTokens,
+);
+
+// ── Logout (revoke refresh token) ──────────────────────────────────────────────
+router.post(
+  "/logout",
+  authController.logoutUser,
 );
 
 module.exports = router;

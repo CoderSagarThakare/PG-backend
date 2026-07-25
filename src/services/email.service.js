@@ -8,15 +8,21 @@ const logger = require("../config/logger");
  * @param {string} token
  */
 const sendResetPasswordEmail = async (to, token) => {
-  const subject = "Reset the password";
-  // replace this url with the link to the reset password page of your front-end app
-  const resetPasswordUrl = `${config.siteUrl}/auth/reset-password?token=${token}`;
+  const subject = "Reset Your Password";
+  // Use FRONTEND_URL for email links (must point to the React frontend, not the backend)
+  const frontendUrl = config.frontendUrl || config.siteUrl || 'http://localhost:5173';
+  const resetPasswordUrl = `${frontendUrl}/reset-password?token=${token}`;
 
-  const text = `<HTML>Dear User,</br>
-  To reset your password, click on the link  <a href=${resetPasswordUrl} >Verify Account </a> </br> 
-  If you did not request any password reset, then ignore this email.</br>
-  
-  Beta version : need to update proper siteurl of server</HTML>`;
+  const text = `<html>
+    <body style="font-family: Arial, sans-serif; color: #333;">
+      <p>Dear User,</p>
+      <p>To reset your password, click on the link below:</p>
+      <p><a href="${resetPasswordUrl}" style="color: #6c63ff; font-weight: bold;">Reset Password</a></p>
+      <p>If you did not request a password reset, please ignore this email.</p>
+      <br/>
+      <p style="color: #999; font-size: 12px;">— Team PG Stay</p>
+    </body>
+  </html>`;
 
   await sendEmail(to, subject, text);
 };
@@ -86,14 +92,21 @@ const transport = (function () {
 })();
 
 const sendVerificationEmail = async (to, token) => {
-  const subject = "Email Verification";
-  // replace this url with the link to the email verification page of your front-end app
-  const verificationUrl = `${config.siteUrl}/auth/verify-email?token=${token}`;
-  const text = `<html>Dear user,<br>
-  To verify your email click on given link <a href=${verificationUrl}>Verify the Email </a><br>
-  If you did not send request for verify email, then ignore this email.</br>
-  
-  Beta version : need to update proper siteurl of server <html>`;
+  const subject = "Verify Your Email";
+  // Use FRONTEND_URL for email links (must point to the React frontend, not the backend)
+  const frontendUrl = config.frontendUrl || config.siteUrl || 'http://localhost:5173';
+  const verificationUrl = `${frontendUrl}/verify-email?token=${token}`;
+
+  const text = `<html>
+    <body style="font-family: Arial, sans-serif; color: #333;">
+      <p>Dear User,</p>
+      <p>To verify your email address, click on the link below:</p>
+      <p><a href="${verificationUrl}" style="color: #6c63ff; font-weight: bold;">Verify Email</a></p>
+      <p>If you did not request email verification, please ignore this email.</p>
+      <br/>
+      <p style="color: #999; font-size: 12px;">— Team PG Stay</p>
+    </body>
+  </html>`;
 
   await sendEmail(to, subject, text);
 };

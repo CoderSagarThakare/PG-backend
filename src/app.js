@@ -19,6 +19,10 @@ const swaggerDocument = require("./config/swagger.json");
 // app.set('etag', false);
 
 // JSON requests are received as plain text. We need to parse the json request body.
+// Trust first proxy (Render, Railway, Nginx, etc.) so req.ip returns the real client IP.
+// Without this, express-rate-limit sees the proxy's IP for ALL users → global block instead of per-user.
+app.set('trust proxy', 1);
+
 // Enable cors to accept requests from any frontend domain
 app.use(cors());
 
