@@ -30,7 +30,7 @@ const updatePGBedStats = async (pgId) => {
  * @returns {Promise<Room>}
  */
 const createRoom = async (roomBody) => {
-  const { pgId, roomNumber, floor, sharingType, roomType, beds } = roomBody;
+  const { pgId, roomNumber, floor, unitType, sharingType, roomType, beds } = roomBody;
 
   // Check if room number already exists for this PG
   const existingRoom = await Room.findOne({ pgId, roomNumber, isDeleted: false });
@@ -38,7 +38,7 @@ const createRoom = async (roomBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Room number already exists in this PG');
   }
 
-  const room = await Room.create({ pgId, roomNumber, floor, sharingType, roomType });
+  const room = await Room.create({ pgId, roomNumber, floor, unitType, sharingType, roomType });
 
   // Create beds
   const bedsToCreate = beds.map(bed => ({
@@ -307,7 +307,10 @@ const updateRoom = async (roomId, updateBody) => {
     }
   }
 
-  Object.assign(room, updateBody);
+  const updateData = { ...updateBody };
+  delete updateData.beds;
+
+  Object.assign(room, updateData);
   await room.save();
   
   await updatePGBedStats(room.pgId);
