@@ -16,7 +16,7 @@ router
 
 router
   .route('/:roomId')
-  .patch(auth('owner', 'manager'), roomController.updateRoom)
+  .patch(auth('owner', 'manager'), validate(roomValidation.updateRoom), roomController.updateRoom)
   .delete(auth('owner', 'manager'), roomController.deleteRoom);
 
 router

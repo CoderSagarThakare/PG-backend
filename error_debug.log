@@ -4017,3 +4017,61 @@ Stack: Error: Cannot offboard tenant: There are unpaid or pending rent records f
     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
     at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\onboarding.controller.js:127:22
 
+[2026-07-24T22:28:02.251Z] PATCH /room/6a63e6a6177efe2ed18640cb
+Status: 400
+Error: "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "_id" is not allowed, "pgId" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "__v" is not allowed
+Stack: Error: "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "_id" is not allowed, "pgId" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "__v" is not allowed
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:18:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-07-24T22:28:11.232Z] PATCH /room/6a63e6a6177efe2ed18640cb
+Status: 400
+Error: "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "_id" is not allowed, "pgId" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "__v" is not allowed
+Stack: Error: "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "_id" is not allowed, "pgId" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "__v" is not allowed
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:18:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-07-24T23:04:40.456Z] POST /room
+Status: 400
+Error: Room number already exists in this PG
+Stack: Error: Room number already exists in this PG
+    at Object.createRoom (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\room.service.js:38:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\room.controller.js:11:16
+
+[2026-07-24T23:08:02.547Z] PATCH /room/6a63ef9b22e8751c13812881
+Status: 400
+Error: "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed
+Stack: Error: "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:18:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-07-24T23:08:08.534Z] PATCH /room/6a63ef9b22e8751c13812881
+Status: 400
+Error: "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed
+Stack: Error: "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:18:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+[2026-07-24T23:08:17.577Z] PATCH /room/6a63ef9b22e8751c13812881
+Status: 400
+Error: "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed
+Stack: Error: "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed, "roomId" is not allowed, "pgId" is not allowed, "userId" is not allowed, "assignedAt" is not allowed, "isDeleted" is not allowed, "createdAt" is not allowed, "updatedAt" is not allowed
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\validate.js:22:17
+    at Layer.handle [as handle_request] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\express\lib\router\route.js:144:13)
+    at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\middlewares\auth.js:18:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+

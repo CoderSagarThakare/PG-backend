@@ -22,11 +22,17 @@ const roomSchema = mongoose.Schema(
       type: Number, // 1, 2, 3, etc.
       required: true,
       min: 1,
+      max: 20,
     },
     roomType: {
       type: String,
       enum: ["AC", "Non-AC"],
       default: "Non-AC",
+    },
+    unitType: {
+      type: String, // e.g. "1RK", "1BHK", "2BHK", "3BHK", "Studio", "Single Room", "Shared Room", "Other"
+      default: "Single Room",
+      trim: true,
     },
     isDeleted: {
       type: Boolean,
