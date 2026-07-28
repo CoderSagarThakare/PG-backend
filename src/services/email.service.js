@@ -61,22 +61,29 @@ const transport = (function () {
       throw new Error("AWS Mailer not supported");
 
     case "gmail":
+      // NOTE: Port 465 (SSL) is blocked by many cloud providers (Render, Railway, AWS).
+      // Use port 587 with STARTTLS (secure: false + requireTLS: true) instead.
       const mailTransporter = nodemailer.createTransport({
-        service: "gmail",
         host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
-        pool: true,
-        maxConnections: 5,
-        maxMessages: 100,
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 15000,
+        port: 587,
+        secure: false,       // false = STARTTLS (upgrades to TLS after handshake)
+        requireTLS: true,    // force TLS upgrade, reject plain connections
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 20000,
         auth: {
           user: config.gmail.auth.user,
           pass: config.gmail.auth.pass,
         },
+        logger: false,
+        debug: false,
       });
+
+      if (config.env !== "test") {
+        mailTransporter.verify()
+          .then(() => logger.info("Gmail SMTP connected successfully via port 587 STARTTLS"))
+          .catch((err) => logger.error(`Gmail SMTP connection FAILED: ${err.message} | Check GMAIL_USERNAME and GMAIL_PASSWORD (must be a Google App Password, not your regular Gmail password)`));
+      }
 
       return mailTransporter;
 
@@ -85,11 +92,11 @@ const transport = (function () {
       const tp = nodemailer.createTransport({
         ...config.email.smtp,
         pool: true,
-        maxConnections: 5,
-        maxMessages: 100,
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 15000,
+        maxConnections: 3,
+        maxMessages: 50,
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 20000,
       });
       if (config.env !== "test") {
         tp.verify()
