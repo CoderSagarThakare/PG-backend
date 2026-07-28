@@ -62,7 +62,16 @@ const transport = (function () {
 
     case "gmail":
       const mailTransporter = nodemailer.createTransport({
-        service: config.email.provider,
+        service: "gmail",
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        pool: true,
+        maxConnections: 5,
+        maxMessages: 100,
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
         auth: {
           user: config.gmail.auth.user,
           pass: config.gmail.auth.pass,
@@ -73,7 +82,15 @@ const transport = (function () {
 
     case "smtp":
     default:
-      const tp = nodemailer.createTransport(config.email.smtp);
+      const tp = nodemailer.createTransport({
+        ...config.email.smtp,
+        pool: true,
+        maxConnections: 5,
+        maxMessages: 100,
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
+      });
       if (config.env !== "test") {
         tp.verify()
           .then(() =>
@@ -81,9 +98,9 @@ const transport = (function () {
               `Connected to email server => ${config.email.smtp.host}`
             )
           )
-          .catch(() =>
+          .catch((err) =>
             logger.warn(
-              "Unable to connect to email server. Make sure you have correctly configured the SMTP options in .env"
+              `Unable to connect to email server (${err.message}). Make sure you have correctly configured the SMTP options in .env`
             )
           );
       }

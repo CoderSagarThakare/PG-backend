@@ -1,5 +1,6 @@
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
+const logger = require("../config/logger");
 const { sendEmail } = require("./email.service");
 const {
   getUserById,
@@ -43,9 +44,10 @@ const sendVerificationOTP = async (to) => {
     await sendEmail(to, subject, text);
     return otp;
   } catch (e) {
+    logger.error("Failed to send verification email:", e);
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
-      "Error while sending verification mail",
+      `Failed to send verification email (${e.message || 'Email service error'}). Please check server SMTP credentials.`,
     );
   }
 };
