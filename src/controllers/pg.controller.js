@@ -5,6 +5,16 @@ const ApiError = require("../utils/ApiError");
 const sendResponse = require("../utils/sendResponse");
 
 const createPG = catchAsync(async (req, res) => {
+  // Email verification gate: owner must verify email before adding any PG property
+  const { User } = require("../models");
+  const owner = await User.findById(req.user.id).select("isEmailVerified").lean();
+  if (!owner?.isEmailVerified) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "Please verify your email address before adding a PG property. Check your profile to request a verification OTP."
+    );
+  }
+
   const pgData = {
     ...req.body,
     ownerId: req.user.id,

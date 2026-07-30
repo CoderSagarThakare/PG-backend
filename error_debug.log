@@ -4814,3 +4814,49 @@ Stack: Error: please authenticate
     at module.exports [as JwtVerifier] (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
     at C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
 
+[2026-07-30T19:07:10.466Z] POST /auth/login
+Status: 401
+Error: Incorrect email or password
+Stack: Error: Incorrect email or password
+    at Object.loginUserWithEmailAndPassword (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\auth.service.js:18:11)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\auth.controller.js:38:14
+
+[2026-07-30T20:14:58.557Z] POST /auth/login
+Status: 401
+Error: Incorrect email or password
+Stack: Error: Incorrect email or password
+    at Object.loginUserWithEmailAndPassword (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\auth.service.js:18:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\auth.controller.js:38:14
+
+[2026-07-30T20:15:12.235Z] POST /auth/login
+Status: 401
+Error: Incorrect email or password
+Stack: Error: Incorrect email or password
+    at Object.loginUserWithEmailAndPassword (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\auth.service.js:18:11)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\auth.controller.js:38:14
+
+[2026-07-30T21:11:25.639Z] GET /auth/send-verification-otp
+Status: 500
+Error: Failed to send verification email (Invalid `from` field. The email address needs to follow the `email@example.com` or `Name <email@example.com>` format.). Please check server SMTP credentials.
+Stack: Error: Failed to send verification email (Invalid `from` field. The email address needs to follow the `email@example.com` or `Name <email@example.com>` format.). Please check server SMTP credentials.
+    at Object.sendVerificationOTP (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\otp.service.js:48:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\auth.controller.js:159:15
+
+[2026-07-30T21:12:29.468Z] GET /auth/send-verification-otp
+Status: 500
+Error: Failed to send verification email (Invalid `from` field. The email address needs to follow the `email@example.com` or `Name <email@example.com>` format.). Please check server SMTP credentials.
+Stack: Error: Failed to send verification email (Invalid `from` field. The email address needs to follow the `email@example.com` or `Name <email@example.com>` format.). Please check server SMTP credentials.
+    at Object.sendVerificationOTP (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\otp.service.js:48:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\auth.controller.js:159:15
+
+[2026-07-30T21:15:10.024Z] GET /auth/send-verification-otp
+Status: 500
+Error: Failed to send verification email (sagar is not defined). Please check server SMTP credentials.
+Stack: Error: Failed to send verification email (sagar is not defined). Please check server SMTP credentials.
+    at Object.sendVerificationOTP (C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\services\otp.service.js:48:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\AM-LP-64\Documents\SAGAR\PG-Management\PG-backend\src\controllers\auth.controller.js:159:15
+

@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "PG Management System API Documentation",
-    "description": "Exhaustive, 100% complete API documentation for the StaySync PG Management System backend. Supports user authentication, dual JWT token rotation, geolocated PG discovery, room & bed management, tenant onboarding lifecycle, rent invoicing, staff payroll, expense tracking, reviews, and scheduled cron triggers. Set your Bearer Token to test authenticated routes.",
+    "description": "Exhaustive API documentation for the PG Management System backend. Register users, manage PGs, assign rooms, submit rent proofs, view stats, and trigger cron jobs. Set your Bearer Token to test authenticated routes.",
     "version": "1.0.0"
   },
   "servers": [
@@ -15,8 +15,8 @@
       "description": "Local Development Server"
     },
     {
-      "url": "https://pg-backend-test.onrender.com",
-      "description": "Production Testing Server (Render)"
+      "url": "https://pg-backend-l3q4.onrender.com",
+      "description": "Production Server (Render)"
     }
   ],
   "components": {
@@ -44,20 +44,20 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name", "email", "password", "role", "mobNo1"],
+                "required": ["name", "email", "password", "role"],
                 "properties": {
-                  "name": { "type": "string", "example": "John Doe" },
-                  "email": { "type": "string", "format": "email", "example": "john@example.com" },
-                  "password": { "type": "string", "example": "password123" },
-                  "role": { "type": "string", "enum": ["user", "owner", "manager", "employee", "admin"], "default": "user" },
-                  "mobNo1": { "type": "string", "example": "9876543210" }
+                  "name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" },
+                  "role": { "type": "string", "enum": ["user", "owner", "manager", "employee", "admin"] },
+                  "mobNo1": { "type": "string" }
                 }
               }
             }
           }
         },
         "responses": {
-          "201": { "description": "Successfully registered, returns tokens and user object" }
+          "201": { "description": "Successfully registered" }
         }
       }
     },
@@ -73,15 +73,15 @@
                 "type": "object",
                 "required": ["email", "password"],
                 "properties": {
-                  "email": { "type": "string", "format": "email", "example": "john@example.com" },
-                  "password": { "type": "string", "example": "password123" }
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Successfully logged in, returns access token (15m), refresh token (7d), and user details" }
+          "200": { "description": "Successfully logged in, returns tokens (access & refresh) and user details" }
         }
       }
     },
@@ -123,14 +123,14 @@
                 "type": "object",
                 "required": ["email"],
                 "properties": {
-                  "email": { "type": "string", "format": "email", "example": "john@example.com" }
+                  "email": { "type": "string", "format": "email" }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Password reset email sent successfully" }
+          "200": { "description": "Password reset email sent" }
         }
       }
     },
@@ -149,14 +149,14 @@
                 "type": "object",
                 "required": ["password"],
                 "properties": {
-                  "password": { "type": "string", "example": "newPassword123" }
+                  "password": { "type": "string" }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Password reset successfully (executes bcrypt pre-save hashing)" }
+          "200": { "description": "Password reset successfully" }
         }
       }
     },
@@ -184,7 +184,7 @@
     "/auth/send-verification-otp": {
       "get": {
         "tags": ["Authentication"],
-        "summary": "Send a 6-digit verification OTP to the user's registered email",
+        "summary": "Send a verification OTP to the user's registered phone",
         "responses": {
           "200": { "description": "OTP sent successfully" }
         }
@@ -193,7 +193,7 @@
     "/auth/verify-otp": {
       "post": {
         "tags": ["Authentication"],
-        "summary": "Verify 6-digit OTP code",
+        "summary": "Verify phone OTP code",
         "requestBody": {
           "required": true,
           "content": {
@@ -202,60 +202,14 @@
                 "type": "object",
                 "required": ["otp"],
                 "properties": {
-                  "otp": { "type": "number", "example": 123456 }
+                  "otp": { "type": "string" }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "OTP verified successfully, updates isEmailVerified = true" }
-        }
-      }
-    },
-    "/auth/refresh-tokens": {
-      "post": {
-        "tags": ["Authentication"],
-        "summary": "Refresh Access (15m) and Refresh (7d) Token pair",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["refreshToken"],
-                "properties": {
-                  "refreshToken": { "type": "string" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Tokens refreshed successfully" }
-        }
-      }
-    },
-    "/auth/logout": {
-      "post": {
-        "tags": ["Authentication"],
-        "summary": "Revoke refresh token and end session",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["refreshToken"],
-                "properties": {
-                  "refreshToken": { "type": "string" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": { "description": "Logged out successfully" }
+          "200": { "description": "OTP verified successfully" }
         }
       }
     },
@@ -374,17 +328,7 @@
                   "name": { "type": "string" },
                   "mobNo1": { "type": "string" },
                   "mobNo2": { "type": "string" },
-                  "gender": { "type": "string", "enum": ["male", "female", "transgender", "preferNotToSay"] },
-                  "vehicleType": { "type": "string", "enum": ["2wheeler", "4wheeler", "none"] },
-                  "vehicleNumber": { "type": "string" },
-                  "address": {
-                    "type": "object",
-                    "properties": {
-                      "city": { "type": "string" },
-                      "state": { "type": "string" },
-                      "pincode": { "type": "string" }
-                    }
-                  }
+                  "address": { "type": "string" }
                 }
               }
             }
@@ -396,7 +340,7 @@
       },
       "delete": {
         "tags": ["Profile"],
-        "summary": "Deactivate/Soft-delete user profile",
+        "summary": "Deactivate/Delete user profile",
         "responses": {
           "200": { "description": "User profile deleted successfully" }
         }
@@ -494,9 +438,7 @@
         "tags": ["PG Management"],
         "summary": "Get all PGs belonging to the owner/manager",
         "parameters": [
-          { "name": "search", "in": "query", "schema": { "type": "string" } },
-          { "name": "page", "in": "query", "schema": { "type": "integer" } },
-          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+          { "name": "search", "in": "query", "schema": { "type": "string" } }
         ],
         "responses": {
           "200": { "description": "List of PGs" }
@@ -511,40 +453,14 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name", "address", "managerId", "pgType", "pgStartedDate", "facilities"],
+                "required": ["name", "address", "city", "dueDayOfMonth"],
                 "properties": {
                   "name": { "type": "string" },
-                  "address": {
-                    "type": "object",
-                    "required": ["landmark", "city", "state", "country", "pincode"],
-                    "properties": {
-                      "landmark": { "type": "string" },
-                      "city": { "type": "string" },
-                      "state": { "type": "string" },
-                      "country": { "type": "string", "default": "India" },
-                      "pincode": { "type": "number" },
-                      "locationDescription": { "type": "string" }
-                    }
-                  },
-                  "managerId": { "type": "string", "description": "Mongo ID of assigned manager" },
-                  "pgType": { "type": "string", "enum": ["male", "female", "unisex", "coLiving"] },
-                  "description": { "type": "string" },
-                  "landline": { "type": "string" },
-                  "pgStartedDate": { "type": "string", "format": "date" },
-                  "checkInTime": { "type": "string" },
-                  "checkOutTime": { "type": "string" },
+                  "address": { "type": "string" },
+                  "city": { "type": "string" },
                   "dueDayOfMonth": { "type": "integer", "default": 10 },
                   "lateFee": { "type": "number", "default": 0 },
-                  "facilities": { "type": "array", "items": { "type": "string" } },
-                  "location": {
-                    "type": "object",
-                    "properties": {
-                      "type": { "type": "string", "enum": ["Point"], "default": "Point" },
-                      "coordinates": { "type": "array", "items": { "type": "number" }, "description": "[longitude, latitude]" }
-                    }
-                  },
-                  "upiId": { "type": "string", "example": "name@upi" },
-                  "paymentQrKey": { "type": "string" }
+                  "facilities": { "type": "array", "items": { "type": "string" } }
                 }
               }
             }
@@ -558,7 +474,7 @@
     "/pg/facilities": {
       "get": {
         "tags": ["PG Management"],
-        "summary": "Get all available facilities / amenities taxonomy",
+        "summary": "Get all available facilities / amenities",
         "responses": {
           "200": { "description": "List of facilities" }
         }
@@ -577,19 +493,6 @@
         }
       }
     },
-    "/pg/payment-qr-upload-url": {
-      "get": {
-        "tags": ["PG Management"],
-        "summary": "Generate presigned S3 URL for uploading PG UPI payment QR code",
-        "parameters": [
-          { "name": "fileName", "in": "query", "required": true, "schema": { "type": "string" } },
-          { "name": "fileType", "in": "query", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Presigned URL details for QR upload" }
-        }
-      }
-    },
     "/pg/file": {
       "delete": {
         "tags": ["PG Management"],
@@ -605,18 +508,11 @@
     "/pg/discover": {
       "get": {
         "tags": ["PG Management"],
-        "summary": "Public/User discovery to search and filter PGs by location & amenities",
+        "summary": "Public/User discovery to search and filter PGs",
         "parameters": [
-          { "name": "lat", "in": "query", "schema": { "type": "number" }, "description": "Latitude for geospatial 2dsphere search" },
-          { "name": "lng", "in": "query", "schema": { "type": "number" }, "description": "Longitude for geospatial 2dsphere search" },
-          { "name": "radius", "in": "query", "schema": { "type": "number" }, "description": "Search radius in km" },
-          { "name": "budget", "in": "query", "schema": { "type": "number" } },
-          { "name": "gender", "in": "query", "schema": { "type": "string", "enum": ["male", "female", "unisex", "coLiving"] } },
-          { "name": "sharing", "in": "query", "schema": { "type": "integer" } },
           { "name": "search", "in": "query", "schema": { "type": "string" } },
           { "name": "city", "in": "query", "schema": { "type": "string" } },
-          { "name": "page", "in": "query", "schema": { "type": "integer" } },
-          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+          { "name": "gender", "in": "query", "schema": { "type": "string" } }
         ],
         "responses": {
           "200": { "description": "Matching PGs" }
@@ -626,7 +522,7 @@
     "/pg/{pgId}": {
       "get": {
         "tags": ["PG Management"],
-        "summary": "Get PG details by ID",
+        "summary": "Get PG details",
         "parameters": [
           { "name": "pgId", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
@@ -647,17 +543,10 @@
                 "type": "object",
                 "properties": {
                   "name": { "type": "string" },
-                  "address": { "type": "object" },
-                  "managerId": { "type": "string" },
-                  "pgType": { "type": "string", "enum": ["male", "female", "unisex", "coLiving"] },
-                  "description": { "type": "string" },
                   "dueDayOfMonth": { "type": "integer" },
                   "lateFee": { "type": "number" },
-                  "facilities": { "type": "array", "items": { "type": "string" } },
-                  "upiId": { "type": "string" },
-                  "paymentQrKey": { "type": "string" },
-                  "isActive": { "type": "boolean" },
-                  "isDeleted": { "type": "boolean" }
+                  "address": { "type": "string" },
+                  "city": { "type": "string" }
                 }
               }
             }
@@ -669,7 +558,7 @@
       },
       "delete": {
         "tags": ["PG Management"],
-        "summary": "Soft delete PG property",
+        "summary": "Delete PG",
         "parameters": [
           { "name": "pgId", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
@@ -705,21 +594,19 @@
     "/room": {
       "post": {
         "tags": ["Room Management"],
-        "summary": "Create a room inside a PG (auto-generates beds)",
+        "summary": "Create a room inside a PG",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["pgId", "roomNumber", "floor", "sharingType", "beds"],
+                "required": ["pgId", "roomNumber", "sharingType", "beds"],
                 "properties": {
                   "pgId": { "type": "string" },
                   "roomNumber": { "type": "string" },
-                  "floor": { "type": "integer", "default": 0 },
-                  "sharingType": { "type": "integer", "minimum": 1, "maximum": 20, "description": "Sharing capacity (max 20 beds)" },
-                  "roomType": { "type": "string", "enum": ["AC", "Non-AC"], "default": "Non-AC" },
-                  "unitType": { "type": "string", "enum": ["1 BHK", "2 BHK", "3 BHK", "1 RK", "Single Room", "Studio", "Penthouse", "Other"] },
+                  "floor": { "type": "integer" },
+                  "sharingType": { "type": "integer" },
                   "beds": {
                     "type": "array",
                     "items": {
@@ -727,8 +614,7 @@
                       "required": ["bedNumber", "price"],
                       "properties": {
                         "bedNumber": { "type": "string" },
-                        "price": { "type": "number", "minimum": 0 },
-                        "position": { "type": "string" }
+                        "price": { "type": "number" }
                       }
                     }
                   }
@@ -738,26 +624,26 @@
           }
         },
         "responses": {
-          "201": { "description": "Room and beds created successfully" }
+          "201": { "description": "Room created successfully" }
         }
       }
     },
     "/room/pg/{pgId}": {
       "get": {
         "tags": ["Room Management"],
-        "summary": "Get all rooms and bed topology in a PG",
+        "summary": "Get all rooms in a PG",
         "parameters": [
           { "name": "pgId", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
-          "200": { "description": "List of rooms with nested beds topology" }
+          "200": { "description": "List of rooms" }
         }
       }
     },
     "/room/{roomId}": {
       "patch": {
         "tags": ["Room Management"],
-        "summary": "Update room details and bed pricing",
+        "summary": "Update room details",
         "parameters": [
           { "name": "roomId", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
@@ -768,11 +654,7 @@
                 "type": "object",
                 "properties": {
                   "roomNumber": { "type": "string" },
-                  "floor": { "type": "integer" },
-                  "sharingType": { "type": "integer", "maximum": 20 },
-                  "roomType": { "type": "string", "enum": ["AC", "Non-AC"] },
-                  "unitType": { "type": "string" },
-                  "beds": { "type": "array", "items": { "type": "object" } }
+                  "floor": { "type": "integer" }
                 }
               }
             }
@@ -820,8 +702,7 @@
                 "type": "object",
                 "required": ["userId"],
                 "properties": {
-                  "userId": { "type": "string" },
-                  "joiningDate": { "type": "string", "format": "date-time" }
+                  "userId": { "type": "string" }
                 }
               }
             }
@@ -859,9 +740,7 @@
                 "type": "object",
                 "properties": {
                   "price": { "type": "number" },
-                  "bedNumber": { "type": "string" },
-                  "position": { "type": "string" },
-                  "status": { "type": "string", "enum": ["available", "occupied", "maintenance"] }
+                  "bedNumber": { "type": "string" }
                 }
               }
             }
@@ -869,245 +748,6 @@
         },
         "responses": {
           "200": { "description": "Bed details updated successfully" }
-        }
-      }
-    },
-    "/onboarding/tenant/my-pg": {
-      "get": {
-        "tags": ["Tenant Onboarding"],
-        "summary": "Tenant reads their active PG, room, bed, deposit & rules summary",
-        "responses": {
-          "200": { "description": "Active PG and bed assignment summary" }
-        }
-      }
-    },
-    "/onboarding/tenant/history": {
-      "get": {
-        "tags": ["Tenant Onboarding"],
-        "summary": "Tenant reads their full bed-assignment history across all PGs",
-        "responses": {
-          "200": { "description": "Historical bed assignments timeline" }
-        }
-      }
-    },
-    "/onboarding/confirm-settlement": {
-      "post": {
-        "tags": ["Tenant Onboarding"],
-        "summary": "Tenant confirms receipt of offboarding refund settlement",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["onboardingId"],
-                "properties": {
-                  "onboardingId": { "type": "string" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Settlement confirmed, status moved to removed" }
-        }
-      }
-    },
-    "/onboarding/initiate": {
-      "post": {
-        "tags": ["Tenant Onboarding"],
-        "summary": "Initiate onboarding process for a tenant with a converted enquiry (Owner/Manager)",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["enquiryId"],
-                "properties": {
-                  "enquiryId": { "type": "string" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": { "description": "Onboarding record initiated" }
-        }
-      }
-    },
-    "/onboarding/shift-bed": {
-      "post": {
-        "tags": ["Tenant Onboarding"],
-        "summary": "Shift an active tenant to a different bed within the PG (Owner/Manager)",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["userId", "pgId", "newBedId", "effectiveDate"],
-                "properties": {
-                  "userId": { "type": "string" },
-                  "pgId": { "type": "string" },
-                  "newBedId": { "type": "string" },
-                  "effectiveDate": { "type": "string", "format": "date" },
-                  "shiftNote": { "type": "string" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Tenant shifted to new bed successfully" }
-        }
-      }
-    },
-    "/onboarding/offboard": {
-      "post": {
-        "tags": ["Tenant Onboarding"],
-        "summary": "Initiate tenant offboarding & calculate net refund settlement (Owner/Manager)",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["onboardingId", "exitDate", "reason"],
-                "properties": {
-                  "onboardingId": { "type": "string" },
-                  "exitDate": { "type": "string", "format": "date" },
-                  "reason": { "type": "string" },
-                  "deductions": { "type": "number", "default": 0 },
-                  "deductionNotes": { "type": "string" },
-                  "pendingRent": { "type": "number", "default": 0 },
-                  "settlementReference": { "type": "string" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Offboarding initiated, status moved to settlement_pending" }
-        }
-      }
-    },
-    "/onboarding/tenants": {
-      "get": {
-        "tags": ["Tenant Onboarding"],
-        "summary": "Query central tenant directory across managed PGs (Owner/Manager)",
-        "parameters": [
-          { "name": "search", "in": "query", "schema": { "type": "string" } },
-          { "name": "pgId", "in": "query", "schema": { "type": "string" } },
-          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["initiated", "docs_reviewed", "deposit_confirmed", "onboarding_completed", "settlement_pending", "removed", "all"] } },
-          { "name": "page", "in": "query", "schema": { "type": "integer" } },
-          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
-        ],
-        "responses": {
-          "200": { "description": "List of tenants" }
-        }
-      }
-    },
-    "/onboarding/pg/{pgId}": {
-      "get": {
-        "tags": ["Tenant Onboarding"],
-        "summary": "List all onboarding records for a specific PG (Owner/Manager)",
-        "parameters": [
-          { "name": "pgId", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "status", "in": "query", "schema": { "type": "string" } },
-          { "name": "page", "in": "query", "schema": { "type": "integer" } },
-          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
-        ],
-        "responses": {
-          "200": { "description": "List of PG onboardings" }
-        }
-      }
-    },
-    "/onboarding/{id}": {
-      "get": {
-        "tags": ["Tenant Onboarding"],
-        "summary": "Get full onboarding details by ID",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Onboarding object details" }
-        }
-      }
-    },
-    "/onboarding/{id}/step": {
-      "patch": {
-        "tags": ["Tenant Onboarding"],
-        "summary": "Update step details (emergency contact, financial terms, joining date)",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "emergencyContact": {
-                    "type": "object",
-                    "properties": {
-                      "name": { "type": "string" },
-                      "phone": { "type": "string" },
-                      "relation": { "type": "string", "enum": ["father", "mother", "spouse", "sibling", "friend", "other"] }
-                    }
-                  },
-                  "documentsReviewed": {
-                    "type": "object",
-                    "properties": {
-                      "reviewedAt": { "type": "string", "format": "date-time" },
-                      "reviewedBy": { "type": "string" }
-                    }
-                  },
-                  "financialTerms": {
-                    "type": "object",
-                    "properties": {
-                      "securityDepositAmount": { "type": "number" },
-                      "securityDepositReceived": { "type": "boolean" },
-                      "securityDepositReference": { "type": "string" },
-                      "securityDepositDate": { "type": "string", "format": "date" }
-                    }
-                  },
-                  "joiningDate": { "type": "string", "format": "date" },
-                  "notes": { "type": "string" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Step updated successfully" }
-        }
-      }
-    },
-    "/onboarding/{id}/assign-bed": {
-      "post": {
-        "tags": ["Tenant Onboarding"],
-        "summary": "Final hard-gated onboarding step: assign bed after rules & deposit gates pass",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["bedId"],
-                "properties": {
-                  "bedId": { "type": "string" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Bed assigned, onboarding completed" }
         }
       }
     },
@@ -1464,11 +1104,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["pgId", "postId"],
+                "required": ["pgId", "roomId"],
                 "properties": {
                   "pgId": { "type": "string" },
-                  "postId": { "type": "string" },
-                  "moveInDate": { "type": "string", "format": "date" },
+                  "roomId": { "type": "string" },
                   "message": { "type": "string" }
                 }
               }
@@ -1493,7 +1132,7 @@
       },
       "patch": {
         "tags": ["Enquiry Management"],
-        "summary": "Update enquiry details or CRM status (contacted, dealDone, rejected)",
+        "summary": "Update enquiry details or status (e.g. approved, rejected)",
         "parameters": [
           { "name": "enquiryId", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
@@ -1503,7 +1142,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "status": { "type": "string", "enum": ["pending", "contacted", "dealDone", "rejected"] },
+                  "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
                   "message": { "type": "string" }
                 }
               }
@@ -1512,67 +1151,6 @@
         },
         "responses": {
           "200": { "description": "Enquiry updated successfully" }
-        }
-      }
-    },
-    "/review": {
-      "post": {
-        "tags": ["Reviews & Ratings"],
-        "summary": "Create or update a tenant review for a PG (User/Student only)",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["pgId", "rating", "comment"],
-                "properties": {
-                  "pgId": { "type": "string" },
-                  "rating": { "type": "number", "minimum": 1, "maximum": 5 },
-                  "comment": { "type": "string" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Review created or updated successfully" }
-        }
-      }
-    },
-    "/review/pg/{pgId}": {
-      "get": {
-        "tags": ["Reviews & Ratings"],
-        "summary": "Get all reviews for a PG (Public)",
-        "parameters": [
-          { "name": "pgId", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "List of PG reviews" }
-        }
-      }
-    },
-    "/review/my-review/{pgId}": {
-      "get": {
-        "tags": ["Reviews & Ratings"],
-        "summary": "Get logged in user's review for a PG (User/Student only)",
-        "parameters": [
-          { "name": "pgId", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Tenant review details" }
-        }
-      }
-    },
-    "/review/{reviewId}": {
-      "delete": {
-        "tags": ["Reviews & Ratings"],
-        "summary": "Delete tenant review (Owner of review only)",
-        "parameters": [
-          { "name": "reviewId", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Review deleted successfully" }
         }
       }
     },
@@ -1597,18 +1175,6 @@
         ],
         "responses": {
           "200": { "description": "Overdue scan complete" }
-        }
-      }
-    },
-    "/cron/generate-payroll": {
-      "post": {
-        "tags": ["Cron Tasks"],
-        "summary": "Webhook to manually trigger monthly payroll generation for all active staff",
-        "parameters": [
-          { "name": "cron_secret", "in": "query", "schema": { "type": "string" }, "description": "API Key token matching CRON_SECRET" }
-        ],
-        "responses": {
-          "200": { "description": "Payroll generation complete" }
         }
       }
     },

@@ -2,13 +2,16 @@ const config = require("../config/config");
 const nodemailer = require("nodemailer");
 const logger = require("../config/logger");
 
+const { Resend } = require("resend");
+
+const resend = config.email.resendApiKey ? new Resend(config.email.resendApiKey) : null;
+
 /**
- *
  * @param {string} to
  * @param {string} token
  */
 const sendResetPasswordEmail = async (to, token) => {
-  const subject = "Reset Your Password";
+  const subject = "StaySync: Reset Your Password";
   // Use FRONTEND_URL for email links (must point to the React frontend, not the backend)
   const frontendUrl = config.frontendUrl || config.siteUrl || 'http://localhost:5173';
   const resetPasswordUrl = `${frontendUrl}/reset-password?token=${token}`;
@@ -17,10 +20,10 @@ const sendResetPasswordEmail = async (to, token) => {
     <body style="font-family: Arial, sans-serif; color: #333;">
       <p>Dear User,</p>
       <p>To reset your password, click on the link below:</p>
-      <p><a href="${resetPasswordUrl}" style="color: #6c63ff; font-weight: bold;">Reset Password</a></p>
+      <p><a href="${resetPasswordUrl}" style="color: #6366f1; font-weight: bold;">Reset Password</a></p>
       <p>If you did not request a password reset, please ignore this email.</p>
       <br/>
-      <p style="color: #999; font-size: 12px;">— Team PG Stay</p>
+      <p style="color: #999; font-size: 12px;">— Team StaySync</p>
     </body>
   </html>`;
 
@@ -28,31 +31,58 @@ const sendResetPasswordEmail = async (to, token) => {
 };
 
 const sendEmail = async (to, subject, text) => {
-  const msg = {
-    from: `Admin@PG_Stay <${config.gmail.auth.user}>`,
-    to,
-    subject,
-    html: text,
-  };
+  let from = config.email.from || "test@prathmeshjadhav.com";
+  // Format display name as "StaySync PG Management <email>" so clients render professional sender name
+  if (!from.includes("<")) {
+    from = `StaySync PG Management <${from}>`;
+  }
 
   switch (config.email.provider) {
+    case "resend": {
+      if (!resend) {
+        throw new Error("Resend API key is missing in configuration");
+      }
+      const { data, error } = await resend.emails.send({
+        from,
+        to,
+        subject,
+        html: text,
+      });
+
+      if (error) {
+        logger.error(`Resend email dispatch error: ${JSON.stringify(error)}`);
+        throw new Error(error.message || "Failed to send email via Resend");
+      }
+
+      logger.info(`Email sent via Resend successfully. ID: ${data?.id}`);
+      return data;
+    }
+
     case "sendgrid":
       // to be implemented.
       break;
 
     case "gmail":
-      await transport.sendMail(msg);
-      break;
-
     case "smtp":
-    default:
+    default: {
+      const msg = {
+        from: from.includes("<") ? from : `StaySync PG Management <${from}>`,
+        to,
+        subject,
+        html: text,
+      };
       await transport.sendMail(msg);
       break;
+    }
   }
 };
 
 const transport = (function () {
   switch (config.email.provider) {
+    case "resend":
+      logger.info(`Email provider initialized: Resend (API Key configured)`);
+      return null;
+
     case "sendgrid":
       throw new Error("sendGrid Mailer not supported");
 

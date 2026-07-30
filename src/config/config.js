@@ -57,8 +57,9 @@ module.exports = {
     },
   },
   email: {
-    provider: envVars.EMAIL_PROVIDER, //// sendgrid, aws, nodemailer
+    provider: envVars.EMAIL_PROVIDER || "resend", //// resend, sendgrid, aws, gmail, smtp
     key: envVars.EMAIL_PROVIDER_KEY, // For sendgrid and aws
+    resendApiKey: envVars.RESEND_API_KEY,
     smtp: {
       host: envVars.SMTP_HOST,
       port: envVars.SMTP_PORT,
@@ -67,7 +68,7 @@ module.exports = {
         pass: envVars.SMTP_PASSWORD,
       },
     },
-    from: envVars.EMAIL_FROM,
+    from: envVars.MAIL_FROM || envVars.EMAIL_FROM || "test@prathmeshjadhav.com",
   },
   gmail: {
     auth: {
