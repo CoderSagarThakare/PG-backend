@@ -5,19 +5,6 @@ const ApiError = require("../utils/ApiError");
 const sendResponse = require("../utils/sendResponse");
 
 const createPG = catchAsync(async (req, res) => {
-  // Email verification gate: owner must verify email before creating first PG
-  const { User, PG } = require("../models");
-  const owner = await User.findById(req.user.id).select("isEmailVerified").lean();
-  if (!owner?.isEmailVerified) {
-    const existingPGCount = await PG.countDocuments({ ownerId: req.user.id, isDeleted: false });
-    if (existingPGCount === 0) {
-      throw new ApiError(
-        httpStatus.FORBIDDEN,
-        "Please verify your email address before creating your first PG. Check your inbox or request a new verification email from your profile."
-      );
-    }
-  }
-
   const pgData = {
     ...req.body,
     ownerId: req.user.id,
