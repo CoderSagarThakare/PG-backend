@@ -1,5 +1,6 @@
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
+const logger = require("../config/logger");
 const { sendEmail } = require("./email.service");
 const {
   getUserById,
@@ -8,32 +9,32 @@ const {
 } = require("./user.service");
 
 const sendVerificationOTP = async (to) => {
-  const subject = "PG_Stay: Verify Your Identity";
+  const subject = "StaySync: Verify Your Email Address";
   const otp = generateOTP();
   const currentYear = new Date().getFullYear();
   // Professional Responsive Template
   const text = `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <h1 style="color: #127de0; margin: 0;">PG_Stay</h1>
-        <p style="color: #666; font-size: 14px;">Your Premium Stay Partner</p>
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+      <div style="text-align: center; margin-bottom: 24px; border-bottom: 2px solid #f1f5f9; padding-bottom: 16px;">
+        <h1 style="color: #6366f1; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">StaySync</h1>
+        <p style="color: #64748b; font-size: 13px; margin-top: 4px; font-weight: 500;">Smart & Seamless PG Property Management</p>
       </div>
       
-      <div style="background-color: #f9f9f9; padding: 30px; border-radius: 8px; text-align: center;">
-        <h2 style="color: #333; margin-top: 0;">Verify Your Email</h2>
-        <p style="color: #555; font-size: 16px;">Please use the following One-Time Password (OTP) to complete your verification. This code is valid for <b>2 minutes</b>.</p>
+      <div style="background-color: #f8fafc; padding: 32px 24px; border-radius: 10px; text-align: center; border: 1px solid #f1f5f9;">
+        <h2 style="color: #0f172a; margin-top: 0; font-size: 20px; font-weight: 700;">Verify Your Email Address</h2>
+        <p style="color: #475569; font-size: 15px; line-height: 1.5;">Please use the following One-Time Password (OTP) to complete your account verification. This code expires in <b>2 minutes</b>.</p>
         
-        <div style="margin: 30px 0;">
-          <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #127de0; background: #fff; padding: 10px 20px; border: 2px dashed #127de0; border-radius: 5px;">
+        <div style="margin: 28px 0;">
+          <span style="font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #6366f1; background: #ffffff; padding: 12px 28px; border: 2px dashed #6366f1; border-radius: 8px; display: inline-block;">
             ${otp}
           </span>
         </div>
         
-        <p style="color: #888; font-size: 12px;">If you didn't request this, you can safely ignore this email.</p>
+        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">If you did not request this verification code, please ignore this email.</p>
       </div>
       
-      <div style="margin-top: 20px; text-align: center; color: #999; font-size: 12px;">
-        <p>&copy; ${currentYear} PG_Stay Inc. | All rights reserved.</p>
+      <div style="margin-top: 24px; text-align: center; color: #94a3b8; font-size: 12px;">
+        <p style="margin: 0;">&copy; ${currentYear} StaySync PG Management. All rights reserved.</p>
       </div>
     </div>`;
 
@@ -43,9 +44,10 @@ const sendVerificationOTP = async (to) => {
     await sendEmail(to, subject, text);
     return otp;
   } catch (e) {
+    logger.error("Failed to send verification email:", e);
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
-      "Error while sending verification mail",
+      `Failed to send verification email (${e.message || 'Email service error'}). Please check server SMTP credentials.`,
     );
   }
 };

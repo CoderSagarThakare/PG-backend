@@ -46,8 +46,11 @@ const createPG = {
       }),
     location: Joi.object().keys({
       type: Joi.string().valid("Point").default("Point"),
-      coordinates: Joi.array().items(Joi.number()).length(2).required(),
-    }).optional(),
+      coordinates: Joi.array().items(Joi.number().required()).length(2).required().messages({
+        "number.base": "Geospatial coordinates must be valid numbers.",
+        "array.length": "Coordinates must contain exactly longitude and latitude."
+      }),
+    }).allow(null).optional(),
     totalRooms: Joi.any(),
     totalBeds: Joi.any(),
     occupiedBeds: Joi.any(),
