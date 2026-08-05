@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Review, PG, Bed, RentPayment } = require("../models");
+const { Review, PG, Bed, RentPayment, Onboarding, Employee } = require("../models");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 
@@ -33,7 +33,7 @@ const updatePGAverageRating = async (pgId) => {
 };
 
 /**
- * Check if user is eligible to rate a PG (current or past tenant)
+ * Check if user is eligible to rate a PG (current or past tenant, onboarded user, or assigned employee)
  * @param {string} userId
  * @param {string} pgId
  * @returns {Promise<boolean>}
@@ -43,9 +43,17 @@ const checkUserEligibility = async (userId, pgId) => {
   const currentBed = await Bed.findOne({ userId, pgId, isDeleted: false });
   if (currentBed) return true;
 
+  // Check if user has an active or completed onboarding in this PG
+  const onboarding = await Onboarding.findOne({ userId, pgId, isDeleted: false });
+  if (onboarding) return true;
+
   // Check if user has rent records in this PG (past tenant)
   const hasRentHistory = await RentPayment.findOne({ userId, pgId, isDeleted: false });
   if (hasRentHistory) return true;
+
+  // Check if user is an employee/staff assigned to this PG
+  const isEmployee = await Employee.findOne({ userId, pgIds: pgId, isDeleted: false });
+  if (isEmployee) return true;
 
   return false;
 };

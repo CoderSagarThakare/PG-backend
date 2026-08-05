@@ -10,7 +10,7 @@ logger.warn("--------------------------------------");
 
 // Connect to DB first, then start the server
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(async () => {
-  logger.info(`Connected to MongoDB => ${config.mongoose.url}`);
+  logger.info(`Connected to MongoDB `);
   logger.warn("--------------------------------------");
 
   try {

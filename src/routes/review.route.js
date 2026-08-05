@@ -6,25 +6,25 @@ const { reviewValidation } = require("../validations");
 
 const router = require("express").Router();
 
-// Create or update a review (Tenants only)
+// Create or update a review (Tenants & Employees)
 router.post(
   "/",
-  auth(ROLE_TYPES.user),
+  auth(ROLE_TYPES.user, ROLE_TYPES.employee),
   validate(reviewValidation.createOrUpdateReview),
   reviewController.createOrUpdateReview
 );
 
-// Get all reviews for a PG (Public - all roles: guests, tenants, owners, managers)
+// Get all reviews for a PG (Public - all roles: guests, tenants, owners, managers, employees)
 router.get(
   "/pg/:pgId",
   validate(reviewValidation.getPGReviews),
   reviewController.getPGReviews
 );
 
-// Get logged in user's review for a PG (Tenants only)
+// Get logged in user's review for a PG (Tenants & Employees)
 router.get(
   "/my-review/:pgId",
-  auth(ROLE_TYPES.user),
+  auth(ROLE_TYPES.user, ROLE_TYPES.employee),
   validate(reviewValidation.getMyReview),
   reviewController.getMyReview
 );
@@ -32,7 +32,7 @@ router.get(
 // Delete a review (Owner of the review only)
 router.delete(
   "/:reviewId",
-  auth(ROLE_TYPES.user),
+  auth(ROLE_TYPES.user, ROLE_TYPES.employee),
   validate(reviewValidation.deleteReview),
   reviewController.deleteReview
 );
