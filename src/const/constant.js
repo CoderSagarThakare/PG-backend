@@ -22,6 +22,7 @@ const SCHEMA_NAME = {
   review: "Review",
   onboarding: "Onboarding",
   bedAssignment: "BedAssignment",
+  preBooking: "PreBooking",
 };
 
 const GENDER_TYPES = {

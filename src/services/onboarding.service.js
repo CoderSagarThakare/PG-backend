@@ -32,6 +32,7 @@ const {
   Enquiry,
   User,
   RentPayment,
+  PreBooking,
 } = require("../models");
 const awsService = require("./aws.service");
 const roomService = require("./room.service");
@@ -194,9 +195,28 @@ const updateOnboardingStep = async (onboardingId, staffId, stepData) => {
   }
 
   if (financialTerms !== undefined) {
+    let injectedTerms = { ...financialTerms };
+    const user = await User.findById(onboarding.userId).select('mobNo1 email');
+    const preBooking = await PreBooking.findOne({ 
+      pgId: onboarding.pgId, 
+      status: 'reserved', 
+      isDeleted: false,
+      $or: [
+        { userId: onboarding.userId },
+        ...(user?.mobNo1 ? [{ 'guestDetails.phone': user.mobNo1 }] : []),
+        ...(user?.email ? [{ 'guestDetails.email': user.email }] : [])
+      ]
+    });
+    
+    if (preBooking) {
+      injectedTerms.preBookingAdvanceCredited = preBooking.advanceAmount;
+      injectedTerms.preBookingId = preBooking._id;
+      injectedTerms.netDepositDue = Math.max(0, (injectedTerms.securityDepositAmount || onboarding.financialTerms?.securityDepositAmount || 0) - preBooking.advanceAmount);
+    }
+
     onboarding.financialTerms = {
       ...onboarding.financialTerms?.toObject?.() ?? {},
-      ...financialTerms,
+      ...injectedTerms,
     };
   }
 
@@ -825,6 +845,29 @@ const getBedHistory = async (userId) => {
 
 // ── Exports ───────────────────────────────────────────────────────────────────
 
+const getVacatingTenants = async (pgId, staffId) => {
+  const pg = await PG.findById(pgId).select("ownerId managerId");
+  if (!pg) throw new ApiError(httpStatus.NOT_FOUND, "PG not found");
+  assertStaffAccessToPG(pg, staffId);
+
+  const beds = await Bed.find({ pgId, status: 'vacating_soon', isDeleted: false });
+  const userIds = beds.map(b => b.userId).filter(Boolean);
+
+  const onboardings = await Onboarding.find({
+    pgId,
+    userId: { $in: userIds },
+    status: 'onboarding_completed',
+    isDeleted: false
+  }).populate('userId', 'name email mobNo1').populate('pgId', 'name address').lean();
+
+  const bedMap = new Map(beds.map(b => [b.userId.toString(), b]));
+
+  return onboardings.map(o => ({
+    ...o,
+    vacatingDetails: bedMap.get(o.userId._id.toString())?.vacatingDetails
+  }));
+};
+
 module.exports = {
   initiateOnboarding,
   updateOnboardingStep,
@@ -837,4 +880,5 @@ module.exports = {
   queryTenants,
   getMyPGInfo,
   getBedHistory,
+  getVacatingTenants,
 };

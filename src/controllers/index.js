@@ -11,3 +11,4 @@ module.exports.employeeController = require("./employee.controller");
 module.exports.roomController = require("./room.controller");
 module.exports.avatarController = require("./avatar.controller");
 module.exports.reviewController = require("./review.controller");
+module.exports.preBookingController = require("./preBooking.controller");

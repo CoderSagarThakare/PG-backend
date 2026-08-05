@@ -10,7 +10,14 @@ const ApiError = require('../utils/ApiError');
 const updatePGBedStats = async (pgId) => {
   const [totalBeds, occupiedBeds, emptyBeds, totalRooms] = await Promise.all([
     Bed.countDocuments({ pgId, isDeleted: false }),
-    Bed.countDocuments({ pgId, status: 'occupied', isDeleted: false }),
+    Bed.countDocuments({
+      pgId,
+      isDeleted: false,
+      $or: [
+        { status: { $in: ['occupied', 'vacating_soon'] } },
+        { status: 'reserved', userId: { $ne: null } }
+      ]
+    }),
     Bed.countDocuments({ pgId, status: 'available', isDeleted: false }),
     Room.countDocuments({ pgId, isDeleted: false })
   ]);
@@ -64,7 +71,9 @@ const createRoom = async (roomBody) => {
 const getRoomsByPg = async (pgId) => {
   const rooms = await Room.find({ pgId, isDeleted: false }).lean();
   const roomIds = rooms.map(r => r._id);
-  const beds = await Bed.find({ roomId: { $in: roomIds }, isDeleted: false }).populate('userId', 'name email mobNo1 vehicleType vehicleNumber');
+  const beds = await Bed.find({ roomId: { $in: roomIds }, isDeleted: false })
+    .populate('userId', 'name email mobNo1 vehicleType vehicleNumber')
+    .populate('activePreBookingId');
 
   // Map beds to their rooms
   return rooms.map(room => ({
@@ -85,7 +94,7 @@ const assignTenant = async (bedId, userId, joiningDate) => {
   if (!bed || bed.isDeleted) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Bed not found');
   }
-  if (bed.status !== 'available') {
+  if (!['available', 'reserved'].includes(bed.status)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Bed is already occupied or under maintenance');
   }
 
@@ -140,9 +149,20 @@ const assignTenant = async (bedId, userId, joiningDate) => {
   }
   // coLiving: any gender is fine as long as it is set (already checked above)
 
+  // Handle reserved bed assignment
+  if (bed.status === 'reserved' && bed.activePreBookingId) {
+    const { PreBooking } = require('../models');
+    await PreBooking.updateOne(
+      { _id: bed.activePreBookingId },
+      { $set: { status: 'onboarded' } }
+    );
+    bed.activePreBookingId = null;
+  }
+
   bed.userId    = userId;
   bed.status    = 'occupied';
   bed.assignedAt = joiningDate ? new Date(joiningDate) : new Date();
+  bed.vacatingDetails = undefined;
   await bed.save();
 
   await updatePGBedStats(bed.pgId);
@@ -203,8 +223,13 @@ const unassignTenant = async (bedId) => {
   }
 
   bed.userId    = null;
-  bed.status    = 'available';
   bed.assignedAt = null;
+  bed.vacatingDetails = undefined;
+  if (bed.activePreBookingId) {
+    bed.status = 'reserved';
+  } else {
+    bed.status = 'available';
+  }
   await bed.save();
 
   await updatePGBedStats(bed.pgId);

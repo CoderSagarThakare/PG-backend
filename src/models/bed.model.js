@@ -39,8 +39,18 @@ const bedSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["available", "occupied", "maintenance"],
+      enum: ["available", "occupied", "vacating_soon", "reserved", "maintenance"],
       default: "available",
+    },
+    vacatingDetails: {
+      vacatingDate: { type: Date },
+      noticeGivenAt: { type: Date },
+      reason: { type: String, trim: true },
+    },
+    activePreBookingId: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: SCHEMA_NAME.preBooking,
+      default: null,
     },
     isDeleted: {
       type: Boolean,

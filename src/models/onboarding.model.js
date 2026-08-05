@@ -76,6 +76,9 @@ const onboardingSchema = new mongoose.Schema(
       securityDepositDate: { type: Date },
       /** Day of month on which rent is due (overrides PG default if set) */
       dueDay: { type: Number, min: 1, max: 31 },
+      preBookingAdvanceCredited: { type: Number, default: 0 },
+      preBookingId: { type: ObjectId, ref: SCHEMA_NAME.preBooking, default: null },
+      netDepositDue: { type: Number, min: 0 },
     },
 
     /** Agreed joining date */
