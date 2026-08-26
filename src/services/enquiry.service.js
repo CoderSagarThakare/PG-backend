@@ -176,8 +176,30 @@ const updateEnquiryById = async (enquiryId, updateBody, staffId) => {
     throw new ApiError(httpStatus.NOT_FOUND, "Enquiry not found");
   }
 
+  // ── Post-deleted guard ─────────────────────────────────────────────────────
+  // If the linked vacancy post has been deleted, block forward-progression
+  // (contacted → visited → dealDone). Only allow 'rejected' / 'inventoryFull'
+  // for cleanup.  Enquiries already at 'dealDone' may still transition
+  // (e.g. revert, or proceed to onboarding) because the deal was closed
+  // before the post was removed.
   const oldStatus = enquiry.status;
   const newStatus = updateBody.status;
+  if (newStatus) {
+    const post = await Post.findById(enquiry.postId).select('isDeleted').lean();
+    const postDeleted = post?.isDeleted === true || !post;
+
+    if (postDeleted) {
+      const allowedOnDeletedPost = ['rejected', 'inventoryFull'];
+
+      // If the enquiry is NOT already at dealDone, only allow closing statuses
+      if (oldStatus !== 'dealDone' && !allowedOnDeletedPost.includes(newStatus)) {
+        throw new ApiError(
+          httpStatus.BAD_REQUEST,
+          'Cannot progress this enquiry: the vacancy post has been deleted. You may only reject or mark as inventory full.'
+        );
+      }
+    }
+  }
 
   // If status changes away from dealDone, clean up pending onboarding record
   if (oldStatus === "dealDone" && newStatus && newStatus !== "dealDone") {

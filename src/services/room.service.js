@@ -110,10 +110,20 @@ const assignTenant = async (bedId, userId, joiningDate) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Cannot assign bed: Tenant must have an enquiry with "dealDone" status for this property.');
   }
 
-  // Ensure user is not already assigned to another bed in this PG
-  const existingAssignment = await Bed.findOne({ pgId: bed.pgId, userId, status: 'occupied', isDeleted: false });
+  // Ensure user is not already assigned to another bed in this PG.
+  // Don't filter by bed status — a bed can be 'reserved' (pre-booked for the
+  // next tenant) while the current tenant's userId is still on it.
+  // Any bed that has this userId set means the tenant is still occupying it.
+  const existingAssignment = await Bed.findOne({
+    pgId: bed.pgId,
+    userId,
+    isDeleted: false,
+  });
   if (existingAssignment) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Cannot assign bed: Tenant already has an active occupancy in this property.');
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Cannot assign bed: Tenant already has an active occupancy in this property.'
+    );
   }
 
   // ── Gender validation against PG type ──────────────────────────────────────
@@ -368,7 +378,7 @@ const getEligibleTenants = async (pgId) => {
     Onboarding.find({ pgId, status: 'onboarding_completed', isDeleted: false })
       .populate('userId', 'name email mobNo1 gender vehicleType vehicleNumber')
       .lean(),
-    Bed.find({ pgId, status: 'occupied', isDeleted: false }).select('userId').lean(),
+    Bed.find({ pgId, userId: { $ne: null }, isDeleted: false }).select('userId').lean(),
     PG.findById(pgId).select('pgType'),
   ]);
 

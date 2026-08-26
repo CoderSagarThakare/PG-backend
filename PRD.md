@@ -402,6 +402,23 @@ stateDiagram-v2
 4. **Step 3 (Joining Date)**: Select joining date and complete onboarding.
 5. **Bed Assignment**: Assign pre-booked bed. Updates bed status to `occupied`, sets `activePreBookingId = null`, and marks pre-booking as `onboarded`.
 
+### 5.4 Enquiry Lifecycle — Post-Deleted Guard
+When a Vacancy Post is soft-deleted, the following rules apply to its linked enquiries:
+
+| Enquiry Status | Allowed Actions | Blocked Actions |
+| :--- | :--- | :--- |
+| `interested` / `contacted` / `visited` | Change to `rejected` or `inventoryFull` | Forward-progression to `contacted` / `visited` / `dealDone` |
+| `dealDone` | **All transitions allowed** (including Onboard) | None — the deal was closed before the post was removed |
+| `rejected` / `inventoryFull` | Already terminal | N/A |
+
+**Enforcement Layers**:
+- **Backend Guard** (`enquiry.service.js` → `updateEnquiryById`): Checks `Post.isDeleted` before allowing status transitions. Throws `400 Bad Request` if a blocked forward-progression is attempted.
+- **Frontend Guard** (`Enquiries.jsx`):
+  - Edit (pencil) icon replaced with a disabled Ban icon for non-`dealDone` enquiries with deleted posts.
+  - Update modal restricts the status dropdown to only `rejected` / `inventoryFull` options with a warning banner.
+  - Auto-contact mutation on Call button (interested → contacted) is suppressed when the post is deleted.
+- **Onboard button**: Always visible for `dealDone` enquiries regardless of post deletion status — the deal was finalized before the post was removed.
+
 ---
 
 ## 6. Complete API Endpoint Specification
