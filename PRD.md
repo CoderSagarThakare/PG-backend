@@ -359,6 +359,28 @@ Manages tenant onboarding workflows, financial security terms, pre-booking advan
 }
 ```
 
+### 4.7 `Employee` Model (`employee.model.js`)
+Represents a staff profile linked to an existing User account, specifying operational details like PG assignments, designation (subrole), and salary details.
+
+```javascript
+{
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  pgIds: [{ type: Schema.Types.ObjectId, ref: 'Pg', required: true }],
+  joinedDate: { type: Date, required: true },
+  monthlySalary: { type: Number, required: true, min: 0 },
+  pgSalaries: { type: Map, of: Number, default: {} },
+  designation: { 
+    type: String, 
+    enum: ['caretaker', 'cook', 'cleaner', 'security', 'warden', 'maintenance', 'manager', 'other'], 
+    default: 'other' 
+  },
+  status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+  notes: { type: String, trim: true, default: null },
+  addedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+  isDeleted: { type: Boolean, default: false }
+}
+```
+
 ---
 
 ## 5. Core Workflows & Business Logic

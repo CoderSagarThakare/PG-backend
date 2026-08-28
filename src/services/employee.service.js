@@ -5,6 +5,39 @@ const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 
 /**
+ * Clean employee record by filtering out null or deleted PGs,
+ * updating the pgSalaries map accordingly, and recalculating total salary.
+ */
+const cleanEmployeeRecord = (emp) => {
+  if (!emp) return emp;
+
+  // Filter out null / deleted pgIds
+  const activePgIds = (emp.pgIds || []).filter(Boolean);
+
+  // Create a clean pgSalaries object containing only active PG IDs
+  const activePgIdStrings = activePgIds.map(pg => String(pg._id || pg));
+  const cleanedPgSalaries = {};
+  if (emp.pgSalaries) {
+    const salariesObj = emp.pgSalaries instanceof Map ? Object.fromEntries(emp.pgSalaries) : emp.pgSalaries;
+    for (const pgIdStr of activePgIdStrings) {
+      if (salariesObj[pgIdStr] !== undefined) {
+        cleanedPgSalaries[pgIdStr] = salariesObj[pgIdStr];
+      }
+    }
+  }
+
+  // Recalculate total salary based on active PGs to prevent revenue leakage
+  const activeTotalSalary = Object.values(cleanedPgSalaries).reduce((sum, val) => sum + (Number(val) || 0), 0);
+
+  return {
+    ...emp,
+    pgIds: activePgIds,
+    pgSalaries: cleanedPgSalaries,
+    monthlySalary: activeTotalSalary > 0 ? activeTotalSalary : emp.monthlySalary
+  };
+};
+
+/**
  * Add a staff member (employee/manager) to a PG.
  * The role is derived from the existing User account — no role override allowed.
  */
@@ -55,7 +88,7 @@ const syncManagerWithPgs = async (managerUserId, oldPgIds = [], newPgIds = []) =
  * The role is derived from the existing User account — no role override allowed.
  */
 const addEmployee = async (data, addedBy) => {
-  const { userId, pgId, pgIds, joinedDate, monthlySalary, notes, pgSalaries } = data;
+  const { userId, pgId, pgIds, joinedDate, monthlySalary, notes, pgSalaries, designation } = data;
 
   // Validate user exists and has an allowed role
   const user = await User.findOne({ _id: userId, isDeleted: false });
@@ -92,6 +125,7 @@ const addEmployee = async (data, addedBy) => {
     if (joinedDate) employee.joinedDate = joinedDate;
     if (notes) employee.notes = notes;
     if (pgSalaries !== undefined) employee.pgSalaries = pgSalaries;
+    if (designation !== undefined) employee.designation = designation;
     await employee.save();
   } else {
     // Create new profile record
@@ -101,6 +135,7 @@ const addEmployee = async (data, addedBy) => {
       joinedDate,
       monthlySalary,
       pgSalaries: pgSalaries || {},
+      designation: designation || (user.role === "manager" ? "manager" : "other"),
       notes: notes || null,
       addedBy,
     });
@@ -111,10 +146,11 @@ const addEmployee = async (data, addedBy) => {
     await syncManagerWithPgs(userId, oldPgIds, employee.pgIds);
   }
 
-  return employee.populate([
+  const populated = await employee.populate([
     { path: "userId", select: "name email mobNo1 role picture profileImageKey" },
-    { path: "pgIds", select: "name" },
+    { path: "pgIds", select: "name", match: { isDeleted: false } },
   ]);
+  return cleanEmployeeRecord(populated.toObject());
 };
 
 /**
@@ -130,7 +166,7 @@ const getEmployees = async ({ pgId, userId, status, page = 1, limit = 20 }) => {
   const [employees, total] = await Promise.all([
     Employee.find(filter)
       .populate({ path: "userId", select: "name email mobNo1 role picture gender profileImageKey" })
-      .populate({ path: "pgIds", select: "name" })
+      .populate({ path: "pgIds", select: "name", match: { isDeleted: false } })
       .populate({ path: "addedBy", select: "name" })
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -138,7 +174,9 @@ const getEmployees = async ({ pgId, userId, status, page = 1, limit = 20 }) => {
     Employee.countDocuments(filter),
   ]);
 
-  return { employees, total, page: Number(page), limit: Number(limit) };
+  const cleanedEmployees = employees.map(emp => cleanEmployeeRecord(emp.toObject()));
+
+  return { employees: cleanedEmployees, total, page: Number(page), limit: Number(limit) };
 };
 
 /**
@@ -181,7 +219,7 @@ const updateEmployee = async (employeeId, updates) => {
     }
   }
 
-  const allowed = ["monthlySalary", "status", "notes", "joinedDate", "pgIds", "pgSalaries"];
+  const allowed = ["monthlySalary", "status", "notes", "joinedDate", "pgIds", "pgSalaries", "designation"];
   allowed.forEach((key) => {
     if (updates[key] !== undefined) employee[key] = updates[key];
   });
@@ -193,10 +231,11 @@ const updateEmployee = async (employeeId, updates) => {
     await syncManagerWithPgs(employee.userId, oldPgIds, employee.pgIds);
   }
 
-  return employee.populate([
+  const populated = await employee.populate([
     { path: "userId", select: "name email mobNo1 role picture profileImageKey" },
-    { path: "pgIds", select: "name" },
+    { path: "pgIds", select: "name", match: { isDeleted: false } },
   ]);
+  return cleanEmployeeRecord(populated.toObject());
 };
 
 /**

@@ -19,6 +19,22 @@ const getUser = catchAsync(async (req, res) => {
     aadharFileUrl = await awsService.getFileUrl(user.aadharFileKey);
   }
 
+  let employeeDetails = null;
+  if (["employee", "manager"].includes(user.role)) {
+    const { Employee } = require("../models");
+    const emp = await Employee.findOne({ userId: user._id, isDeleted: false })
+      .populate("pgIds", "name")
+      .lean();
+    if (emp) {
+      employeeDetails = {
+        designation: emp.designation || "other",
+        monthlySalary: emp.monthlySalary || 0,
+        joinedDate: emp.joinedDate || null,
+        pgs: emp.pgIds?.map(p => ({ id: p._id, name: p.name })) || [],
+      };
+    }
+  }
+
   sendResponse(res, {
     data: {
       id: user._id,
@@ -37,6 +53,7 @@ const getUser = catchAsync(async (req, res) => {
       isEmailVerified: user.isEmailVerified,
       vehicleType: user.vehicleType || "none",
       vehicleNumber: user.vehicleNumber || null,
+      employeeDetails,
       createdAt: user.createdAt,
     },
     statusCode: httpStatus.OK,

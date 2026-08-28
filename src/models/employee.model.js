@@ -31,6 +31,11 @@ const employeeSchema = mongoose.Schema(
       of: Number,
       default: {},
     },
+    designation: {
+      type: String,
+      enum: ["caretaker", "cook", "cleaner", "security", "warden", "maintenance", "manager", "other"],
+      default: "other",
+    },
     status: {
       type: String,
       enum: ["active", "inactive"],
