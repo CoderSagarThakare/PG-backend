@@ -65,7 +65,7 @@ const getEmployees = catchAsync(async (req, res) => {
     }
   }
 
-  const result = await employeeService.getEmployees(query);
+  const result = await employeeService.getEmployees(query, req.user);
   if (result && Array.isArray(result.employees)) {
     for (const emp of result.employees) {
       if (emp.userId) {
@@ -86,7 +86,7 @@ const updateEmployee = catchAsync(async (req, res) => {
     }
   }
 
-  const employee = await employeeService.updateEmployee(req.params.id, req.body);
+  const employee = await employeeService.updateEmployee(req.params.id, req.body, req.user._id);
   if (employee && employee.userId) {
     await resolveUserPicture(employee.userId);
   }

@@ -308,14 +308,29 @@ const syncPostVacancy = async (pgId, opts = {}) => {
 
     if (post.pgType === 'unisex') {
       // In unisex PGs, we track male and female vacancy counts.
+      let currentMale = post.maleVacancyCount || 0;
+      let currentFemale = post.femaleVacancyCount || 0;
+
+      // Adjust vacancy count if gender and delta are provided (e.g. during assign/unassign)
+      if (opts.userGender && opts.delta !== undefined) {
+        const gender = String(opts.userGender).toLowerCase();
+        const delta = Number(opts.delta);
+        if (gender === 'male') {
+          currentMale = Math.max(0, currentMale + delta);
+        } else if (gender === 'female') {
+          currentFemale = Math.max(0, currentFemale + delta);
+        }
+      }
+
       // If the sum exceeds total empty beds, adjust/cap them.
-      const currentMale = post.maleVacancyCount || 0;
-      const currentFemale = post.femaleVacancyCount || 0;
       const totalRequested = currentMale + currentFemale;
 
       if (totalRequested > emptyBeds) {
         post.maleVacancyCount = Math.min(currentMale, emptyBeds);
         post.femaleVacancyCount = Math.max(0, emptyBeds - post.maleVacancyCount);
+      } else {
+        post.maleVacancyCount = currentMale;
+        post.femaleVacancyCount = currentFemale;
       }
       post.vacancyCount = (post.maleVacancyCount || 0) + (post.femaleVacancyCount || 0);
     } else {

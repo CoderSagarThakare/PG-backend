@@ -38,6 +38,50 @@ const cleanEmployeeRecord = (emp) => {
 };
 
 /**
+ * Scope employee records to hide other owners' confidential PGs and salary mappings.
+ */
+const scopeEmployeeForUser = async (emp, requestingUser) => {
+  if (!emp || !requestingUser) return emp;
+
+  // Employees see their own full details. Admin sees everything.
+  if (requestingUser.role === "employee" || requestingUser.role === "admin") {
+    return emp;
+  }
+
+  // Find all PGs managed by the requesting user
+  const managedPGs = await PG.find({
+    $or: [{ ownerId: requestingUser._id }, { managerId: requestingUser._id }],
+    isDeleted: false,
+  }).select("_id");
+  const managedPgIdStrings = new Set(managedPGs.map(pg => String(pg._id)));
+
+  // Filter pgIds
+  const originalPgIds = emp.pgIds || [];
+  const scopedPgIds = originalPgIds.filter(pg => managedPgIdStrings.has(String(pg._id || pg)));
+
+  // Filter pgSalaries
+  const scopedPgSalaries = {};
+  if (emp.pgSalaries) {
+    const salariesObj = emp.pgSalaries instanceof Map ? Object.fromEntries(emp.pgSalaries) : emp.pgSalaries;
+    for (const pgIdStr of managedPgIdStrings) {
+      if (salariesObj[pgIdStr] !== undefined) {
+        scopedPgSalaries[pgIdStr] = salariesObj[pgIdStr];
+      }
+    }
+  }
+
+  // Calculate scoped monthly salary (sum of scoped salaries)
+  const scopedMonthlySalary = Object.values(scopedPgSalaries).reduce((sum, val) => sum + (Number(val) || 0), 0);
+
+  return {
+    ...emp,
+    pgIds: scopedPgIds,
+    pgSalaries: scopedPgSalaries,
+    monthlySalary: scopedMonthlySalary > 0 ? scopedMonthlySalary : (scopedPgIds.length === 0 ? 0 : emp.monthlySalary)
+  };
+};
+
+/**
  * Add a staff member (employee/manager) to a PG.
  * The role is derived from the existing User account — no role override allowed.
  */
@@ -150,13 +194,15 @@ const addEmployee = async (data, addedBy) => {
     { path: "userId", select: "name email mobNo1 role picture profileImageKey" },
     { path: "pgIds", select: "name", match: { isDeleted: false } },
   ]);
-  return cleanEmployeeRecord(populated.toObject());
+  const cleaned = cleanEmployeeRecord(populated.toObject());
+  const requestingUser = addedBy ? await User.findById(addedBy) : null;
+  return scopeEmployeeForUser(cleaned, requestingUser);
 };
 
 /**
  * Get all staff for PGs owned/managed by this user.
  */
-const getEmployees = async ({ pgId, userId, status, page = 1, limit = 20 }) => {
+const getEmployees = async ({ pgId, userId, status, page = 1, limit = 20 }, requestingUser) => {
   const filter = { isDeleted: false };
   if (pgId) filter.pgIds = pgId;
   if (userId) filter.userId = userId;
@@ -175,20 +221,60 @@ const getEmployees = async ({ pgId, userId, status, page = 1, limit = 20 }) => {
   ]);
 
   const cleanedEmployees = employees.map(emp => cleanEmployeeRecord(emp.toObject()));
+  const scopedEmployees = await Promise.all(cleanedEmployees.map(emp => scopeEmployeeForUser(emp, requestingUser)));
 
-  return { employees: cleanedEmployees, total, page: Number(page), limit: Number(limit) };
+  return { employees: scopedEmployees, total, page: Number(page), limit: Number(limit) };
 };
 
 /**
  * Update a staff member's salary, status, or notes.
  */
-const updateEmployee = async (employeeId, updates) => {
+const updateEmployee = async (employeeId, updates, staffId) => {
   const employee = await Employee.findOne({ _id: employeeId, isDeleted: false });
   if (!employee) throw new ApiError(httpStatus.NOT_FOUND, "Staff record not found");
 
   const user = await User.findById(employee.userId);
   const isManager = user && user.role === "manager";
   const oldPgIds = [...employee.pgIds];
+
+  // Protect other owners' PG assignments and salaries from being overwritten
+  if (staffId) {
+    const managedPGs = await PG.find({
+      $or: [{ ownerId: staffId }, { managerId: staffId }],
+      isDeleted: false,
+    }).select("_id");
+    const managedPgIdStrings = new Set(managedPGs.map(pg => String(pg._id)));
+
+    // 1. Merge and protect pgIds
+    if (updates.pgIds !== undefined) {
+      const otherOwnerPgIds = employee.pgIds.filter(pgId => !managedPgIdStrings.has(String(pgId)));
+      const newPgIds = updates.pgIds.map(id => new mongoose.Types.ObjectId(id));
+      updates.pgIds = [...otherOwnerPgIds, ...newPgIds];
+    }
+
+    // 2. Merge and protect pgSalaries
+    if (updates.pgSalaries !== undefined) {
+      const originalSalaries = employee.pgSalaries instanceof Map ? Object.fromEntries(employee.pgSalaries) : (employee.pgSalaries || {});
+      const cleanedSalaries = {};
+      
+      // Preserve other owners' salaries
+      for (const [key, val] of Object.entries(originalSalaries)) {
+        if (!managedPgIdStrings.has(key)) {
+          cleanedSalaries[key] = val;
+        }
+      }
+      // Set current owner's new salaries
+      for (const [key, val] of Object.entries(updates.pgSalaries)) {
+        if (managedPgIdStrings.has(key)) {
+          cleanedSalaries[key] = Number(val) || 0;
+        }
+      }
+      updates.pgSalaries = cleanedSalaries;
+
+      // Recalculate total monthlySalary across all PGs (own + other owners)
+      updates.monthlySalary = Object.values(cleanedSalaries).reduce((sum, val) => sum + (Number(val) || 0), 0);
+    }
+  }
 
   // If updates.pgIds is provided, prevent unassigning the manager if they are the current active manager of the PG
   if (isManager && updates.pgIds !== undefined) {
@@ -235,7 +321,10 @@ const updateEmployee = async (employeeId, updates) => {
     { path: "userId", select: "name email mobNo1 role picture profileImageKey" },
     { path: "pgIds", select: "name", match: { isDeleted: false } },
   ]);
-  return cleanEmployeeRecord(populated.toObject());
+
+  const cleaned = cleanEmployeeRecord(populated.toObject());
+  const requestingUser = staffId ? await User.findById(staffId) : null;
+  return scopeEmployeeForUser(cleaned, requestingUser);
 };
 
 /**

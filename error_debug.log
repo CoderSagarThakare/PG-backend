@@ -5198,3 +5198,108 @@ Stack: Error: please authenticate
     at new Promise (<anonymous>)
     at C:\SAGAR\PG MGMT SYS\PG-backend\src\middlewares\auth.js:8:12
 
+[2026-08-28T10:10:27.580Z] PATCH /staff-payments/undefined/pay
+Status: 400
+Error: Cast to ObjectId failed for value "undefined" (type string) at path "_id" for model "StaffPayment"
+Stack: CastError: Cast to ObjectId failed for value "undefined" (type string) at path "_id" for model "StaffPayment"
+    at SchemaObjectId.cast (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\mongoose\lib\schema\objectId.js:250:11)
+    at SchemaType.applySetters (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\mongoose\lib\schemaType.js:1221:12)
+    at SchemaType.castForQuery (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\mongoose\lib\schemaType.js:1636:17)
+    at cast (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\mongoose\lib\cast.js:375:32)
+    at Query.cast (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\mongoose\lib\query.js:4746:12)
+    at Query._castConditions (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\mongoose\lib\query.js:2200:10)
+    at model.Query._findOne (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\mongoose\lib\query.js:2484:8)
+    at model.Query.exec (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\mongoose\lib\query.js:4290:80)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\SAGAR\PG MGMT SYS\PG-backend\src\controllers\staffPayment.controller.js:72:25
+
+[2026-08-29T09:10:14.666Z] GET /profile
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\SAGAR\PG MGMT SYS\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+
+[2026-08-29T09:10:14.973Z] GET /pg
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\SAGAR\PG MGMT SYS\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+
+[2026-08-29T09:10:14.994Z] GET /employees?limit=100
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\SAGAR\PG MGMT SYS\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+
+[2026-08-29T09:10:15.007Z] GET /expenses?month=2026-08&limit=100
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\SAGAR\PG MGMT SYS\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+
+[2026-08-29T09:10:15.032Z] GET /staff-payments?month=2026-08&limit=100
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\SAGAR\PG MGMT SYS\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+
+[2026-08-29T09:17:11.415Z] GET /profile
+Status: 401
+Error: please authenticate
+Stack: Error: please authenticate
+    at C:\SAGAR\PG MGMT SYS\PG-backend\src\middlewares\auth.js:31:9
+    at allFailed (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport\lib\middleware\authenticate.js:305:9)
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\jsonwebtoken\verify.js:101:10)
+    at module.exports [as JwtVerifier] (C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\verify_jwt.js:4:16)
+    at C:\SAGAR\PG MGMT SYS\PG-backend\node_modules\passport-jwt\lib\strategy.js:104:25
+
