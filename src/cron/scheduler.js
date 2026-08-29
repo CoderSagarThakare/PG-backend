@@ -67,7 +67,6 @@ const startCronJobs = () => {
     cronOptions
   );
 
-  logger.info("Cron jobs successfully initialized in Asia/Kolkata timezone.");
 };
 
 module.exports = { startCronJobs };

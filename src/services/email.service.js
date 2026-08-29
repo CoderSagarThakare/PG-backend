@@ -80,7 +80,6 @@ const sendEmail = async (to, subject, text) => {
 const transport = (function () {
   switch (config.email.provider) {
     case "resend":
-      logger.info(`Email provider initialized: Resend (API Key configured)`);
       return null;
 
     case "sendgrid":
@@ -91,8 +90,6 @@ const transport = (function () {
       throw new Error("AWS Mailer not supported");
 
     case "gmail":
-      // NOTE: Port 465 (SSL) is blocked by many cloud providers (Render, Railway, AWS).
-      // Use port 587 with STARTTLS (secure: false + requireTLS: true) instead.
       const mailTransporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 587,
