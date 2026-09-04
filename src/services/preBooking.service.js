@@ -103,7 +103,8 @@ const setVacatingNotice = async (bedId, vacatingDate, reason, staffId) => {
   if (!bed) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Bed not found');
   }
-  if (!['occupied', 'reserved'].includes(bed.status) || (bed.status === 'reserved' && !bed.userId)) {
+  const hasActiveOccupant = bed.userId && ['occupied', 'vacating_soon', 'reserved'].includes(bed.status);
+  if (!hasActiveOccupant) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Bed does not have an active occupant to set vacating notice');
   }
 

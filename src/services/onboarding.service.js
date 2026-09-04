@@ -386,7 +386,7 @@ const getOnboarding = async (onboardingId, requestingUser) => {
   const activeBed = await Bed.findOne({
     pgId: onboarding.pgId?._id || onboarding.pgId,
     userId: onboarding.userId?._id || onboarding.userId,
-    status: "occupied",
+    status: { $in: ["occupied", "vacating_soon", "reserved"] },
     isDeleted: false,
   }).populate("roomId").lean();
 
@@ -442,7 +442,7 @@ const listOnboardings = async (pgId, filters, staffId) => {
   const activeBeds = await Bed.find({
     pgId,
     userId: { $in: userIds },
-    status: "occupied",
+    status: { $in: ["occupied", "vacating_soon", "reserved"] },
     isDeleted: false,
   }).populate("roomId").lean();
 
@@ -728,7 +728,7 @@ const queryTenants = async (filters, staffId) => {
   const activeBeds = await Bed.find({
     pgId: { $in: managedPGIds },
     userId: { $in: userIds },
-    status: "occupied",
+    status: { $in: ["occupied", "vacating_soon", "reserved"] },
     isDeleted: false,
   }).populate("roomId").lean();
 
