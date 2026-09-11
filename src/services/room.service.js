@@ -86,10 +86,30 @@ const getRoomsByPg = async (pgId) => {
  * Assign a tenant to a bed
  * @param {string} bedId
  * @param {string} userId
+/**
+ * Helper to verify staff has ownership/manager access to a PG
+ */
+const assertStaffAccessToPG = async (pgId, staffId) => {
+  if (!staffId) return;
+  const pg = await PG.findById(pgId).select('ownerId managerId isDeleted');
+  if (!pg || pg.isDeleted) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'PG not found');
+  }
+  const sId = staffId.toString();
+  if (pg.ownerId?.toString() !== sId && pg.managerId?.toString() !== sId) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'Access denied: you are not the owner or manager of this PG');
+  }
+};
+
+/**
+ * Assign a tenant to a bed
+ * @param {string} bedId
+ * @param {string} userId
  * @param {Date|string} [joiningDate]
+ * @param {string} [staffId]
  * @returns {Promise<Bed>}
  */
-const assignTenant = async (bedId, userId, joiningDate) => {
+const assignTenant = async (bedId, userId, joiningDate, staffId) => {
   const bed = await Bed.findById(bedId);
   if (!bed || bed.isDeleted) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Bed not found');
@@ -97,6 +117,8 @@ const assignTenant = async (bedId, userId, joiningDate) => {
   if (!['available', 'reserved'].includes(bed.status)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Bed is already occupied or under maintenance');
   }
+
+  await assertStaffAccessToPG(bed.pgId, staffId);
 
   // Verify that there is an enquiry with 'dealDone' status for this user and PG
   const enquiry = await Enquiry.findOne({ 
@@ -210,13 +232,16 @@ const assignTenant = async (bedId, userId, joiningDate) => {
 /**
  * Remove a tenant from a bed
  * @param {string} bedId
+ * @param {string} [staffId]
  * @returns {Promise<Bed>}
  */
-const unassignTenant = async (bedId) => {
+const unassignTenant = async (bedId, staffId) => {
   const bed = await Bed.findById(bedId);
   if (!bed || bed.isDeleted) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Bed not found');
   }
+
+  await assertStaffAccessToPG(bed.pgId, staffId);
 
   // Capture the previous occupant's gender BEFORE clearing the bed
   // so syncPostVacancy knows which counter to increment
@@ -257,13 +282,16 @@ const unassignTenant = async (bedId) => {
  * Update bed details (price, position, status)
  * @param {string} bedId
  * @param {Object} updateBody
+ * @param {string} [staffId]
  * @returns {Promise<Bed>}
  */
-const updateBed = async (bedId, updateBody) => {
+const updateBed = async (bedId, updateBody, staffId) => {
   const bed = await Bed.findById(bedId);
   if (!bed || bed.isDeleted) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Bed not found');
   }
+
+  await assertStaffAccessToPG(bed.pgId, staffId);
 
   Object.assign(bed, updateBody);
   await bed.save();
@@ -278,13 +306,16 @@ const updateBed = async (bedId, updateBody) => {
  * Update room details
  * @param {string} roomId
  * @param {Object} updateBody
+ * @param {string} [staffId]
  * @returns {Promise<Room>}
  */
-const updateRoom = async (roomId, updateBody) => {
+const updateRoom = async (roomId, updateBody, staffId) => {
   const room = await Room.findById(roomId);
   if (!room || room.isDeleted) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
   }
+
+  await assertStaffAccessToPG(room.pgId, staffId);
 
   const newSharingType = Number(updateBody.sharingType);
   const oldSharingType = room.sharingType;
@@ -355,11 +386,14 @@ const updateRoom = async (roomId, updateBody) => {
 /**
  * Delete a room and its beds (soft delete)
  * @param {string} roomId
+ * @param {string} [staffId]
  * @returns {Promise<void>}
  */
-const deleteRoom = async (roomId) => {
+const deleteRoom = async (roomId, staffId) => {
   const room = await Room.findById(roomId);
   if (!room) throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
+
+  await assertStaffAccessToPG(room.pgId, staffId);
 
   room.isDeleted = true;
   await room.save();

@@ -13,7 +13,11 @@ const sendResponse = require("../utils/sendResponse");
  */
 const validateCronSecret = (req, res, next) => {
   const secret = req.headers["x-cron-secret"] || req.query.cron_secret;
-  const configuredSecret = process.env.CRON_SECRET || "super-secret-cron-key-12345";
+  const configuredSecret = process.env.CRON_SECRET || (process.env.NODE_ENV !== "production" ? "super-secret-cron-key-12345" : undefined);
+
+  if (!configuredSecret) {
+    return next(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "CRON_SECRET is not configured on the server"));
+  }
 
   if (!secret || secret !== configuredSecret) {
     return next(new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized cron trigger request"));

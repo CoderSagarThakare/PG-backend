@@ -58,13 +58,13 @@ const getMonthlySummary = catchAsync(async (req, res) => {
 
 const updatePayment = catchAsync(async (req, res) => {
   const { pgId } = req.query;
-  const rent = await rentService.updatePayment(req.params.id, req.body, pgId);
+  const rent = await rentService.updatePayment(req.params.id, req.body, pgId, req.user._id);
   sendResponse(res, { data: rent, message: "Payment updated" });
 });
 
 const deletePayment = catchAsync(async (req, res) => {
   const { pgId } = req.query;
-  await rentService.deletePayment(req.params.id, pgId);
+  await rentService.deletePayment(req.params.id, pgId, req.user._id);
   sendResponse(res, { message: "Payment record deleted" });
 });
 
@@ -85,7 +85,6 @@ const getMyRentPayments = catchAsync(async (req, res) => {
 });
 
 const approvePayment = catchAsync(async (req, res) => {
-
   const { pgId } = req.query;
   const rent = await rentService.approvePayment(req.params.id, req.user._id, pgId);
   sendResponse(res, { data: rent, message: "Payment approved successfully" });
@@ -94,7 +93,7 @@ const approvePayment = catchAsync(async (req, res) => {
 const rejectPayment = catchAsync(async (req, res) => {
   const { pgId } = req.query;
   const { notes } = req.body;
-  const rent = await rentService.rejectPayment(req.params.id, pgId, notes);
+  const rent = await rentService.rejectPayment(req.params.id, pgId, notes, req.user._id);
   sendResponse(res, { data: rent, message: "Payment rejected" });
 });
 

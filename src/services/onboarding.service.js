@@ -294,23 +294,13 @@ const assignBed = async (onboardingId, bedId, staffId) => {
     );
   }
 
-  // ── Delegate to roomService (handles gender + availability checks) ────────
+  // ── Delegate to roomService (handles gender + availability checks + BedAssignment audit) ──
   const bed = await roomService.assignTenant(
     bedId,
     onboarding.userId,
-    onboarding.joiningDate
+    onboarding.joiningDate,
+    staffId
   );
-
-  // ── Create BedAssignment audit record ────────────────────────────────────
-  await BedAssignment.create({
-    userId: onboarding.userId,
-    pgId: onboarding.pgId,
-    bedId: bed._id,
-    roomId: bed.roomId,
-    onboardingId: onboarding._id,
-    startDate: onboarding.joiningDate || new Date(),
-    shiftReason: "initial_onboarding",
-  });
 
   // ── Finalize onboarding ───────────────────────────────────────────────────────────
   onboarding.status = "onboarding_completed";

@@ -25,42 +25,42 @@ const getEnquiries = {
   }),
 };
 
-// const getEnquiry = {
-//   params: Joi.object().keys({
-//     enquiryId: Joi.string().custom(objectId).required(),
-//   }),
-// };
+const getEnquiry = {
+  params: Joi.object().keys({
+    enquiryId: Joi.string().custom(objectId).required(),
+  }),
+};
 
-// const updateEnquiry = {
-//   params: Joi.object().keys({
-//     enquiryId: Joi.string().custom(objectId).required(),
-//   }),
-//   body: Joi.object()
-//     .keys({
-//       status: Joi.string().valid(
-//         "interested",
-//         "contacted",
-//         "visited",
-//         "dealDone",
-//         "rejected",
-//         "inventoryFull"
-//       ),
-//       staffRemarks: Joi.string().max(500),
-//       userRemark: Joi.string().max(300),
-//     })
-//     .min(1),
-// };
+const updateEnquiry = {
+  params: Joi.object().keys({
+    enquiryId: Joi.string().custom(objectId).required(),
+  }),
+  body: Joi.object()
+    .keys({
+      status: Joi.string().valid(
+        "interested",
+        "contacted",
+        "visited",
+        "dealDone",
+        "rejected",
+        "inventoryFull"
+      ),
+      staffRemarks: Joi.string().max(500),
+      userRemark: Joi.string().max(300),
+    })
+    .min(1),
+};
 
-// const deleteEnquiry = {
-//   params: Joi.object().keys({
-//     enquiryId: Joi.string().custom(objectId).required(),
-//   }),
-// };
+const deleteEnquiry = {
+  params: Joi.object().keys({
+    enquiryId: Joi.string().custom(objectId).required(),
+  }),
+};
 
 module.exports = {
   createEnquiry,
   getEnquiries,
-  // getEnquiry,
-  // updateEnquiry,
-  // deleteEnquiry,
+  getEnquiry,
+  updateEnquiry,
+  deleteEnquiry,
 };

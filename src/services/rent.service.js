@@ -84,6 +84,21 @@ const checkAndApplyOverduePayments = async (pgIdOrIds) => {
 
 
 /**
+ * Helper to verify staff has ownership/manager access to a PG
+ */
+const assertStaffAccessToPG = async (pgId, staffId) => {
+  if (!staffId) return;
+  const pg = await PG.findById(pgId).select("ownerId managerId isDeleted");
+  if (!pg || pg.isDeleted) {
+    throw new ApiError(httpStatus.NOT_FOUND, "PG not found");
+  }
+  const sId = staffId.toString();
+  if (pg.ownerId?.toString() !== sId && pg.managerId?.toString() !== sId) {
+    throw new ApiError(httpStatus.FORBIDDEN, "Access denied: you are not the owner or manager of this PG");
+  }
+};
+
+/**
  * Create or upsert a rent payment record for a given tenant/bed/month.
  */
 const recordPayment = async (data, recordedBy) => {
@@ -93,6 +108,7 @@ const recordPayment = async (data, recordedBy) => {
   const bed = await Bed.findById(bedId).populate("roomId").populate("pgId");
   if (!bed || bed.isDeleted) throw new ApiError(httpStatus.NOT_FOUND, "Bed not found");
   if (String(bed.userId) !== String(userId)) throw new ApiError(httpStatus.BAD_REQUEST, "User is not assigned to this bed");
+  await assertStaffAccessToPG(bed.pgId?._id || bed.pgId, recordedBy);
 
   const initialPaid = amountPaid ?? amount;
   let status = inputStatus;
@@ -242,7 +258,7 @@ const getMonthlySummary = async (pgId, rentMonth) => {
 /**
  * Update a single rent payment (partial to full, add reference, etc.)
  */
-const updatePayment = async (rentId, updates, pgId) => {
+const updatePayment = async (rentId, updates, pgId, staffId) => {
   rentId = validateAndGetCleanId(rentId, "Rent record");
   if (pgId && typeof pgId === "string") pgId = pgId.trim();
 
@@ -251,6 +267,7 @@ const updatePayment = async (rentId, updates, pgId) => {
 
   const rent = await RentPayment.findOne(query);
   if (!rent) throw new ApiError(httpStatus.NOT_FOUND, "Rent record not found");
+  await assertStaffAccessToPG(rent.pgId, staffId);
 
   const paid = updates.amountPaid !== undefined ? updates.amountPaid : rent.amountPaid;
   const baseDue = updates.amount !== undefined ? updates.amount : rent.amount;
@@ -293,7 +310,7 @@ const updatePayment = async (rentId, updates, pgId) => {
 /**
  * Soft-delete a rent record.
  */
-const deletePayment = async (rentId, pgId) => {
+const deletePayment = async (rentId, pgId, staffId) => {
   rentId = validateAndGetCleanId(rentId, "Rent record");
   if (pgId && typeof pgId === "string") pgId = pgId.trim();
 
@@ -302,6 +319,7 @@ const deletePayment = async (rentId, pgId) => {
 
   const rent = await RentPayment.findOne(query);
   if (!rent) throw new ApiError(httpStatus.NOT_FOUND, "Rent record not found");
+  await assertStaffAccessToPG(rent.pgId, staffId);
   rent.isDeleted = true;
   await rent.save();
 };
@@ -312,6 +330,7 @@ const deletePayment = async (rentId, pgId) => {
  * Useful for bulk rent generation at month start.
  */
 const generateMonthlyRent = async (pgId, rentMonth, recordedBy) => {
+  await assertStaffAccessToPG(pgId, recordedBy);
   const now = new Date();
   const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   if (rentMonth > currentMonthStr) {
@@ -411,6 +430,7 @@ const approvePayment = async (rentId, recordedBy, pgId) => {
 
   const rent = await RentPayment.findOne(query);
   if (!rent) throw new ApiError(httpStatus.NOT_FOUND, "Rent record not found");
+  await assertStaffAccessToPG(rent.pgId, recordedBy);
 
   const totalDue = rent.amount + (rent.penaltyAmount || 0);
   const paid = rent.amountPaid || totalDue;
@@ -428,7 +448,7 @@ const approvePayment = async (rentId, recordedBy, pgId) => {
 /**
  * Owner/Manager rejects a payment proof (resets back to pending)
  */
-const rejectPayment = async (rentId, pgId, rejectionNotes) => {
+const rejectPayment = async (rentId, pgId, rejectionNotes, staffId) => {
   rentId = validateAndGetCleanId(rentId, "Rent record");
   if (pgId && typeof pgId === "string") pgId = pgId.trim();
 
@@ -437,7 +457,7 @@ const rejectPayment = async (rentId, pgId, rejectionNotes) => {
 
   const rent = await RentPayment.findOne(query);
   if (!rent) throw new ApiError(httpStatus.NOT_FOUND, "Rent record not found");
-
+  await assertStaffAccessToPG(rent.pgId, staffId);
 
   rent.status = "pending";
   rent.notes = rejectionNotes ? `Rejection reason: ${rejectionNotes}` : "Payment proof rejected by owner";

@@ -91,6 +91,8 @@ const createOrUpdateReview = async (userId, pgId, rating, comment) => {
   return review;
 };
 
+const awsService = require("./aws.service");
+
 /**
  * Get reviews for a PG with pagination
  * @param {string} pgId
@@ -103,15 +105,28 @@ const getPGReviews = async (pgId, options = {}) => {
   const skip = (page - 1) * limit;
 
   const reviews = await Review.find({ pgId })
-    .populate("userId", "name avatar profilePicture")
+    .populate("userId", "name picture profileImageKey")
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
 
+  const reviewsWithUrls = [];
+  for (const rev of reviews) {
+    const revObj = rev.toObject();
+    if (revObj.userId?.profileImageKey) {
+      try {
+        revObj.userId.picture = await awsService.getFileUrl(revObj.userId.profileImageKey);
+      } catch {
+        // Fallback to default picture if S3 signed URL fails
+      }
+    }
+    reviewsWithUrls.push(revObj);
+  }
+
   const total = await Review.countDocuments({ pgId });
 
   return {
-    reviews,
+    reviews: reviewsWithUrls,
     page,
     limit,
     totalPages: Math.ceil(total / limit),

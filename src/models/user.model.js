@@ -126,8 +126,13 @@ const userSchema = mongoose.Schema(
     otp: {
       type: Number,
       default: -1,
+      private: true,
     },
-    otpGeneratedTime: { type: String, default: undefined },
+    otpGeneratedTime: {
+      type: String,
+      default: undefined,
+      private: true,
+    },
     vehicleType: {
       type: String,
       enum: ["none", "bike", "car"],

@@ -84,4 +84,7 @@ module.exports = {
       bucketName: envVars.AWS_S3_BUCKET_NAME,
     },
   },
+  reCaptcha: {
+    secret: envVars.RECAPTCHA_SECRET,
+  },
 };

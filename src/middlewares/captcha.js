@@ -6,7 +6,7 @@ const catchAsync = require("../utils/catchAsync");
 
 // Captcha verification middleware
 const verifyCaptcha = catchAsync(async (req, res, next) => {
-  if (req.query.captcha !== "false") {
+  if (req.query.captcha !== "false" && config.reCaptcha?.secret) {
     try {
       const captcha = req.body.captcha;
       delete req.body.captcha;
@@ -32,12 +32,16 @@ const verifyCaptcha = catchAsync(async (req, res, next) => {
         );
       }
     } catch (error) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
       throw new ApiError(
         httpStatus.UNPROCESSABLE_ENTITY, // UNPROCESSABLE_ENTITY : 422
         error.message || error
       );
     }
   } else {
+    delete req.body.captcha;
     next();
   }
 });

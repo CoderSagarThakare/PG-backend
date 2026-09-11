@@ -35,7 +35,7 @@ const assignTenant = catchAsync(async (req, res) => {
   const { bedId } = req.params;
   const { userId, joiningDate } = req.body;
   
-  const bed = await roomService.assignTenant(bedId, userId, joiningDate);
+  const bed = await roomService.assignTenant(bedId, userId, joiningDate, req.user.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -47,7 +47,7 @@ const assignTenant = catchAsync(async (req, res) => {
 const unassignTenant = catchAsync(async (req, res) => {
   const { bedId } = req.params;
   
-  const bed = await roomService.unassignTenant(bedId);
+  const bed = await roomService.unassignTenant(bedId, req.user.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -59,7 +59,7 @@ const unassignTenant = catchAsync(async (req, res) => {
 const updateBed = catchAsync(async (req, res) => {
   const { bedId } = req.params;
   
-  const bed = await roomService.updateBed(bedId, req.body);
+  const bed = await roomService.updateBed(bedId, req.body, req.user.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -70,7 +70,7 @@ const updateBed = catchAsync(async (req, res) => {
 
 const updateRoom = catchAsync(async (req, res) => {
   const { roomId } = req.params;
-  const room = await roomService.updateRoom(roomId, req.body);
+  const room = await roomService.updateRoom(roomId, req.body, req.user.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -81,7 +81,7 @@ const updateRoom = catchAsync(async (req, res) => {
 
 const deleteRoom = catchAsync(async (req, res) => {
   const { roomId } = req.params;
-  await roomService.deleteRoom(roomId);
+  await roomService.deleteRoom(roomId, req.user.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -91,6 +91,7 @@ const deleteRoom = catchAsync(async (req, res) => {
 
 const getEligibleTenants = catchAsync(async (req, res) => {
   const { pgId } = req.params;
+  await PgService.getPGById(pgId, req.user.id);
   const { users, genderMismatchCount } = await roomService.getEligibleTenants(pgId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
