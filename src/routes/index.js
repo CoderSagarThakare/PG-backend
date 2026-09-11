@@ -27,6 +27,7 @@ const defaultRoutes = [
   { path: "/review", route: require("./review.route") },
   { path: "/onboarding", route: require("./onboarding.route") }, // Tenant onboarding lifecycle
   { path: "/pre-booking", route: require("./preBooking.route") },
+  { path: "/analytics", route: require("./analytics.route") }, // Business intelligence & analytics
 ];
 
 defaultRoutes.map((route) => {
